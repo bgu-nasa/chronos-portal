@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-
+/** @author aaron-iz */
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
