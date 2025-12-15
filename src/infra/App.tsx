@@ -1,0 +1,39 @@
+/** @author aaron-iz */
+import { Route, Routes } from "react-router";
+import { ApplicationRoutesRepository } from "./federation";
+import { AuthenticatedPageFilter, PublicLayout } from "./theme";
+
+function App() {
+    const publicRoutes = ApplicationRoutesRepository.getPublicRoutes();
+    const privateRoutes = ApplicationRoutesRepository.getAuthenticatedRoutes();
+
+    const getRouteKey = (route: any, index: number) => {
+        return `${route.name}-r${index}`;
+    };
+
+    return (
+        <Routes>
+            <Route element={<PublicLayout />}>
+                {publicRoutes.map((route, index) => (
+                    <Route
+                        key={getRouteKey(route, index)}
+                        path={route.path}
+                        element={route.element}
+                    />
+                ))}
+            </Route>
+
+            <Route element={<AuthenticatedPageFilter />}>
+                {privateRoutes.map((route, index) => (
+                    <Route
+                        key={getRouteKey(route, index)}
+                        path={route.path}
+                        element={route.element}
+                    />
+                ))}
+            </Route>
+        </Routes>
+    );
+}
+
+export default App;

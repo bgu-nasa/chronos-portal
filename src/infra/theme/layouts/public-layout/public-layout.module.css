@@ -1,0 +1,27 @@
+/** @author aaron-iz */
+.publicLayoutHeaderStack {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 1.25rem;
+    height: 100%;
+}
+
+.publicLayoutNavigationContainer {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: .75rem;
+}
+
+.publicLayoutNavigationLink {
+    min-width: 100px;
+    width: fit-content;
+}
+
+.publicLayoutMain {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}

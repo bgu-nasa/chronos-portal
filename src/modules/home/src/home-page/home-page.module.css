@@ -1,0 +1,20 @@
+.homePageContainer {
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    padding: 2rem;
+}
+
+.homePageFeatureTabs {
+    margin-top: 2rem;
+    min-width: 480px;
+    max-width: 800px;
+}
+
+.homePageHero {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 1.25rem;
+}
