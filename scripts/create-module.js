@@ -40,7 +40,6 @@ console.log(`Module directory: ${moduleDir}`);
 const directories = [
     moduleDir,
     path.join(moduleDir, '.mock'),
-    path.join(moduleDir, '.static'),
     path.join(moduleDir, 'src')
 ];
 
@@ -52,7 +51,6 @@ directories.forEach(dir => {
 // Create empty index.ts files
 const emptyIndexFiles = [
     path.join(moduleDir, '.mock', 'index.ts'),
-    path.join(moduleDir, '.static', 'index.ts'),
     path.join(moduleDir, 'src', 'index.ts')
 ];
 
@@ -60,6 +58,15 @@ emptyIndexFiles.forEach(file => {
     fs.writeFileSync(file, '', 'utf8');
     console.log(`Created empty file: ${file}`);
 });
+
+// Create directory in root public folder and resources.json file
+const publicModuleDir = path.join(__dirname, '..', 'public', kebabCaseName);
+fs.mkdirSync(publicModuleDir, { recursive: true });
+console.log(`Created directory: ${publicModuleDir}`);
+
+const resourcesJsonPath = path.join(publicModuleDir, 'resources.json');
+fs.writeFileSync(resourcesJsonPath, '', 'utf8');
+console.log(`Created empty file: ${resourcesJsonPath}`);
 
 // Create root index.ts
 const rootIndexContent = `export * from "./module.config";
@@ -89,9 +96,9 @@ console.log(`\nModule structure:`);
 console.log(`src/modules/${kebabCaseName}/`);
 console.log(`├── .mock/`);
 console.log(`│   └── index.ts`);
-console.log(`├── .static/`);
-console.log(`│   └── index.ts`);
 console.log(`├── src/`);
 console.log(`│   └── index.ts`);
 console.log(`├── index.ts`);
 console.log(`└── module.config.ts`);
+console.log(`\npublic/${kebabCaseName}/`);
+console.log(`└── resources.json`);
