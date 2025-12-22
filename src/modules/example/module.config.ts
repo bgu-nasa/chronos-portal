@@ -15,7 +15,7 @@ export const moduleConfig: ModuleConfig = {
         },
         {
             name: "example-dashboard-page",
-            path: "dashboard", // Route will be /example/dashboard
+            path: "/dashboard", // Route will be /example/dashboard
             element: React.createElement(ExampleDashboardPage),
             authorize: true,
         },
