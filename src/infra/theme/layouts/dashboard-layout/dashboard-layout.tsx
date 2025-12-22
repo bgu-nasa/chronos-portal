@@ -1,3 +1,4 @@
+/** @author aaron-iz */
 import { Outlet } from "react-router";
 import styles from "./dashboard-layout.module.css";
 
