@@ -1,7 +1,11 @@
 /** @author aaron-iz */
 import { Route, Routes } from "react-router";
 import { ApplicationRoutesRepository } from "./federation";
-import { AuthenticatedPageFilter, PublicLayout } from "./theme";
+import {
+    AuthenticatedPageFilter,
+    DashboardLayout,
+    PublicLayout,
+} from "./theme";
 
 function App() {
     const publicRoutes = ApplicationRoutesRepository.getPublicRoutes();
@@ -24,13 +28,15 @@ function App() {
             </Route>
 
             <Route element={<AuthenticatedPageFilter />}>
-                {privateRoutes.map((route, index) => (
-                    <Route
-                        key={getRouteKey(route, index)}
-                        path={route.path}
-                        element={route.element}
-                    />
-                ))}
+                <Route element={<DashboardLayout />}>
+                    {privateRoutes.map((route, index) => (
+                        <Route
+                            key={getRouteKey(route, index)}
+                            path={route.path}
+                            element={route.element}
+                        />
+                    ))}
+                </Route>
             </Route>
         </Routes>
     );

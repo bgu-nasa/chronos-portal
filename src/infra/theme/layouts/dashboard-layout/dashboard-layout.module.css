@@ -1,0 +1,43 @@
+/** @author aaron-iz */
+.dashboardLayoutContainer {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    width: 100%;
+}
+
+.dashboardHeader {
+    position: sticky;
+    height: 60px;
+    top: 0;
+    z-index: 1000;
+    width: 100%;
+
+    /*temp*/
+    background-color: aquamarine;
+    color: black;
+}
+
+.dashboardScreen {
+    flex: 1;
+    display: flex;
+    overflow: hidden;
+}
+
+.dashboardSidebar {
+    width: 250px;
+    height: 100%;
+    overflow-y: auto;
+
+    /*temp*/
+    background-color: mediumvioletred;
+    color: black;
+}
+
+.dashboardContent {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    height: 100%;
+    overflow-y: auto;
+}
