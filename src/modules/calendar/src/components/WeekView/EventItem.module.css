@@ -1,0 +1,26 @@
+.eventItem {
+  position: absolute;
+  color: var(--mantine-color-white);
+  padding: 4px;
+  border-radius: 4px;
+  cursor: pointer;
+  box-shadow: var(--mantine-shadow-xs);
+  overflow: hidden;
+  transition: opacity 0.2s ease;
+}
+
+.eventItem:hover {
+  opacity: 0.9;
+}
+
+.eventTitle {
+  display: block;
+}
+
+.popoverDropdown {
+  pointer-events: none;
+}
+
+.popoverStack {
+  min-width: 200px;
+}

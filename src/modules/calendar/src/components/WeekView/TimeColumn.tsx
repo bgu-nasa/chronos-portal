@@ -2,6 +2,9 @@
 import React from 'react';
 import { Box, Text } from '@mantine/core';
 
+import styles from './TimeColumn.module.css';
+import resources from './TimeColumn.resources.json';
+
 interface TimeColumnProps {
   hourHeight?: number;
   dayStartHour?: number;
@@ -20,22 +23,20 @@ export const TimeColumn: React.FC<TimeColumnProps> = ({
 
     // Simple 12-hour format logic
     const h = hour % 24;
-    if (h === 0) displayHour = '12 AM';
-    else if (h < 12) displayHour = `${h} AM`;
-    else if (h === 12) displayHour = '12 PM';
-    else displayHour = `${h - 12} PM`;
+    if (h === 0) displayHour = resources.labels.midnight;
+    else if (h < 12) displayHour = `${h} ${resources.labels.am}`;
+    else if (h === 12) displayHour = resources.labels.noon;
+    else displayHour = `${h - 12} ${resources.labels.pm}`;
 
     return (
       <Box
         key={`time-${hour}`}
+        className={styles.timeSlot}
         style={{
-          height: i === hoursPerDay ? 0 : `${hourHeight}px`,
-          position: 'relative',
-          textAlign: 'right',
-          paddingRight: '8px'
+          height: i === hoursPerDay ? 0 : `${hourHeight}px`
         }}
       >
-        <Text size="xs" c="dimmed" style={{ transform: 'translateY(-50%)' }}>
+        <Text size="xs" c="dimmed" className={styles.timeLabel}>
           {displayHour}
         </Text>
       </Box>
@@ -43,14 +44,7 @@ export const TimeColumn: React.FC<TimeColumnProps> = ({
   });
 
   return (
-    <Box
-      style={{
-        width: '60px',
-        flexShrink: 0,
-        backgroundColor: 'var(--mantine-color-body)',
-        borderRight: '1px solid var(--mantine-color-gray-3)'
-      }}
-    >
+    <Box className={styles.timeColumn}>
       {times}
     </Box>
   );

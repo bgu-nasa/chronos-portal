@@ -5,6 +5,8 @@ import { TimeColumn } from './TimeColumn';
 import { DayColumn } from './DayColumn';
 import type { CalendarEvent } from '@/modules/calendar/src/types';
 
+import styles from './TimeGrid.module.css';
+
 interface TimeGridProps {
   weekDates: Date[];
   events: CalendarEvent[];
@@ -21,8 +23,8 @@ export const TimeGrid: React.FC<TimeGridProps> = ({
   hoursPerDay = 24
 }) => {
   return (
-    <ScrollArea style={{ height: 'calc(100vh - 160px)' }} type="auto">
-      <Box style={{ display: 'flex', padding: '10px 0' }}>
+    <ScrollArea className={styles.scrollArea} type="auto">
+      <Box className={styles.gridContent}>
         <TimeColumn
           hourHeight={hourHeight}
           dayStartHour={dayStartHour}

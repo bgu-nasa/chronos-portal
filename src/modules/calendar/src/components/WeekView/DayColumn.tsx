@@ -5,6 +5,9 @@ import { useInterval } from '@mantine/hooks';
 import type { CalendarEvent } from '@/modules/calendar/src/types';
 import { EventItem } from './EventItem';
 
+import styles from './DayColumn.module.css';
+import resources from './DayColumn.resources.json';
+
 interface DayColumnProps {
   date: Date;
   events: CalendarEvent[];
@@ -17,19 +20,19 @@ export const DayColumn: React.FC<DayColumnProps> = ({
   date,
   events,
   hourHeight = 60,
-  dayStartHour = 0,
+  dayStartHour = 8,
   hoursPerDay = 24
 }) => {
   const [now, setNow] = useState(new Date());
 
-  const interval = useInterval(() => setNow(new Date()), 60000);
+  const interval = useInterval(() => setNow(new Date()), resources.intervals.nowUpdate);
 
   useEffect(() => {
     interval.start();
     return interval.stop;
-  }, []);
+  }, [interval]);
 
-  const isToday = now.toDateString() === date.toDateString();
+  const isToday = date.toDateString() === now.toDateString();
 
   // Generate grid lines
   const gridLines = useMemo(() => {
@@ -37,41 +40,37 @@ export const DayColumn: React.FC<DayColumnProps> = ({
     return hours.map((hour) => (
       <Box
         key={`grid-line-${hour}`}
+        className={styles.gridLine}
         style={{
-          position: 'absolute',
-          top: `${hour * hourHeight}px`,
-          left: 0,
-          right: 0,
-          height: '1px',
-          backgroundColor: 'var(--mantine-color-gray-1)',
-          borderBottom: '1px solid var(--mantine-color-gray-0)'
+          top: `${hour * hourHeight}px`
         }}
       />
     ));
   }, [hoursPerDay, hourHeight]);
 
-  // Check if event belongs to this day
-  const dayEvents = useMemo(() => {
-    const filtered = events.filter(event =>
-      event.start.getDate() === date.getDate() &&
-      event.start.getMonth() === date.getMonth() &&
-      event.start.getFullYear() === date.getFullYear()
-    );
+  // Handle current time indicator position
+  let currentTimeTop = null;
+  if (isToday) {
+    const currentHour = now.getHours() + now.getMinutes() / 60;
+    if (currentHour >= dayStartHour && currentHour <= dayStartHour + hoursPerDay) {
+      currentTimeTop = (currentHour - dayStartHour) * hourHeight;
+    }
+  }
 
-    // Sort by start time
-    return filtered.sort((a, b) => a.start.getTime() - b.start.getTime());
+  const dailyEvents = useMemo(() => {
+    return events.filter((e) => e.start.toDateString() === date.toDateString());
   }, [events, date]);
 
-  // Overlap algorithm
+  // Positioning algorithm for overlapping events
   const positionedEvents = useMemo(() => {
-    const results: Array<{ event: CalendarEvent; left: number; width: number }> = [];
+    const sorted = [...dailyEvents].sort((a, b) => a.start.getTime() - b.start.getTime());
     const columns: CalendarEvent[][] = [];
 
-    dayEvents.forEach(event => {
+    for (const event of sorted) {
       let placed = false;
       for (const column of columns) {
-        const lastEventInColumn = column.at(-1);
-        if (lastEventInColumn && event.start >= lastEventInColumn.end) {
+        const lastInColumn = column.at(-1);
+        if (lastInColumn && event.start >= lastInColumn.end) {
           column.push(event);
           placed = true;
           break;
@@ -80,74 +79,40 @@ export const DayColumn: React.FC<DayColumnProps> = ({
       if (!placed) {
         columns.push([event]);
       }
-    });
+    }
 
-    columns.forEach((column, colIndex) => {
-      const width = 100 / columns.length;
-      const left = colIndex * width;
-      column.forEach(event => {
-        results.push({ event, left, width });
-      });
-    });
-
-    return results;
-  }, [dayEvents]);
-
-  const currentTimeTop = useMemo(() => {
-    if (!isToday) return null;
-    const hours = now.getHours() + now.getMinutes() / 60;
-    return (hours - dayStartHour) * hourHeight;
-  }, [isToday, now, dayStartHour, hourHeight]);
+    return columns.flatMap((column, colIndex) =>
+      column.map((event) => ({
+        ...event,
+        left: (colIndex / columns.length) * 100,
+        width: 100 / columns.length,
+      }))
+    );
+  }, [dailyEvents]);
 
   return (
-    <Box
-      style={{
-        position: 'relative',
-        height: `${hoursPerDay * hourHeight}px`,
-        flex: 1,
-        borderRight: '1px solid var(--mantine-color-gray-3)',
-        backgroundColor: isToday ? 'var(--mantine-color-blue-0)' : 'var(--mantine-color-body)',
-        transition: 'background-color 0.3s ease',
-        overflow: 'hidden'
-      }}
-    >
+    <Box className={`${styles.dayColumn} ${isToday ? styles.todayColumn : styles.notTodayColumn}`}>
       {gridLines}
 
       {isToday && currentTimeTop !== null && (
         <Box
+          className={styles.nowLine}
           style={{
-            position: 'absolute',
-            top: `${currentTimeTop}px`,
-            left: 0,
-            right: 0,
-            height: '2px',
-            backgroundColor: 'var(--mantine-color-red-6)',
-            zIndex: 20,
-            pointerEvents: 'none'
+            top: `${currentTimeTop}px`
           }}
         >
-          <Box
-            style={{
-              position: 'absolute',
-              top: '-4px',
-              left: '-5px',
-              width: '10px',
-              height: '10px',
-              borderRadius: '50%',
-              backgroundColor: 'var(--mantine-color-red-6)'
-            }}
-          />
+          <Box className={styles.nowDot} />
         </Box>
       )}
 
-      {positionedEvents.map(({ event, left, width }) => (
+      {positionedEvents.map((event) => (
         <EventItem
           key={event.id}
           event={event}
           hourHeight={hourHeight}
           dayStartHour={dayStartHour}
-          left={left}
-          width={width}
+          left={event.left}
+          width={event.width}
         />
       ))}
     </Box>

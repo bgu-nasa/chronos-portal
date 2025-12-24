@@ -6,6 +6,9 @@ import { WeekHeader } from './WeekHeader';
 import { TimeGrid } from './TimeGrid';
 import type { CalendarEvent } from '@/modules/calendar/src/types';
 
+import styles from './WeekView.module.css';
+import resources from './WeekView.resources.json';
+
 interface WeekViewProps {
   initialDate?: Date;
   events: CalendarEvent[];
@@ -16,8 +19,8 @@ interface WeekViewProps {
 export const WeekView: React.FC<WeekViewProps> = ({
   initialDate = new Date(),
   events,
-  dayStartHour = 8,
-  dayEndHour = 20
+  dayStartHour = resources.config.defaultStartHour,
+  dayEndHour = resources.config.defaultEndHour
 }) => {
   const [currentDate, setCurrentDate] = useState(initialDate);
 
@@ -63,19 +66,19 @@ export const WeekView: React.FC<WeekViewProps> = ({
   const hoursPerDay = Math.max(1, dayEndHour - dayStartHour);
 
   return (
-    <Paper shadow="xs" p="md" withBorder style={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
+    <Paper shadow="xs" p="md" withBorder className={styles.weekViewPaper}>
       <Group justify="space-between" mb="md">
         <Group>
-          <Button variant="default" onClick={handleToday}>Today</Button>
+          <Button variant="default" onClick={handleToday}>{resources.navigation.today}</Button>
           <Group gap={4}>
-            <Button variant="subtle" size="compact-md" onClick={handlePreviousWeek}>&lt;</Button>
-            <Button variant="subtle" size="compact-md" onClick={handleNextWeek}>&gt;</Button>
+            <Button variant="subtle" size="compact-md" onClick={handlePreviousWeek}>{resources.navigation.prev}</Button>
+            <Button variant="subtle" size="compact-md" onClick={handleNextWeek}>{resources.navigation.next}</Button>
           </Group>
           <Text size="xl" fw={700}>{monthLabel}</Text>
         </Group>
       </Group>
 
-      <Box style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
+      <Box className={styles.navigationContainer}>
         <WeekHeader weekDates={weekDates} />
         <TimeGrid
           weekDates={weekDates}

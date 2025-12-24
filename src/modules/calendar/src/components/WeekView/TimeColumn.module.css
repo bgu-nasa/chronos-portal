@@ -1,0 +1,16 @@
+.timeColumn {
+  width: 60px;
+  flex-shrink: 0;
+  background-color: var(--mantine-color-body);
+  border-right: 1px solid var(--mantine-color-gray-3);
+}
+
+.timeSlot {
+  position: relative;
+  text-align: right;
+  padding-right: 8px;
+}
+
+.timeLabel {
+  transform: translateY(-50%);
+}

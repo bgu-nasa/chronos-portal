@@ -1,65 +1,33 @@
 /** @author noamarg */
-
 import React from 'react';
 import { Box, Text } from '@mantine/core';
+import styles from './WeekHeader.module.css';
+import resources from './WeekHeader.resources.json';
 
 interface WeekHeaderProps {
   weekDates: Date[];
 }
 
 export const WeekHeader: React.FC<WeekHeaderProps> = ({ weekDates }) => {
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+
   return (
-    <Box
-      style={{
-        display: 'flex',
-        borderBottom: '1px solid var(--mantine-color-gray-3)',
-        paddingBottom: '8px',
-        paddingTop: '16px'
-      }}
-    >
-      {/* Spacer for TimeColumn */}
-      <Box style={{ width: '60px', flexShrink: 0 }} />
-
+    <Box className={styles.weekHeaderContainer}>
       {weekDates.map((date) => {
-        const isToday = new Date().toDateString() === date.toDateString();
-
+        const isToday = date.getTime() === today.getTime();
         return (
-          <Box
-            key={date.toISOString()}
-            style={{
-              flex: 1,
-              textAlign: 'center'
-            }}
-          >
-            <Text
-              size="sm"
-              c={isToday ? 'blue' : 'dimmed'}
-              fw={500}
-            >
-              {date.toLocaleDateString('en-US', { weekday: 'short' })}
+          <Box key={date.toISOString()} className={styles.dayHeader}>
+            <Text size="xs" fw={isToday ? 700 : 500} c={isToday ? 'blue' : 'dimmed'} tt="uppercase">
+              {date.toLocaleDateString('default', { weekday: resources.formatting.dayName as "short" | "long" | "narrow" })}
             </Text>
-            <Box
-              style={{
-                display: 'inline-block',
-                borderRadius: '50%',
-                width: '30px',
-                height: '30px',
-                lineHeight: '30px',
-                backgroundColor: isToday ? 'var(--mantine-color-blue-filled)' : 'transparent',
-              }}
+            <Text
+              className={`${styles.dayNumber} ${isToday ? styles.activeDay : ''}`}
+              size="lg"
+              fw={isToday ? 700 : 400}
             >
-              <Text
-                size="xl"
-                c={isToday ? 'white' : 'dark'}
-                fw={700}
-                style={{
-                  lineHeight: '30px',
-                  display: 'block'
-                }}
-              >
-                {date.getDate()}
-              </Text>
-            </Box>
+              {date.toLocaleDateString('default', { day: resources.formatting.dayNumber as "numeric" | "2-digit" })}
+            </Text>
           </Box>
         );
       })}
