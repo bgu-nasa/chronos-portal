@@ -9,6 +9,7 @@ import { useThemeStore } from "./theme/state";
 import App from "./App";
 import "@mantine/core/styles.css";
 import "primereact/resources/primereact.min.css";
+import "./theme/primereact-overrides.css";
 
 const ThemedApp = () => {
     const colorScheme = useThemeStore((state) => state.colorScheme);
