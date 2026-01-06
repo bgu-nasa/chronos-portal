@@ -1,4 +1,4 @@
-import { Button, Tooltip } from "@mantine/core";
+import { Button } from "@mantine/core";
 import resources from "@/modules/management/src/pages/departments-page/departments-page.resources.json";
 
 interface DepartmentActionsProps {
