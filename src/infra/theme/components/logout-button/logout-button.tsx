@@ -10,6 +10,9 @@ export default function LogoutButton() {
         // Clear the authentication token
         $app.token.clearToken();
 
+        // Clear organization state
+        $app.organization.clearOrganization();
+
         // Navigate to login page
         navigate("/", { replace: true });
     };
