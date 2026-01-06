@@ -1,4 +1,4 @@
-import { Button } from "@mantine/core";
+import { Button, Tooltip } from "@mantine/core";
 import resources from "@/modules/auth/src/pages/users/users-page.resources.json";
 
 interface UserActionsProps {
@@ -9,7 +9,7 @@ interface UserActionsProps {
 }
 
 export function UserActions({
-    selectedUser,
+    selectedUser, // will be used in the future
     onCreateClick,
     onEditClick,
     onDeleteClick,
@@ -17,12 +17,16 @@ export function UserActions({
     return (
         <Button.Group mb="md">
             <Button onClick={onCreateClick}>{resources.createButton}</Button>
-            <Button onClick={onEditClick} disabled={!selectedUser}>
-                {resources.editButton}
-            </Button>
-            <Button onClick={onDeleteClick} disabled={!selectedUser}>
-                {resources.deleteButton}
-            </Button>
+            <Tooltip label={resources.underDevelopmentTooltip}>
+                <Button onClick={onEditClick} disabled>
+                    {resources.editButton}
+                </Button>
+            </Tooltip>
+            <Tooltip label={resources.underDevelopmentTooltip}>
+                <Button onClick={onDeleteClick} disabled>
+                    {resources.deleteButton}
+                </Button>
+            </Tooltip>
         </Button.Group>
     );
 }

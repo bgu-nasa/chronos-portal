@@ -9,5 +9,6 @@
     "emailColumn": "Email",
     "verifiedColumn": "Verified",
     "verified": "Verified",
-    "unverified": "Unverified"
+    "unverified": "Unverified",
+    "underDevelopmentTooltip": "This feature is still under development"
 }
