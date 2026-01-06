@@ -1,7 +1,7 @@
 import type { ModuleConfig } from "@/infra";
 import { DashboardHomePage, HomePage } from "./src";
 import React from "react";
-import { HiOutlineHome } from "react-icons/hi";
+import { HomeIcon } from "@/common/icons";
 
 export const moduleConfig: ModuleConfig = {
     name: "Home",
@@ -37,7 +37,7 @@ export const moduleConfig: ModuleConfig = {
             location: "dashboard",
             label: "Home",
             href: "/dashboard/home",
-            icon: React.createElement(HiOutlineHome),
+            icon: React.createElement(HomeIcon),
             order: 0,
         },
     ],

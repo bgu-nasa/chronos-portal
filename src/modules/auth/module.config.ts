@@ -1,7 +1,7 @@
 import type { ModuleConfig } from "@/infra";
 import React from "react";
 import { LoginPage, RegisterPage, UsersPage } from "./src/pages";
-import { HiOutlineUsers } from "react-icons/hi";
+import { UsersIcon } from "@/common/icons";
 
 export const moduleConfig: ModuleConfig = {
     name: "Auth",
@@ -36,7 +36,7 @@ export const moduleConfig: ModuleConfig = {
             label: "Users",
             href: "/auth/users",
             location: "dashboard",
-            icon: React.createElement(HiOutlineUsers),
+            icon: React.createElement(UsersIcon),
         },
     ],
 };
