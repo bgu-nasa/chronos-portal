@@ -44,6 +44,9 @@ export interface OrganizationInformation {
     name: string;
     deleted: boolean;
     deletedTime: string; // DateTime from C# - ISO string
+    userEmail: string;
+    userFullName: string;
+    avatarUrl: string | null;
     userRoles: RoleAssignmentResponse[];
     departments: DepartmentResponse[];
 }
