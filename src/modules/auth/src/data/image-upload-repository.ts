@@ -1,6 +1,6 @@
 /**
  * Image upload data repository
- * Uses imgbb.com free API for image hosting
+ * Currently disabled - no working anonymous upload service found
  */
 
 /**
@@ -15,66 +15,16 @@ export interface ImageUploadResponse {
  * Image upload repository class
  */
 export class ImageUploadRepository {
-    // Using a public demo key for imgbb - in production, this should be environment variable
-    private readonly API_KEY = "demo_key";
-    private readonly API_URL = "https://api.imgbb.com/1/upload";
-
     /**
      * Upload an image file
      * @param file - Image file to upload
      * @returns Image URL and display URL
      */
     async uploadImage(file: File): Promise<ImageUploadResponse> {
-        try {
-            // Convert file to base64
-            const base64 = await this.fileToBase64(file);
-
-            // Create form data
-            const formData = new FormData();
-            formData.append("key", this.API_KEY);
-            formData.append("image", base64.split(",")[1]); // Remove data:image/...;base64, prefix
-
-            // Upload to imgbb
-            const response = await fetch(
-                `${this.API_URL}?key=${this.API_KEY}`,
-                {
-                    method: "POST",
-                    body: formData,
-                }
-            );
-
-            if (!response.ok) {
-                throw new Error("Failed to upload image");
-            }
-
-            const data = await response.json();
-
-            if (!data.success) {
-                throw new Error(data.error?.message || "Upload failed");
-            }
-
-            return {
-                url: data.data.url,
-                displayUrl: data.data.display_url || data.data.url,
-            };
-        } catch (error) {
-            console.error("Error uploading image:", error);
-            throw new Error("Failed to upload image. Please try again.");
-        }
-    }
-
-    /**
-     * Convert file to base64 string
-     * @param file - File to convert
-     * @returns Base64 encoded string
-     */
-    private fileToBase64(file: File): Promise<string> {
-        return new Promise((resolve, reject) => {
-            const reader = new FileReader();
-            reader.readAsDataURL(file);
-            reader.onload = () => resolve(reader.result as string);
-            reader.onerror = (error) => reject(error);
-        });
+        console.log("Image upload is not working right now");
+        throw new Error(
+            "Image upload service is currently unavailable. Please try again later."
+        );
     }
 
     /**
