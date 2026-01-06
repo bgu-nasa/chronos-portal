@@ -17,11 +17,9 @@ export function DepartmentActions({
     return (
         <Button.Group mb="md">
             <Button onClick={onCreateClick}>{resources.createButton}</Button>
-            <Tooltip label={resources.underDevelopmentTooltip}>
-                <Button onClick={onEditClick} disabled>
-                    {resources.editButton}
-                </Button>
-            </Tooltip>
+            <Button onClick={onEditClick} disabled={!selectedDepartment}>
+                {resources.editButton}
+            </Button>
             <Tooltip label={resources.underDevelopmentTooltip}>
                 <Button onClick={onDeleteClick} disabled>
                     {resources.deleteButton}
