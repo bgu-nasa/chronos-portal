@@ -3,6 +3,5 @@
 user@test-chronos.net
 User
 Tester
-1234ABCD0
-
+1234AbcD0
 Organization0
