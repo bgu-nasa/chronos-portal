@@ -15,5 +15,6 @@
     "editorCancelButton": "Cancel",
     "editorSaveButton": "Save",
     "editorCreateButton": "Create",
-    "editorNameRequired": "Department name is required"
+    "editorNameRequired": "Department name is required",
+    "emptyStateMessage": "No departments yet. Get started by creating your first department!"
 }

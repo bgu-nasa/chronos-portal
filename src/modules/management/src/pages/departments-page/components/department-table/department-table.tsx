@@ -1,7 +1,7 @@
 import { DataTable } from "primereact/datatable";
 import type { DataTableSelectionSingleChangeEvent } from "primereact/datatable";
 import { Column } from "primereact/column";
-import { Badge } from "@mantine/core";
+import { Badge, Text, Stack } from "@mantine/core";
 import type { DepartmentData } from "@/modules/management/src/pages/departments-page/components/department-table/types";
 import resources from "@/modules/management/src/pages/departments-page/departments-page.resources.json";
 
@@ -30,6 +30,16 @@ export function DepartmentTable({
         );
     };
 
+    const emptyMessage = () => {
+        return (
+            <Stack align="center" justify="center" style={{ padding: "3rem" }}>
+                <Text size="lg" c="dimmed" ta="center">
+                    {resources.emptyStateMessage}
+                </Text>
+            </Stack>
+        );
+    };
+
     return (
         <DataTable
             value={departments}
@@ -40,6 +50,7 @@ export function DepartmentTable({
             stripedRows
             paginator
             rows={10}
+            emptyMessage={emptyMessage()}
         >
             <Column selectionMode="single" headerStyle={{ width: "3rem" }} />
             <Column field="name" header={resources.nameColumn} sortable />
