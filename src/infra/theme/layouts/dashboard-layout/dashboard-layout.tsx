@@ -3,6 +3,7 @@ import { Outlet, useLocation, useNavigate } from "react-router";
 import { AppShell, Image, NavLink, Stack } from "@mantine/core";
 import styles from "./dashboard-layout.module.css";
 import { useDashboardNavigation } from "./use-dashboard-navigation";
+import { LogoutButton } from "../../components/logout-button";
 import type { NavigationItem } from "@/infra/federation/module.types";
 
 function TemporaryLogo() {
@@ -46,6 +47,7 @@ export default function DashboardLayout() {
             <AppShell.Header>
                 <div className={styles.headerContainer}>
                     <TemporaryLogo />
+                    <LogoutButton />
                 </div>
             </AppShell.Header>
 

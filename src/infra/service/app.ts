@@ -23,6 +23,11 @@ interface IApp {
      */
     isAuthenticated: () => boolean;
 
+    /**
+     * Logout the current user by clearing the authentication token
+     */
+    logout: () => void;
+
     // Future services can be added here:
     // auth: IAuthService;
     // storage: IStorageService;
@@ -56,4 +61,5 @@ interface IApp {
 export const $app: IApp = {
     ajax: ajaxService,
     isAuthenticated: () => tokenService.hasToken(),
+    logout: () => tokenService.clearToken(),
 };
