@@ -1,4 +1,4 @@
-export const userTableCols = [
+export const userTableColumnNames = [
     "Profile",
     "First Name",
     "Last Name",
@@ -9,3 +9,8 @@ export const userTableCols = [
 export function toField(columnName: string): string {
     return columnName.toLowerCase().replace(" ", "");
 }
+
+export const userTableColumns = userTableColumnNames.map((columnName) => ({
+    field: toField(columnName),
+    colName: columnName,
+}));
