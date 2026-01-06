@@ -20,11 +20,9 @@ export function DepartmentActions({
             <Button onClick={onEditClick} disabled={!selectedDepartment}>
                 {resources.editButton}
             </Button>
-            <Tooltip label={resources.underDevelopmentTooltip}>
-                <Button onClick={onDeleteClick} disabled>
-                    {resources.deleteButton}
-                </Button>
-            </Tooltip>
+            <Button onClick={onDeleteClick} disabled={!selectedDepartment}>
+                {resources.deleteButton}
+            </Button>
         </Button.Group>
     );
 }

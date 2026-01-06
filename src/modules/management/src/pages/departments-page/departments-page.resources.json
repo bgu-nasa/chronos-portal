@@ -16,5 +16,9 @@
     "editorSaveButton": "Save",
     "editorCreateButton": "Create",
     "editorNameRequired": "Department name is required",
-    "emptyStateMessage": "No departments yet. Get started by creating your first department!"
+    "emptyStateMessage": "No departments yet. Get started by creating your first department!",
+    "deleteConfirmTitle": "Delete Department",
+    "deleteConfirmMessage": "Are you sure you want to delete the department \"{name}\"? This action will soft-delete the department and can be undone later.",
+    "deleteConfirmButton": "Delete",
+    "deleteCancelButton": "Cancel"
 }
