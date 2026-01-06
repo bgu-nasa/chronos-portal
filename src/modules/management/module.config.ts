@@ -5,12 +5,20 @@ import {
     HiOutlineClipboardList,
     HiOutlineLockOpen,
 } from "react-icons/hi";
+import { DepartmentsPage } from "./src/pages/departments-page";
 
 export const moduleConfig: ModuleConfig = {
     name: "management",
     owner: "",
     basePath: "/management",
-    routes: [],
+    routes: [
+        {
+            authorize: true,
+            name: "departments",
+            path: "/departments",
+            element: React.createElement(DepartmentsPage),
+        },
+    ],
     navigationItems: [
         {
             label: "Management",

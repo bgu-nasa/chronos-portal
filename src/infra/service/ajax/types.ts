@@ -28,6 +28,11 @@ export interface AjaxRequestConfig {
      * @default true
      */
     auth?: boolean;
+
+    /**
+     * Additional headers to include in the request
+     */
+    headers?: Record<string, string>;
 }
 
 /**

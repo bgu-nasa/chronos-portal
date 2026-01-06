@@ -7,6 +7,7 @@ import { useDashboardNavigation } from "./use-dashboard-navigation";
 import { LogoutButton } from "@/infra/theme/components/logout-button";
 import { useOrganization } from "@/infra/service";
 import type { NavigationItem } from "@/infra/federation/module.types";
+import { DashboardLoadingScreen } from "./dashboard-loading-screen";
 
 function TemporaryLogo() {
     return <Image src="/logo.png" alt="Logo" h={40} w="auto" />;
@@ -23,7 +24,7 @@ function renderNavigationItems(
             label={item.label}
             leftSection={item.icon}
             active={currentPath === item.href}
-            onClick={() => navigate(item.href)}
+            href={item.href}
         >
             {item.children &&
                 item.children.length > 0 &&
@@ -36,7 +37,8 @@ export default function DashboardLayout() {
     const navigationItems = useDashboardNavigation();
     const navigate = useNavigate();
     const location = useLocation();
-    const { fetchOrganization, organization } = useOrganization();
+    const { fetchOrganization, organization, isLoading, error } =
+        useOrganization();
 
     // Fetch organization information when the dashboard layout mounts
     useEffect(() => {
@@ -78,7 +80,9 @@ export default function DashboardLayout() {
             </AppShell.Navbar>
 
             <AppShell.Main>
-                <Outlet />
+                {isLoading && <DashboardLoadingScreen />}
+                {error}
+                {!isLoading && !error && <Outlet />}
             </AppShell.Main>
         </AppShell>
     );
