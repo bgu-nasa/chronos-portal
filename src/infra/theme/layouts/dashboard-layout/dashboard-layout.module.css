@@ -2,6 +2,8 @@
 .headerContainer {
     display: flex;
     align-items: center;
+    justify-content: space-between;
     height: 100%;
     padding-left: 20px;
+    padding-right: 20px;
 }

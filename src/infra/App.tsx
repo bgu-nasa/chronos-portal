@@ -3,6 +3,7 @@ import { Route, Routes } from "react-router";
 import { ApplicationRoutesRepository } from "./federation";
 import {
     AuthenticatedPageFilter,
+    UnauthenticatedPageFilter,
     DashboardLayout,
     PublicLayout,
 } from "./theme";
@@ -17,14 +18,16 @@ function App() {
 
     return (
         <Routes>
-            <Route element={<PublicLayout />}>
-                {publicRoutes.map((route, index) => (
-                    <Route
-                        key={getRouteKey(route, index)}
-                        path={route.path}
-                        element={route.element}
-                    />
-                ))}
+            <Route element={<UnauthenticatedPageFilter />}>
+                <Route element={<PublicLayout />}>
+                    {publicRoutes.map((route, index) => (
+                        <Route
+                            key={getRouteKey(route, index)}
+                            path={route.path}
+                            element={route.element}
+                        />
+                    ))}
+                </Route>
             </Route>
 
             <Route element={<AuthenticatedPageFilter />}>

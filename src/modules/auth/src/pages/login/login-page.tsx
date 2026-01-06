@@ -6,23 +6,54 @@ import {
     TextInput,
     Title,
 } from "@mantine/core";
-import { useState } from "react";
+import { useMemo, useState } from "react";
+import { useNavigate } from "react-router";
+import { useLogin } from "@/modules/auth/src/hooks";
+import {
+    validateEmail,
+    validatePassword,
+} from "@/modules/auth/src/common/validation.service";
 import styles from "./login-page.module.css";
 import resources from "./login-page.resources.json";
 
 export function LoginPage() {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
-    const [isLoading, setIsLoading] = useState(false);
+    const [touched, setTouched] = useState({ email: false, password: false });
+    const { login, isLoading, error } = useLogin();
+    const navigate = useNavigate();
+
+    // Compute errors reactively based on current field values
+    const emailError = useMemo(() => {
+        return touched.email ? validateEmail(email) : undefined;
+    }, [email, touched.email]);
+
+    const passwordError = useMemo(() => {
+        return touched.password ? validatePassword(password) : undefined;
+    }, [password, touched.password]);
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        setIsLoading(true);
 
-        // TODO: Implement login logic with backend
-        console.log("Login attempt:", { email, password });
+        // Mark all fields as touched for validation display
+        setTouched({ email: true, password: true });
 
-        setIsLoading(false);
+        // Check for validation errors
+        const emailValidation = validateEmail(email);
+        const passwordValidation = validatePassword(password);
+
+        if (emailValidation || passwordValidation) {
+            return;
+        }
+
+        try {
+            await login(email, password);
+            // Navigate to dashboard home page after successful login
+            navigate("/dashboard/home");
+        } catch (err) {
+            // Error is already handled by the hook
+            console.error("Login error:", err);
+        }
     };
 
     return (
@@ -41,12 +72,22 @@ export function LoginPage() {
                 </div>
 
                 <form onSubmit={handleSubmit} className={styles.loginForm}>
+                    {error && (
+                        <Text c="red" size="sm">
+                            {error}
+                        </Text>
+                    )}
+
                     <TextInput
                         label={resources.emailLabel}
                         placeholder={resources.emailPlaceholder}
                         type="email"
                         value={email}
                         onChange={(e) => setEmail(e.currentTarget.value)}
+                        onBlur={() =>
+                            setTouched((prev) => ({ ...prev, email: true }))
+                        }
+                        error={emailError}
                         required
                         size="md"
                     />
@@ -56,6 +97,10 @@ export function LoginPage() {
                         placeholder={resources.passwordPlaceholder}
                         value={password}
                         onChange={(e) => setPassword(e.currentTarget.value)}
+                        onBlur={() =>
+                            setTouched((prev) => ({ ...prev, password: true }))
+                        }
+                        error={passwordError}
                         required
                         size="md"
                     />
