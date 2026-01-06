@@ -7,6 +7,7 @@ import {
     Title,
 } from "@mantine/core";
 import { useState } from "react";
+import { useNavigate } from "react-router";
 import { useLogin } from "@/modules/auth/src/hooks";
 import styles from "./login-page.module.css";
 import resources from "./login-page.resources.json";
@@ -15,14 +16,15 @@ export function LoginPage() {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const { login, isLoading, error } = useLogin();
+    const navigate = useNavigate();
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
 
         try {
             await login(email, password);
-            // TODO: Navigate to dashboard or home page after successful login
-            console.log("Login successful");
+            // Navigate to dashboard home page after successful login
+            navigate("/dashboard/home");
         } catch (err) {
             // Error is already handled by the hook
             console.error("Login error:", err);

@@ -8,6 +8,7 @@ import {
     Title,
 } from "@mantine/core";
 import { useState } from "react";
+import { useNavigate } from "react-router";
 import { PLANS, type PlanType } from "@/modules/auth/.mock/plans";
 import { useRegister } from "@/modules/auth/src/hooks";
 import styles from "./register-page.module.css";
@@ -27,6 +28,7 @@ export function RegisterPage() {
 
     const { register, isLoading, error: hookError } = useRegister();
     const [validationError, setValidationError] = useState<string | null>(null);
+    const navigate = useNavigate();
 
     // Combine hook error and validation error
     const error = validationError || hookError;
@@ -58,8 +60,8 @@ export function RegisterPage() {
             };
 
             await register(registerRequest);
-            // TODO: Navigate to dashboard or home page after successful registration
-            console.log("Registration successful");
+            // Navigate to dashboard home page after successful registration
+            navigate("/dashboard/home");
         } catch (err) {
             // Error is already handled by the hook
             console.error("Registration error:", err);
