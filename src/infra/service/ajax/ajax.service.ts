@@ -12,10 +12,11 @@ import type { AxiosRequestConfig } from "axios";
 function buildConfig(
     config?: AjaxRequestConfig
 ): AxiosRequestConfig & { _requiresAuth?: boolean } {
-    const { auth = true, ...rest } = config || {};
+    const { auth = true, headers, ...rest } = config || {};
 
     return {
         ...rest,
+        headers,
         _requiresAuth: auth,
     } as AxiosRequestConfig & { _requiresAuth?: boolean };
 }
