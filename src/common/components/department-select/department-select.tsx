@@ -55,7 +55,7 @@ export function DepartmentSelect({
     required = false,
     error,
     clearable = true,
-    includeDeleted = true,
+    includeDeleted = false,
 }: DepartmentSelectProps) {
     const [departments, setDepartments] = useState<Department[]>([]);
 

@@ -4,5 +4,18 @@
     "userEmailColumn": "User Email",
     "scopeColumn": "Scope",
     "rolesColumn": "Roles",
-    "emptyStateMessage": "No role assignments yet. Get started by creating your first role assignment!"
+    "emptyStateMessage": "No role assignments yet. Get started by creating your first role assignment!",
+    "drawerTitle": "Create Role Assignment",
+    "userLabel": "User",
+    "userPlaceholder": "Select a user",
+    "departmentLabel": "Department (Optional)",
+    "departmentPlaceholder": "Select a department",
+    "roleLabel": "Role",
+    "rolePlaceholder": "Select a role",
+    "scopeInfoOrg": "The role will be scoped under organization",
+    "scopeInfoDept": "The role will be scoped under department: {departmentName}",
+    "cancelButton": "Cancel",
+    "createRoleButton": "Create Role Assignment",
+    "userRequired": "User is required",
+    "roleRequired": "Role is required"
 }

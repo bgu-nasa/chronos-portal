@@ -5,6 +5,7 @@ import {
     RoleTable,
     type RoleTableRow,
 } from "@/modules/management/src/pages/roles-page/components/role-table";
+import { RoleAssignmentDrawer } from "@/modules/management/src/pages/roles-page/components/role-assignment-drawer";
 import { useRoleAssignments } from "@/modules/management/src/hooks/use-roles";
 import type { UserRoleAssignmentSummary } from "@/modules/management/src/data/role.types";
 import resources from "@/modules/management/src/pages/roles-page/roles-page.resources.json";
@@ -12,6 +13,7 @@ import styles from "@/modules/management/src/pages/roles-page/roles-page.module.
 
 export function RolesPage() {
     const [selectedRow, setSelectedRow] = useState<RoleTableRow | null>(null);
+    const [drawerOpened, setDrawerOpened] = useState(false);
     const { roleAssignments, fetchRoleAssignments } = useRoleAssignments();
 
     // Fetch role assignments on mount
@@ -20,8 +22,11 @@ export function RolesPage() {
     }, []);
 
     const handleCreateClick = () => {
-        // TODO: Implement create functionality
-        console.log("Create role assignment clicked");
+        setDrawerOpened(true);
+    };
+
+    const handleCloseDrawer = () => {
+        setDrawerOpened(false);
     };
 
     // Transform UserRoleAssignmentSummary to RoleTableRow
@@ -90,6 +95,11 @@ export function RolesPage() {
                     rows={tableRows}
                     selectedRow={selectedRow}
                     onSelectionChange={setSelectedRow}
+                />
+
+                <RoleAssignmentDrawer
+                    opened={drawerOpened}
+                    onClose={handleCloseDrawer}
                 />
             </div>
         </Container>
