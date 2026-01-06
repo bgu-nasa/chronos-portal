@@ -2,11 +2,8 @@ import { Stack } from "@mantine/core";
 import { WelcomeSection, FeatureCard, InfoSection } from "./components";
 import resources from "./dashboard-home-page.resources.json";
 import styles from "./dashboard-home-page.module.css";
-import { useOrganization } from "@/infra/service";
 
 export function DashboardHomePage() {
-    const organization = useOrganization();
-
     return (
         <div className={styles.dashboardHomePageContainer}>
             <Stack gap="xl">
@@ -14,8 +11,6 @@ export function DashboardHomePage() {
                     title={resources.welcome.title}
                     subtitle={resources.welcome.subtitle}
                 />
-
-                <div>{organization.organization?.name}</div>
 
                 <div className={styles.featuresGrid}>
                     <FeatureCard
