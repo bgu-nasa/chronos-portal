@@ -6,6 +6,7 @@
 // Components
 export { ConfirmationDialog } from "./components/confirmation-dialog";
 export type { ConfirmationDialogProps } from "./components/confirmation-dialog";
+export { CopiableInput } from "./components/copiable-input";
 
 // Hooks
 export { useConfirmation } from "./hooks/use-confirmation";
