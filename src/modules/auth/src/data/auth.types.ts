@@ -20,9 +20,9 @@ export interface LoginResponse {
 }
 
 /**
- * Create user request contract
+ * Register user request contract (for onboarding)
  */
-export interface CreateUserRequest {
+export interface RegisterUserRequest {
     Email: string;
     FirstName: string;
     LastName: string;
@@ -33,7 +33,7 @@ export interface CreateUserRequest {
  * Register/Onboard request contract
  */
 export interface RegisterRequest {
-    AdminUser: CreateUserRequest;
+    AdminUser: RegisterUserRequest;
     OrganizationName: string;
     Plan: string; // "Free" | "Consumption" | "Enterprise"
 }

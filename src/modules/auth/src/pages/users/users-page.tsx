@@ -1,56 +1,37 @@
-import { useState } from "react";
-import { Container, Divider, Title } from "@mantine/core";
+import { useState, useEffect } from "react";
+import {
+    Container,
+    Divider,
+    Title,
+    Loader,
+    Center,
+    Alert,
+} from "@mantine/core";
 import { UserActions } from "@/modules/auth/src/pages/users/components/user-actions";
 import { UserTable } from "@/modules/auth/src/pages/users/components/user-table/user-table";
 import type { UserData } from "@/modules/auth/src/pages/users/components/user-table/types";
+import { useUsers } from "@/modules/auth/src/hooks/use-users";
 import resources from "@/modules/auth/src/pages/users/users-page.resources.json";
 import styles from "./users-page.module.css";
 
-// Mock data for testing the UI
-const mockUsers: UserData[] = [
-    {
-        id: "1",
-        firstName: "John",
-        lastName: "Doe",
-        email: "john.doe@example.com",
-        avatarUrl: "https://i.pravatar.cc/150?img=1",
-        verified: true,
-    },
-    {
-        id: "2",
-        firstName: "Jane",
-        lastName: "Smith",
-        email: "jane.smith@example.com",
-        avatarUrl: "https://i.pravatar.cc/150?img=2",
-        verified: false,
-    },
-    {
-        id: "3",
-        firstName: "Mike",
-        lastName: "Johnson",
-        email: "mike.johnson@example.com",
-        verified: true,
-    },
-    {
-        id: "4",
-        firstName: "Sarah",
-        lastName: "Williams",
-        email: "sarah.williams@example.com",
-        avatarUrl: "https://i.pravatar.cc/150?img=4",
-        verified: true,
-    },
-    {
-        id: "5",
-        firstName: "David",
-        lastName: "Brown",
-        email: "david.brown@example.com",
-        avatarUrl: "https://i.pravatar.cc/150?img=5",
-        verified: false,
-    },
-];
-
 export function UsersPage() {
     const [selectedUser, setSelectedUser] = useState<UserData | null>(null);
+    const { users, isLoading, error, fetchUsers } = useUsers();
+
+    // Fetch users on mount
+    useEffect(() => {
+        fetchUsers();
+    }, [fetchUsers]);
+
+    // Map UserResponse to UserData for the table component
+    const userData: UserData[] = users.map((user) => ({
+        id: user.userId,
+        firstName: user.firstName,
+        lastName: user.lastName,
+        email: user.email,
+        avatarUrl: user.avatarUrl ?? undefined,
+        verified: user.emailVerified,
+    }));
 
     const handleCreateClick = () => {
         console.log("Create user clicked");
@@ -73,6 +54,12 @@ export function UsersPage() {
                 <Title order={1}>{resources.title}</Title>
                 <Divider className={styles.divider} />
 
+                {error && (
+                    <Alert title="Error" color="red" mb="md">
+                        {error}
+                    </Alert>
+                )}
+
                 <UserActions
                     selectedUser={selectedUser}
                     onCreateClick={handleCreateClick}
@@ -80,11 +67,17 @@ export function UsersPage() {
                     onDeleteClick={handleDeleteClick}
                 />
 
-                <UserTable
-                    users={mockUsers}
-                    selectedUser={selectedUser}
-                    onSelectionChange={setSelectedUser}
-                />
+                {isLoading ? (
+                    <Center mt="xl">
+                        <Loader variant="bars" size="lg" />
+                    </Center>
+                ) : (
+                    <UserTable
+                        users={userData}
+                        selectedUser={selectedUser}
+                        onSelectionChange={setSelectedUser}
+                    />
+                )}
             </div>
         </Container>
     );
