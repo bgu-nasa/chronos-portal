@@ -65,7 +65,7 @@ export type NavigationItem = {
     /**
      * The href of the navigation item
      */
-    href: string;
+    href?: string;
     /**
      * The location of the navigation item in the application
      */
