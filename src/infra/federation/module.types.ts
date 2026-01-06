@@ -78,4 +78,8 @@ export type NavigationItem = {
      * The children navigation items
      */
     children?: NavigationItem[];
+    /**
+     * So you could define the order of the navigation items
+     */
+    order?: number;
 };

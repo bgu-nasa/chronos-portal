@@ -1,0 +1,76 @@
+import {
+    Button,
+    Card,
+    PasswordInput,
+    Text,
+    TextInput,
+    Title,
+} from "@mantine/core";
+import { useState } from "react";
+import styles from "./login-page.module.css";
+import resources from "./login-page.resources.json";
+
+export function LoginPage() {
+    const [email, setEmail] = useState("");
+    const [password, setPassword] = useState("");
+    const [isLoading, setIsLoading] = useState(false);
+
+    const handleSubmit = async (e: React.FormEvent) => {
+        e.preventDefault();
+        setIsLoading(true);
+
+        // TODO: Implement login logic with backend
+        console.log("Login attempt:", { email, password });
+
+        setIsLoading(false);
+    };
+
+    return (
+        <div className={styles.loginContainer}>
+            <Card
+                className={styles.loginCard}
+                shadow="xl"
+                padding="xl"
+                radius="md"
+            >
+                <div className={styles.loginHeader}>
+                    <Title order={2}>{resources.title}</Title>
+                    <Text c="dimmed" size="sm">
+                        {resources.subtitle}
+                    </Text>
+                </div>
+
+                <form onSubmit={handleSubmit} className={styles.loginForm}>
+                    <TextInput
+                        label={resources.emailLabel}
+                        placeholder={resources.emailPlaceholder}
+                        type="email"
+                        value={email}
+                        onChange={(e) => setEmail(e.currentTarget.value)}
+                        required
+                        size="md"
+                    />
+
+                    <PasswordInput
+                        label={resources.passwordLabel}
+                        placeholder={resources.passwordPlaceholder}
+                        value={password}
+                        onChange={(e) => setPassword(e.currentTarget.value)}
+                        required
+                        size="md"
+                    />
+
+                    <Button
+                        type="submit"
+                        fullWidth
+                        size="md"
+                        loading={isLoading}
+                        className={styles.loginButton}
+                    >
+                        {resources.loginButton}
+                    </Button>
+                </form>
+            </Card>
+        </div>
+    );
+}

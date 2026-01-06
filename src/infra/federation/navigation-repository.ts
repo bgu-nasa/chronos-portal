@@ -22,9 +22,14 @@ export class NavigationRepository {
     getNavigationItemsByLocation(
         location: "dashboard" | "public" | "admin"
     ): NavigationItem[] {
-        return this.loadNavigationItems().filter(
-            (item) => item.location === location
-        );
+        return this.loadNavigationItems()
+            .filter((item) => item.location === location)
+            .sort((a, b) => {
+                if (a.order == null && b.order == null) return 0;
+                if (a.order == null) return 1; // a goes last
+                if (b.order == null) return -1; // b goes last
+                return a.order - b.order;
+            });
     }
 
     /**
