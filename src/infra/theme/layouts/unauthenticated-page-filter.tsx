@@ -3,23 +3,23 @@ import { useEffect } from "react";
 import { Outlet, useNavigate } from "react-router";
 import { $app } from "@/infra/service";
 
-const LoginPageRoute = "/";
+const DashboardHomeRoute = "/dashboard/home";
 
 /**
- * Higher-order component that requires authentication
- * Redirects to login page if user is not authenticated
+ * Higher-order component that requires user to be unauthenticated
+ * Redirects to dashboard if user is already authenticated
  */
-export default function AuthenticatedPageFilter() {
+export default function UnauthenticatedPageFilter() {
     const navigate = useNavigate();
     const isAuthenticated = $app.isAuthenticated();
 
     useEffect(() => {
-        if (!isAuthenticated) {
-            navigate(LoginPageRoute, { replace: true });
+        if (isAuthenticated) {
+            navigate(DashboardHomeRoute, { replace: true });
         }
     }, [isAuthenticated, navigate]);
 
-    if (!isAuthenticated) {
+    if (isAuthenticated) {
         return null;
     }
 
