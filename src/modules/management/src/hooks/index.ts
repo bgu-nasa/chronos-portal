@@ -9,3 +9,9 @@ export {
     useDeleteDepartment,
     useRestoreDepartment,
 } from "./use-departments";
+
+export {
+    useRoleAssignments,
+    useCreateRoleAssignment,
+    useRemoveRoleAssignment,
+} from "./use-roles";
