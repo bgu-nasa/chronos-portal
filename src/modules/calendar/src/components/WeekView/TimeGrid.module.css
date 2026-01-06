@@ -1,0 +1,8 @@
+.scrollArea {
+  height: calc(100vh - 160px);
+}
+
+.gridContent {
+  display: flex;
+  padding: 10px 0;
+}

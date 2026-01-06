@@ -1,0 +1,25 @@
+.weekHeaderContainer {
+  display: flex;
+  border-bottom: 1px solid var(--mantine-color-gray-3);
+  margin-left: 60px;
+}
+
+.dayHeader {
+  flex: 1;
+  padding: 8px;
+  text-align: center;
+  border-right: 1px solid var(--mantine-color-gray-3);
+}
+
+.dayNumber {
+  width: 32px;
+  height: 32px;
+  line-height: 32px;
+  border-radius: 50%;
+  margin: 4px auto 0;
+}
+
+.activeDay {
+  background-color: var(--mantine-color-blue-filled);
+  color: var(--mantine-color-white);
+}

@@ -1,0 +1,44 @@
+.dayColumn {
+  position: relative;
+  flex: 1;
+  border-right: 1px solid var(--mantine-color-gray-3);
+  transition: background-color 0.3s ease;
+  overflow: hidden;
+}
+
+.todayColumn {
+  background-color: var(--mantine-color-blue-0);
+}
+
+.notTodayColumn {
+  background-color: var(--mantine-color-body);
+}
+
+.gridLine {
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background-color: var(--mantine-color-gray-1);
+  border-bottom: 1px solid var(--mantine-color-gray-0);
+}
+
+.nowLine {
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background-color: var(--mantine-color-red-6);
+  z-index: 10;
+  pointer-events: none;
+}
+
+.nowDot {
+  position: absolute;
+  left: -6px;
+  top: -6px;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background-color: var(--mantine-color-red-6);
+}
