@@ -5,10 +5,12 @@ import {
     AppShellMain,
     Image,
     NavLink,
+    Group,
 } from "@mantine/core";
 import { Outlet } from "react-router";
 import styles from "./public-layout.module.css";
 import PublicLayoutSpecialAction from "./special-action";
+import { ThemeToggleButton } from "@/infra/theme/components/theme-toggle-button";
 import { ApplicationNavigationRepository as NavItemsRepo } from "@/infra/federation";
 
 const propStyles = {
@@ -49,7 +51,10 @@ export default function PublicLayout() {
                             />
                         ))}
 
-                        <PublicLayoutSpecialAction />
+                        <Group gap="sm">
+                            <ThemeToggleButton />
+                            <PublicLayoutSpecialAction />
+                        </Group>
                     </div>
                 </div>
             </AppShellHeader>

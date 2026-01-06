@@ -1,10 +1,11 @@
 /** @author aaron-iz */
 import { Outlet, useLocation, useNavigate } from "react-router";
-import { AppShell, Image, NavLink, Stack } from "@mantine/core";
+import { AppShell, Image, NavLink, Stack, Group } from "@mantine/core";
 import { useEffect } from "react";
 import styles from "./dashboard-layout.module.css";
 import { useDashboardNavigation } from "./use-dashboard-navigation";
 import { LogoutButton } from "@/infra/theme/components/logout-button";
+import { ThemeToggleButton } from "@/infra/theme/components/theme-toggle-button";
 import { useOrganization } from "@/infra/service";
 import type { NavigationItem } from "@/infra/federation/module.types";
 import { DashboardLoadingScreen } from "./dashboard-loading-screen";
@@ -65,7 +66,10 @@ export default function DashboardLayout() {
             <AppShell.Header>
                 <div className={styles.headerContainer}>
                     <TemporaryLogo />
-                    <LogoutButton />
+                    <Group gap="sm">
+                        <ThemeToggleButton />
+                        <LogoutButton />
+                    </Group>
                 </div>
             </AppShell.Header>
 
