@@ -11,7 +11,7 @@ import type { ApiError } from "./types";
 const BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:29058";
 
 // Refresh endpoint
-const REFRESH_ENDPOINT = "/auth/refresh";
+const REFRESH_ENDPOINT = "/api/auth/refresh";
 
 /**
  * Custom request config with auth flag
