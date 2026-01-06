@@ -3,7 +3,6 @@ import {
     AppShell,
     AppShellHeader,
     AppShellMain,
-    Image,
     NavLink,
     Group,
 } from "@mantine/core";
@@ -12,6 +11,7 @@ import styles from "./public-layout.module.css";
 import PublicLayoutSpecialAction from "./special-action";
 import { ThemeToggleButton } from "@/infra/theme/components/theme-toggle-button";
 import { ApplicationNavigationRepository as NavItemsRepo } from "@/infra/federation";
+import { ChronosLogo } from "@/common";
 
 const propStyles = {
     headerConfig: {
@@ -24,10 +24,6 @@ const propStyles = {
     },
 };
 
-function TemporaryLogo() {
-    return <Image src="/logo.png" alt="Logo" h={40} w="auto" />;
-}
-
 export default function PublicLayout() {
     const publicNavItems = NavItemsRepo.getPublicNavigationItems();
 
@@ -38,7 +34,7 @@ export default function PublicLayout() {
         <AppShell header={propStyles.headerConfig}>
             <AppShellHeader>
                 <div className={styles.publicLayoutHeaderStack}>
-                    <TemporaryLogo />
+                    <ChronosLogo height={40} />
 
                     <div className={styles.publicLayoutNavigationContainer}>
                         {publicNavItems.map((item) => (

@@ -1,6 +1,6 @@
 /** @author aaron-iz */
 import { Outlet, useLocation, useNavigate } from "react-router";
-import { AppShell, Image, NavLink, Stack, Group } from "@mantine/core";
+import { AppShell, NavLink, Stack, Group } from "@mantine/core";
 import { useEffect } from "react";
 import styles from "./dashboard-layout.module.css";
 import { useDashboardNavigation } from "./use-dashboard-navigation";
@@ -9,10 +9,7 @@ import { ThemeToggleButton } from "@/infra/theme/components/theme-toggle-button"
 import { useOrganization } from "@/infra/service";
 import type { NavigationItem } from "@/infra/federation/module.types";
 import { DashboardLoadingScreen } from "./dashboard-loading-screen";
-
-function TemporaryLogo() {
-    return <Image src="/logo.png" alt="Logo" h={40} w="auto" />;
-}
+import { ChronosLogo } from "@/common";
 
 function renderNavigationItems(
     items: NavigationItem[],
@@ -65,7 +62,9 @@ export default function DashboardLayout() {
         >
             <AppShell.Header>
                 <div className={styles.headerContainer}>
-                    <TemporaryLogo />
+                    <div style={{ flexShrink: 0 }}>
+                        <ChronosLogo height={40} />
+                    </div>
                     <Group gap="sm">
                         <ThemeToggleButton />
                         <UserCard />
