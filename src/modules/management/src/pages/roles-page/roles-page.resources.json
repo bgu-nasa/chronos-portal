@@ -17,5 +17,11 @@
     "cancelButton": "Cancel",
     "createRoleButton": "Create Role Assignment",
     "userRequired": "User is required",
-    "roleRequired": "Role is required"
+    "roleRequired": "Role is required",
+    "editorTitle": "Role Assignments",
+    "editorSubtitle": "Role assignments of",
+    "editorScopeLabel": "Scope",
+    "editorScopeOrg": "Organization",
+    "editorScopeDept": "Department: {departmentName}",
+    "editorScopeIdLabel": "Scope ID"
 }

@@ -11,6 +11,7 @@ export { UserSelect } from "./components/user-select";
 export type { User } from "./components/user-select";
 export { DepartmentSelect } from "./components/department-select";
 export type { Department } from "./components/department-select";
+export { UserInfo } from "./components/user-info";
 
 // Hooks
 export { useConfirmation } from "./hooks/use-confirmation";
