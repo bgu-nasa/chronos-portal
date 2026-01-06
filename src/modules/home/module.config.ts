@@ -1,5 +1,5 @@
 import type { ModuleConfig } from "@/infra";
-import { HomePage } from "./src";
+import { DashboardHomePage, HomePage } from "./src";
 import React from "react";
 
 export const moduleConfig: ModuleConfig = {
@@ -18,6 +18,11 @@ export const moduleConfig: ModuleConfig = {
             name: "Home Page",
             element: React.createElement(HomePage),
         },
+        {
+            path: "/dashboard/home",
+            name: "Dashboard Home",
+            element: React.createElement(DashboardHomePage),
+        },
     ],
     navigationItems: [
         {
@@ -25,6 +30,12 @@ export const moduleConfig: ModuleConfig = {
             label: "Home",
             href: "/",
             order: -1,
+        },
+        {
+            location: "dashboard",
+            label: "Home",
+            href: "/dashboard/home",
+            order: 0,
         },
     ],
 };

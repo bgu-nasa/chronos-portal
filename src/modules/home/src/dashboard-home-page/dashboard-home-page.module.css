@@ -1,0 +1,32 @@
+.dashboardHomePageContainer {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 2rem;
+}
+
+.featuresGrid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+.sectionsGrid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+    gap: 1.5rem;
+}
+
+@media (max-width: 768px) {
+    .dashboardHomePageContainer {
+        padding: 1rem;
+    }
+    
+    .featuresGrid {
+        grid-template-columns: 1fr;
+    }
+    
+    .sectionsGrid {
+        grid-template-columns: 1fr;
+    }
+}
