@@ -6,6 +6,8 @@ import { MantineProvider } from "@mantine/core";
 import { theme } from "./theme";
 import App from "./App";
 import "@mantine/core/styles.css";
+import "primereact/resources/themes/lara-light-indigo/theme.css";
+import "primereact/resources/primereact.min.css";
 
 createRoot(document.getElementById("root")!).render(
     <StrictMode>
