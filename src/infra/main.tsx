@@ -20,8 +20,8 @@ const ThemedApp = () => {
         ) as HTMLLinkElement;
         const themePath =
             colorScheme === "dark"
-                ? "primereact/resources/themes/lara-dark-indigo/theme.css"
-                : "primereact/resources/themes/lara-light-indigo/theme.css";
+                ? "/node_modules/primereact/resources/themes/lara-dark-indigo/theme.css"
+                : "/node_modules/primereact/resources/themes/lara-light-indigo/theme.css";
 
         if (themeLink) {
             themeLink.href = themePath;
