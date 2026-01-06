@@ -6,6 +6,7 @@ import {
     HiOutlineLockOpen,
 } from "react-icons/hi";
 import { DepartmentsPage } from "./src/pages/departments-page";
+import { RolesPage } from "./src";
 
 export const moduleConfig: ModuleConfig = {
     name: "management",
@@ -17,6 +18,12 @@ export const moduleConfig: ModuleConfig = {
             name: "departments",
             path: "/departments",
             element: React.createElement(DepartmentsPage),
+        },
+        {
+            authorize: true,
+            name: "roles",
+            path: "/roles",
+            element: React.createElement(RolesPage),
         },
     ],
     navigationItems: [
