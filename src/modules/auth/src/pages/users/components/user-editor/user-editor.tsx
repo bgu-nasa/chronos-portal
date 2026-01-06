@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import {
     Drawer,
     TextInput,
@@ -30,12 +30,6 @@ interface UserFormValues {
     avatarUrl: string | null;
 }
 
-interface FormErrors {
-    email?: string;
-    firstName?: string;
-    lastName?: string;
-}
-
 export function UserEditor() {
     const {
         isOpen,
@@ -56,7 +50,11 @@ export function UserEditor() {
         lastName: "",
         avatarUrl: null,
     });
-    const [formErrors, setFormErrors] = useState<FormErrors>({});
+    const [touched, setTouched] = useState({
+        email: false,
+        firstName: false,
+        lastName: false,
+    });
 
     // Reset form when drawer opens/closes or editing user changes
     useEffect(() => {
@@ -75,23 +73,35 @@ export function UserEditor() {
                 avatarUrl: null,
             });
         }
-        setFormErrors({});
+        setTouched({ email: false, firstName: false, lastName: false });
     }, [isOpen, mode, editingUser]);
 
+    // Compute errors reactively based on current field values and touched state
+    const emailError = useMemo(() => {
+        return touched.email ? validateEmail(formValues.email) : undefined;
+    }, [formValues.email, touched.email]);
+
+    const firstNameError = useMemo(() => {
+        return touched.firstName
+            ? validateFirstName(formValues.firstName)
+            : undefined;
+    }, [formValues.firstName, touched.firstName]);
+
+    const lastNameError = useMemo(() => {
+        return touched.lastName
+            ? validateLastName(formValues.lastName)
+            : undefined;
+    }, [formValues.lastName, touched.lastName]);
+
     const validateForm = (): boolean => {
-        const errors: FormErrors = {};
+        // Mark all fields as touched for validation display
+        setTouched({ email: true, firstName: true, lastName: true });
 
-        const emailError = validateEmail(formValues.email);
-        if (emailError) errors.email = emailError;
+        const emailValidation = validateEmail(formValues.email);
+        const firstNameValidation = validateFirstName(formValues.firstName);
+        const lastNameValidation = validateLastName(formValues.lastName);
 
-        const firstNameError = validateFirstName(formValues.firstName);
-        if (firstNameError) errors.firstName = firstNameError;
-
-        const lastNameError = validateLastName(formValues.lastName);
-        if (lastNameError) errors.lastName = lastNameError;
-
-        setFormErrors(errors);
-        return Object.keys(errors).length === 0;
+        return !emailValidation && !firstNameValidation && !lastNameValidation;
     };
 
     const handleSubmit = async (e: React.FormEvent) => {
@@ -160,7 +170,10 @@ export function UserEditor() {
                                     email: e.target.value,
                                 }))
                             }
-                            error={formErrors.email}
+                            onBlur={() =>
+                                setTouched((prev) => ({ ...prev, email: true }))
+                            }
+                            error={emailError}
                         />
 
                         <TextInput
@@ -174,7 +187,13 @@ export function UserEditor() {
                                     firstName: e.target.value,
                                 }))
                             }
-                            error={formErrors.firstName}
+                            onBlur={() =>
+                                setTouched((prev) => ({
+                                    ...prev,
+                                    firstName: true,
+                                }))
+                            }
+                            error={firstNameError}
                         />
 
                         <TextInput
@@ -188,7 +207,13 @@ export function UserEditor() {
                                     lastName: e.target.value,
                                 }))
                             }
-                            error={formErrors.lastName}
+                            onBlur={() =>
+                                setTouched((prev) => ({
+                                    ...prev,
+                                    lastName: true,
+                                }))
+                            }
+                            error={lastNameError}
                         />
 
                         {mode === "edit" && (

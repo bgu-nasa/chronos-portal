@@ -24,6 +24,13 @@ export function UsersPage() {
         fetchUsers();
     }, [fetchUsers]);
 
+    // Clear selection if the selected user no longer exists in the users list
+    useEffect(() => {
+        if (selectedUser && !users.find((u) => u.id === selectedUser.id)) {
+            setSelectedUser(null);
+        }
+    }, [users, selectedUser]);
+
     // Map UserResponse to UserData for the table component
     const userData: UserData[] = users.map((user) => ({
         id: user.id,
