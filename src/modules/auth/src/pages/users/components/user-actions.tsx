@@ -1,32 +1,78 @@
-import { Button, Tooltip } from "@mantine/core";
+import { Button } from "@mantine/core";
+import { useUserEditorStore } from "@/modules/auth/src/state/user-editor.store";
+import { useDeleteUser } from "@/modules/auth/src/hooks/use-users";
+import { useConfirmation } from "@/common/hooks/use-confirmation";
+import { ConfirmationDialog } from "@/common/components/confirmation-dialog";
+import type { UserData } from "@/modules/auth/src/pages/users/components/user-table/types";
 import resources from "@/modules/auth/src/pages/users/users-page.resources.json";
 
 interface UserActionsProps {
-    selectedUser: any | null;
-    onCreateClick: () => void;
-    onEditClick: () => void;
-    onDeleteClick: () => void;
+    selectedUser: UserData | null;
 }
 
-export function UserActions({
-    selectedUser, // will be used in the future
-    onCreateClick,
-    onEditClick,
-    onDeleteClick,
-}: UserActionsProps) {
+export function UserActions({ selectedUser }: UserActionsProps) {
+    const { openForCreate, openForEdit } = useUserEditorStore();
+    const { deleteUser } = useDeleteUser();
+    const {
+        confirmationState,
+        openConfirmation,
+        closeConfirmation,
+        handleConfirm,
+        isLoading,
+    } = useConfirmation();
+
+    const handleCreateClick = () => {
+        openForCreate();
+    };
+
+    const handleEditClick = () => {
+        if (selectedUser) {
+            openForEdit({
+                userId: selectedUser.id,
+                email: selectedUser.email,
+                firstName: selectedUser.firstName,
+                lastName: selectedUser.lastName,
+                emailVerified: selectedUser.verified,
+                avatarUrl: selectedUser.avatarUrl || null,
+            });
+        }
+    };
+
+    const handleDeleteClick = () => {
+        if (selectedUser) {
+            openConfirmation({
+                title: `Delete ${selectedUser.firstName} ${selectedUser.lastName}?`,
+                message:
+                    "This action cannot be undone. The user will be permanently removed from the organization.",
+                onConfirm: async () => {
+                    await deleteUser(selectedUser.id);
+                },
+            });
+        }
+    };
+
     return (
-        <Button.Group mb="md">
-            <Button onClick={onCreateClick}>{resources.createButton}</Button>
-            <Tooltip label={resources.underDevelopmentTooltip}>
-                <Button onClick={onEditClick} disabled>
+        <>
+            <Button.Group mb="md">
+                <Button onClick={handleCreateClick}>
+                    {resources.createButton}
+                </Button>
+                <Button onClick={handleEditClick} disabled={!selectedUser}>
                     {resources.editButton}
                 </Button>
-            </Tooltip>
-            <Tooltip label={resources.underDevelopmentTooltip}>
-                <Button onClick={onDeleteClick} disabled>
+                <Button onClick={handleDeleteClick} disabled={!selectedUser}>
                     {resources.deleteButton}
                 </Button>
-            </Tooltip>
-        </Button.Group>
+            </Button.Group>
+            <ConfirmationDialog
+                opened={confirmationState.isOpen}
+                onClose={closeConfirmation}
+                onConfirm={handleConfirm}
+                title={confirmationState.title}
+                message={confirmationState.message}
+                confirmText="Delete User"
+                loading={isLoading}
+            />
+        </>
     );
 }

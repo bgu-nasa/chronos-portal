@@ -9,6 +9,7 @@ import {
 } from "@mantine/core";
 import { UserActions } from "@/modules/auth/src/pages/users/components/user-actions";
 import { UserTable } from "@/modules/auth/src/pages/users/components/user-table/user-table";
+import { UserEditor } from "@/modules/auth/src/pages/users/components/user-editor";
 import type { UserData } from "@/modules/auth/src/pages/users/components/user-table/types";
 import { useUsers } from "@/modules/auth/src/hooks/use-users";
 import resources from "@/modules/auth/src/pages/users/users-page.resources.json";
@@ -29,24 +30,9 @@ export function UsersPage() {
         firstName: user.firstName,
         lastName: user.lastName,
         email: user.email,
-        avatarUrl: user.avatarUrl ?? undefined,
+        avatarUrl: user.avatarUrl || undefined,
         verified: user.emailVerified,
     }));
-
-    const handleCreateClick = () => {
-        console.log("Create user clicked");
-        // TODO: Implement create user logic
-    };
-
-    const handleEditClick = () => {
-        console.log("Edit user clicked", selectedUser);
-        // TODO: Implement edit user logic
-    };
-
-    const handleDeleteClick = () => {
-        console.log("Delete user clicked", selectedUser);
-        // TODO: Implement delete user logic
-    };
 
     return (
         <Container size="xl" py="xl">
@@ -60,16 +46,11 @@ export function UsersPage() {
                     </Alert>
                 )}
 
-                <UserActions
-                    selectedUser={selectedUser}
-                    onCreateClick={handleCreateClick}
-                    onEditClick={handleEditClick}
-                    onDeleteClick={handleDeleteClick}
-                />
+                <UserActions selectedUser={selectedUser} />
 
                 {isLoading ? (
                     <Center mt="xl">
-                        <Loader variant="bars" size="lg" />
+                        <Loader size="lg" />
                     </Center>
                 ) : (
                     <UserTable
@@ -78,6 +59,8 @@ export function UsersPage() {
                         onSelectionChange={setSelectedUser}
                     />
                 )}
+
+                <UserEditor />
             </div>
         </Container>
     );
