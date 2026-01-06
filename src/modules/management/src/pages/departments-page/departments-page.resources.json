@@ -1,0 +1,11 @@
+{
+    "title": "Departments Management",
+    "createButton": "Create",
+    "editButton": "Edit",
+    "deleteButton": "Delete",
+    "nameColumn": "Name",
+    "statusColumn": "Status",
+    "active": "Active",
+    "deleted": "Deleted",
+    "underDevelopmentTooltip": "This feature is still under development"
+}
