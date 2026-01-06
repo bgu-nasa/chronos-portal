@@ -10,7 +10,6 @@ import { UserInfo, CopiableInput } from "@/common";
 import {
     useCreateRoleAssignment,
     useRemoveRoleAssignment,
-    useRoleAssignments,
 } from "@/modules/management/src/hooks/use-roles";
 import type { RoleType } from "@/modules/management/src/data/role.types";
 import type { RoleTableRow } from "@/modules/management/src/pages/roles-page/components/role-table/types";
@@ -28,7 +27,6 @@ export function UserScopedRoleEditor({
     onClose,
     selectedRow,
 }: UserScopedRoleEditorProps) {
-    const { roleAssignments } = useRoleAssignments();
     const { createRoleAssignment, isLoading: isCreating } =
         useCreateRoleAssignment();
     const { removeRoleAssignment, isLoading: isRemoving } =
@@ -101,7 +99,7 @@ export function UserScopedRoleEditor({
         } else {
             // Create role assignment
             const result = await createRoleAssignment({
-                userId: selectedRow.userEmail, // Note: This should be userId, but we only have email in the row
+                userId: selectedRow.userId,
                 departmentId: selectedRow.scopeId,
                 role: role,
             });

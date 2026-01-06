@@ -10,6 +10,7 @@ import type { RoleType } from "@/modules/management/src/data/role.types";
  */
 export interface RoleTableRow {
     id: string; // Composite key: userEmail-scope-scopeId
+    userId: string; // User ID from assignments
     userEmail: string;
     scope: "Organization" | "Department";
     scopeId: string | null; // null for org, departmentId for dept

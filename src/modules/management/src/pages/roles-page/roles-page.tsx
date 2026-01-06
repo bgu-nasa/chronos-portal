@@ -61,6 +61,7 @@ export function RolesPage() {
             if (orgAssignments.length > 0) {
                 rows.push({
                     id: `${summary.userEmail}-org`,
+                    userId: orgAssignments[0].userId, // Get userId from first assignment
                     userEmail: summary.userEmail,
                     scope: "Organization",
                     scopeId: null,
@@ -84,6 +85,7 @@ export function RolesPage() {
             deptGroups.forEach((assignments, deptId) => {
                 rows.push({
                     id: `${summary.userEmail}-dept-${deptId}`,
+                    userId: assignments[0].userId, // Get userId from first assignment
                     userEmail: summary.userEmail,
                     scope: "Department",
                     scopeId: deptId,
