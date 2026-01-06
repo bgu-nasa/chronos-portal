@@ -27,7 +27,6 @@ export function UserTable({
             <Avatar
                 src={rowData.avatarUrl}
                 alt={`${rowData.firstName} ${rowData.lastName}`}
-                radius="xl"
             />
         );
     };
@@ -49,7 +48,7 @@ export function UserTable({
             dataKey="id"
             stripedRows
             paginator
-            rows={10}
+            rows={30}
             rowsPerPageOptions={[5, 10, 25, 50]}
         >
             <Column selectionMode="single" headerStyle={{ width: "3rem" }} />

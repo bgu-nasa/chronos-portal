@@ -1,9 +1,10 @@
 import { useState } from "react";
-import { Container, Title } from "@mantine/core";
+import { Container, Divider, Title } from "@mantine/core";
 import { UserActions } from "@/modules/auth/src/pages/users/components/user-actions";
 import { UserTable } from "@/modules/auth/src/pages/users/components/user-table/user-table";
 import type { UserData } from "@/modules/auth/src/pages/users/components/user-table/types";
 import resources from "@/modules/auth/src/pages/users/users-page.resources.json";
+import styles from "./users-page.module.css";
 
 // Mock data for testing the UI
 const mockUsers: UserData[] = [
@@ -68,22 +69,23 @@ export function UsersPage() {
 
     return (
         <Container size="xl" py="xl">
-            <Title order={2} mb="md">
-                {resources.title}
-            </Title>
+            <div className={styles.container}>
+                <Title order={1}>{resources.title}</Title>
+                <Divider className={styles.divider} />
 
-            <UserActions
-                selectedUser={selectedUser}
-                onCreateClick={handleCreateClick}
-                onEditClick={handleEditClick}
-                onDeleteClick={handleDeleteClick}
-            />
+                <UserActions
+                    selectedUser={selectedUser}
+                    onCreateClick={handleCreateClick}
+                    onEditClick={handleEditClick}
+                    onDeleteClick={handleDeleteClick}
+                />
 
-            <UserTable
-                users={mockUsers}
-                selectedUser={selectedUser}
-                onSelectionChange={setSelectedUser}
-            />
+                <UserTable
+                    users={mockUsers}
+                    selectedUser={selectedUser}
+                    onSelectionChange={setSelectedUser}
+                />
+            </div>
         </Container>
     );
 }
