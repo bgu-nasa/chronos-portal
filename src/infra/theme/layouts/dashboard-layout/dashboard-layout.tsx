@@ -1,13 +1,39 @@
 /** @author aaron-iz */
-import { Outlet } from "react-router";
-import { AppShell, Image } from "@mantine/core";
+import { Outlet, useLocation, useNavigate } from "react-router";
+import { AppShell, Image, NavLink, Stack } from "@mantine/core";
 import styles from "./dashboard-layout.module.css";
+import { useDashboardNavigation } from "./use-dashboard-navigation";
+import type { NavigationItem } from "@/infra/federation/module.types";
 
 function TemporaryLogo() {
     return <Image src="/logo.png" alt="Logo" h={40} w="auto" />;
 }
 
+function renderNavigationItems(
+    items: NavigationItem[],
+    navigate: (path: string) => void,
+    currentPath: string
+) {
+    return items.map((item) => (
+        <NavLink
+            key={item.href}
+            label={item.label}
+            leftSection={item.icon}
+            active={currentPath === item.href}
+            onClick={() => navigate(item.href)}
+        >
+            {item.children &&
+                item.children.length > 0 &&
+                renderNavigationItems(item.children, navigate, currentPath)}
+        </NavLink>
+    ));
+}
+
 export default function DashboardLayout() {
+    const navigationItems = useDashboardNavigation();
+    const navigate = useNavigate();
+    const location = useLocation();
+
     return (
         <AppShell
             padding="md"
@@ -23,7 +49,15 @@ export default function DashboardLayout() {
                 </div>
             </AppShell.Header>
 
-            <AppShell.Navbar>Navbar</AppShell.Navbar>
+            <AppShell.Navbar p="md">
+                <Stack gap="xs">
+                    {renderNavigationItems(
+                        navigationItems,
+                        navigate,
+                        location.pathname
+                    )}
+                </Stack>
+            </AppShell.Navbar>
 
             <AppShell.Main>
                 <Outlet />

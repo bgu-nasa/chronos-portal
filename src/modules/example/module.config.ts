@@ -20,5 +20,16 @@ export const moduleConfig: ModuleConfig = {
             authorize: true,
         },
     ],
-    navigationItems: [],
+    navigationItems: [
+        {
+            label: "Example Dashboard",
+            href: "/example/dashboard",
+            location: "dashboard",
+        },
+        {
+            label: "Example Page",
+            href: "/example/not-existing",
+            location: "dashboard",
+        },
+    ],
 };
