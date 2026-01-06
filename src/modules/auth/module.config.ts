@@ -39,7 +39,7 @@ export const moduleConfig: ModuleConfig = {
             order: 20,
         },
         {
-            label: "User Management",
+            label: "Users",
             href: "/auth/users",
             location: "dashboard",
             icon: React.createElement(HiOutlineUsers),
