@@ -4,7 +4,7 @@ import { AppShell, Image, NavLink, Stack, Group } from "@mantine/core";
 import { useEffect } from "react";
 import styles from "./dashboard-layout.module.css";
 import { useDashboardNavigation } from "./use-dashboard-navigation";
-import { LogoutButton } from "@/infra/theme/components/logout-button";
+import { UserCard } from "@/infra/theme/components/user-card";
 import { ThemeToggleButton } from "@/infra/theme/components/theme-toggle-button";
 import { useOrganization } from "@/infra/service";
 import type { NavigationItem } from "@/infra/federation/module.types";
@@ -68,7 +68,7 @@ export default function DashboardLayout() {
                     <TemporaryLogo />
                     <Group gap="sm">
                         <ThemeToggleButton />
-                        <LogoutButton />
+                        <UserCard />
                     </Group>
                 </div>
             </AppShell.Header>

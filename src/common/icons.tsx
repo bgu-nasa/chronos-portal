@@ -12,6 +12,9 @@ import {
     HiOutlineLockOpen,
 } from "react-icons/hi";
 
+// User menu icons
+import { HiOutlineCog, HiOutlineLogout } from "react-icons/hi";
+
 // Theme Icons
 export const MoonIcon = IoMoon;
 export const SunIcon = MdOutlineWbSunny;
@@ -22,3 +25,7 @@ export const UsersIcon = HiOutlineUsers;
 export const ManagementIcon = HiOutlineBriefcase;
 export const DepartmentsIcon = HiOutlineClipboardList;
 export const AccessControlIcon = HiOutlineLockOpen;
+
+// User Menu Icons
+export const SettingsIcon = HiOutlineCog;
+export const LogoutIcon = HiOutlineLogout;
