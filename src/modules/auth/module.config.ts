@@ -33,12 +33,6 @@ export const moduleConfig: ModuleConfig = {
             order: 10,
         },
         {
-            label: "Register",
-            href: "/auth/register",
-            location: "public",
-            order: 20,
-        },
-        {
             label: "Users",
             href: "/auth/users",
             location: "dashboard",

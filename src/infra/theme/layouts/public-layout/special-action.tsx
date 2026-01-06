@@ -2,7 +2,7 @@
 import { Button } from "@mantine/core";
 import { useNavigate } from "react-router";
 
-const DemoRequestPagePath = "/demo";
+const DemoRequestPagePath = "/auth/register";
 
 export default function PublicLayoutSpecialAction() {
     const navigate = useNavigate();
