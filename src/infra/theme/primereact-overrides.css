@@ -56,30 +56,25 @@
     background-color: transparent !important;
 }
 
-/* Make radio button input white accent */
-.p-datatable .p-radiobutton-input {
-    accent-color: white !important;
-}
-
-/* Target ALL possible radio button inner elements */
+/* Target ALL possible radio button inner elements with brand color */
 .p-datatable .p-radiobutton-box.p-highlight,
 .p-datatable .p-radiobutton-box.p-highlight::before,
 .p-datatable .p-radiobutton-box.p-highlight::after,
-.p-datatable .p-radiobutton-box.p-highlight > *,
-.p-datatable .p-radiobutton.p-highlight .p-radiobutton-box,
+/* .p-datatable .p-radiobutton-box.p-highlight > *, */
+/* .p-datatable .p-radiobutton.p-highlight .p-radiobutton-box, */
 .p-datatable .p-radiobutton.p-highlight .p-radiobutton-box::before,
 .p-datatable .p-radiobutton.p-highlight .p-radiobutton-box::after,
 .p-datatable .p-radiobutton.p-radiobutton-checked .p-radiobutton-box,
 .p-datatable .p-radiobutton.p-radiobutton-checked .p-radiobutton-box::before,
 .p-datatable .p-radiobutton.p-radiobutton-checked .p-radiobutton-box::after,
 .p-datatable .p-radiobutton-box .p-radiobutton-icon {
-    background-color: white !important;
-    color: white !important;
+    background-color: #4338ca !important; /* Mantine brand primary color */
+    color: #4338ca !important;
 }
 
-/* Make checkbox checkmark white */
+/* Make checkbox checkmark use brand color */
 .p-datatable .p-checkbox-checked .p-checkbox-box .p-checkbox-icon {
-    color: white !important;
+    color: #4338ca !important; /* Mantine brand primary color */
 }
 
 /* Transparent paginator */
