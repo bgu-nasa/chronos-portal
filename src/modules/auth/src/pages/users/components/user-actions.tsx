@@ -28,11 +28,11 @@ export function UserActions({ selectedUser }: UserActionsProps) {
     const handleEditClick = () => {
         if (selectedUser) {
             openForEdit({
-                userId: selectedUser.id,
+                id: selectedUser.id,
                 email: selectedUser.email,
                 firstName: selectedUser.firstName,
                 lastName: selectedUser.lastName,
-                emailVerified: selectedUser.verified,
+                verified: selectedUser.verified,
                 avatarUrl: selectedUser.avatarUrl || null,
             });
         }
