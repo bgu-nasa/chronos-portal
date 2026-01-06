@@ -4,7 +4,6 @@
  */
 
 import { $app } from "@/infra/service";
-import { tokenService } from "@/infra/service/ajax/token.service";
 import type {
     LoginRequest,
     LoginResponse,
@@ -33,21 +32,21 @@ export class AuthDataRepository {
 
         // Login is an unauthenticated request
         const response = await $app.ajax.post<LoginResponse>(
-            "/auth/login",
+            "/api/auth/login",
             request,
             { auth: false }
         );
 
         // Save token to storage
         if (response.accessToken) {
-            tokenService.setToken(response.accessToken);
+            $app.token.setToken(response.accessToken);
         }
 
         return response;
     }
 
     /**
-     * Onboard new organization with admin user
+     * Register new organization with admin user
      * Creates a new organization and admin user account
      * Sets the token in storage upon successful registration
      *
@@ -55,16 +54,16 @@ export class AuthDataRepository {
      * @returns Registration response with access token
      */
     async onboard(request: RegisterRequest): Promise<RegisterResponse> {
-        // Onboarding is an unauthenticated request
+        // Registration is an unauthenticated request
         const response = await $app.ajax.post<RegisterResponse>(
-            "/auth/onboard",
+            "/api/auth/register",
             request,
             { auth: false }
         );
 
         // Save token to storage
         if (response.accessToken) {
-            tokenService.setToken(response.accessToken);
+            $app.token.setToken(response.accessToken);
         }
 
         return response;
@@ -75,7 +74,7 @@ export class AuthDataRepository {
      * Clears the token from storage
      */
     logout(): void {
-        tokenService.clearToken();
+        $app.token.clearToken();
     }
 
     /**
@@ -83,7 +82,7 @@ export class AuthDataRepository {
      * @returns true if user has a valid token
      */
     isAuthenticated(): boolean {
-        return tokenService.hasToken();
+        return $app.token.hasToken();
     }
 }
 

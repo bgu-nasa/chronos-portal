@@ -8,7 +8,7 @@ export default function LogoutButton() {
 
     const handleLogout = () => {
         // Clear the authentication token
-        $app.logout();
+        $app.token.clearToken();
 
         // Navigate to login page
         navigate("/", { replace: true });

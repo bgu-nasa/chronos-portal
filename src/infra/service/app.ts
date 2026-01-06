@@ -18,15 +18,16 @@ interface IApp {
     ajax: IAjaxService;
 
     /**
+     * Token management service
+     * Handles authentication token storage, retrieval, and lifecycle
+     */
+    token: typeof tokenService;
+
+    /**
      * Check if user is authenticated (has a valid token)
      * @returns true if token exists, false otherwise
      */
     isAuthenticated: () => boolean;
-
-    /**
-     * Logout the current user by clearing the authentication token
-     */
-    logout: () => void;
 
     // Future services can be added here:
     // auth: IAuthService;
@@ -60,6 +61,6 @@ interface IApp {
  */
 export const $app: IApp = {
     ajax: ajaxService,
+    token: tokenService,
     isAuthenticated: () => tokenService.hasToken(),
-    logout: () => tokenService.clearToken(),
 };
