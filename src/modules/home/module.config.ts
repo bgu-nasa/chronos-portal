@@ -19,6 +19,7 @@ export const moduleConfig: ModuleConfig = {
             element: React.createElement(HomePage),
         },
         {
+            authorize: true,
             path: "/dashboard/home",
             name: "Dashboard Home",
             element: React.createElement(DashboardHomePage),
