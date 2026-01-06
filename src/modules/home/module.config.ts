@@ -24,6 +24,7 @@ export const moduleConfig: ModuleConfig = {
             location: "public",
             label: "Home",
             href: "/",
+            order: -1,
         },
     ],
 };

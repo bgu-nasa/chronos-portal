@@ -18,6 +18,7 @@ export const moduleConfig: ModuleConfig = {
             label: "Login",
             href: "/auth/login",
             location: "public",
+            order: 10,
         },
     ],
 };
