@@ -7,10 +7,18 @@ import {
     TextInput,
     Title,
 } from "@mantine/core";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { useNavigate } from "react-router";
 import { PLANS, type PlanType } from "@/modules/auth/.mock/plans";
 import { useRegister } from "@/modules/auth/src/hooks";
+import {
+    validateEmail,
+    validateFirstName,
+    validateLastName,
+    validatePassword,
+    validatePasswordMatch,
+    validateOrganizationName,
+} from "@/modules/auth/src/common/validation.service";
 import styles from "./register-page.module.css";
 import resources from "./register-page.resources.json";
 
@@ -26,9 +34,48 @@ export function RegisterPage() {
     const [organizationName, setOrganizationName] = useState("");
     const [plan, setPlan] = useState<PlanType | null>(null);
 
+    // Track which fields have been touched
+    const [touched, setTouched] = useState({
+        email: false,
+        firstName: false,
+        lastName: false,
+        password: false,
+        confirmPassword: false,
+        organizationName: false,
+    });
+
     const { register, isLoading, error: hookError } = useRegister();
     const [validationError, setValidationError] = useState<string | null>(null);
     const navigate = useNavigate();
+
+    // Compute errors reactively based on current field values
+    const emailError = useMemo(() => {
+        return touched.email ? validateEmail(email) : undefined;
+    }, [email, touched.email]);
+
+    const firstNameError = useMemo(() => {
+        return touched.firstName ? validateFirstName(firstName) : undefined;
+    }, [firstName, touched.firstName]);
+
+    const lastNameError = useMemo(() => {
+        return touched.lastName ? validateLastName(lastName) : undefined;
+    }, [lastName, touched.lastName]);
+
+    const passwordError = useMemo(() => {
+        return touched.password ? validatePassword(password) : undefined;
+    }, [password, touched.password]);
+
+    const confirmPasswordError = useMemo(() => {
+        return touched.confirmPassword
+            ? validatePasswordMatch(password, confirmPassword)
+            : undefined;
+    }, [password, confirmPassword, touched.confirmPassword]);
+
+    const organizationNameError = useMemo(() => {
+        return touched.organizationName
+            ? validateOrganizationName(organizationName)
+            : undefined;
+    }, [organizationName, touched.organizationName]);
 
     // Combine hook error and validation error
     const error = validationError || hookError;
@@ -37,8 +84,37 @@ export function RegisterPage() {
         e.preventDefault();
         setValidationError(null);
 
-        if (password !== confirmPassword) {
-            setValidationError("Passwords do not match");
+        // Mark all fields as touched for validation display
+        setTouched({
+            email: true,
+            firstName: true,
+            lastName: true,
+            password: true,
+            confirmPassword: true,
+            organizationName: true,
+        });
+
+        // Validate all fields
+        const emailValidation = validateEmail(email);
+        const firstNameValidation = validateFirstName(firstName);
+        const lastNameValidation = validateLastName(lastName);
+        const passwordValidation = validatePassword(password);
+        const passwordMatchValidation = validatePasswordMatch(
+            password,
+            confirmPassword
+        );
+        const organizationNameValidation =
+            validateOrganizationName(organizationName);
+
+        // Check for validation errors
+        if (
+            emailValidation ||
+            firstNameValidation ||
+            lastNameValidation ||
+            passwordValidation ||
+            passwordMatchValidation ||
+            organizationNameValidation
+        ) {
             return;
         }
 
@@ -105,6 +181,13 @@ export function RegisterPage() {
                                 onChange={(e) =>
                                     setEmail(e.currentTarget.value)
                                 }
+                                onBlur={() =>
+                                    setTouched((prev) => ({
+                                        ...prev,
+                                        email: true,
+                                    }))
+                                }
+                                error={emailError}
                                 required
                                 size="md"
                             />
@@ -116,6 +199,13 @@ export function RegisterPage() {
                                 onChange={(e) =>
                                     setFirstName(e.currentTarget.value)
                                 }
+                                onBlur={() =>
+                                    setTouched((prev) => ({
+                                        ...prev,
+                                        firstName: true,
+                                    }))
+                                }
+                                error={firstNameError}
                                 required
                                 size="md"
                             />
@@ -127,6 +217,13 @@ export function RegisterPage() {
                                 onChange={(e) =>
                                     setLastName(e.currentTarget.value)
                                 }
+                                onBlur={() =>
+                                    setTouched((prev) => ({
+                                        ...prev,
+                                        lastName: true,
+                                    }))
+                                }
+                                error={lastNameError}
                                 required
                                 size="md"
                             />
@@ -138,6 +235,13 @@ export function RegisterPage() {
                                 onChange={(e) =>
                                     setPassword(e.currentTarget.value)
                                 }
+                                onBlur={() =>
+                                    setTouched((prev) => ({
+                                        ...prev,
+                                        password: true,
+                                    }))
+                                }
+                                error={passwordError}
                                 required
                                 size="md"
                             />
@@ -151,6 +255,13 @@ export function RegisterPage() {
                                 onChange={(e) =>
                                     setConfirmPassword(e.currentTarget.value)
                                 }
+                                onBlur={() =>
+                                    setTouched((prev) => ({
+                                        ...prev,
+                                        confirmPassword: true,
+                                    }))
+                                }
+                                error={confirmPasswordError}
                                 required
                                 size="md"
                             />
@@ -169,6 +280,13 @@ export function RegisterPage() {
                                 onChange={(e) =>
                                     setOrganizationName(e.currentTarget.value)
                                 }
+                                onBlur={() =>
+                                    setTouched((prev) => ({
+                                        ...prev,
+                                        organizationName: true,
+                                    }))
+                                }
+                                error={organizationNameError}
                                 required
                                 size="md"
                             />
