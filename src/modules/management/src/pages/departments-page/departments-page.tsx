@@ -56,18 +56,11 @@ export function DepartmentsPage() {
             onConfirm: async () => {
                 const success = await deleteDepartment(selectedDepartment.id);
                 if (success) {
-                    // Refresh the departments list and clear selection
-                    fetchDepartments();
+                    // State automatically updated by store, just clear selection
                     setSelectedDepartment(null);
                 }
             },
         });
-    };
-
-    const handleEditorSuccess = () => {
-        // Refresh the departments list after successful create/edit
-        fetchDepartments();
-        setSelectedDepartment(null);
     };
 
     // Convert DepartmentResponse to DepartmentData
@@ -96,7 +89,7 @@ export function DepartmentsPage() {
                     onSelectionChange={setSelectedDepartment}
                 />
 
-                <DepartmentEditor onSuccess={handleEditorSuccess} />
+                <DepartmentEditor />
 
                 <ConfirmationDialog
                     opened={confirmationState.isOpen}

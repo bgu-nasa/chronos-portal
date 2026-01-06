@@ -12,11 +12,7 @@ import {
 } from "@/modules/management/src/hooks/use-departments";
 import resources from "@/modules/management/src/pages/departments-page/departments-page.resources.json";
 
-interface DepartmentEditorProps {
-    onSuccess?: () => void;
-}
-
-export function DepartmentEditor({ onSuccess }: DepartmentEditorProps) {
+export function DepartmentEditor() {
     const { isOpen, mode, department, close } = useDepartmentEditorStore();
     const { createDepartment, isLoading: isCreating } = useCreateDepartment();
     const { updateDepartment, isLoading: isUpdating } = useUpdateDepartment();
@@ -59,7 +55,7 @@ export function DepartmentEditor({ onSuccess }: DepartmentEditorProps) {
 
         if (success) {
             handleClose();
-            onSuccess?.();
+            // State automatically updated by store, no need for onSuccess callback
         }
     };
 
