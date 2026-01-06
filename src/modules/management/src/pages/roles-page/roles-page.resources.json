@@ -1,0 +1,8 @@
+{
+    "title": "Role Assignments",
+    "createButton": "Create",
+    "userEmailColumn": "User Email",
+    "scopeColumn": "Scope",
+    "rolesColumn": "Roles",
+    "emptyStateMessage": "No role assignments yet. Get started by creating your first role assignment!"
+}
