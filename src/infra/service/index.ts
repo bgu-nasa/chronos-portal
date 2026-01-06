@@ -11,3 +11,15 @@ export type {
     StoredToken,
 } from "./ajax/types";
 export { tokenService } from "./ajax/token.service";
+
+// Organization service exports
+export {
+    organizationService,
+    useOrganization,
+    useOrganizationStore,
+    RoleType,
+    type IOrganizationService,
+    type OrganizationInformation,
+    type RoleAssignmentResponse,
+    type DepartmentResponse,
+} from "./organization";

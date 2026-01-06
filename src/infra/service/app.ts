@@ -5,7 +5,9 @@
 
 import { ajaxService } from "./ajax/ajax.service";
 import { tokenService } from "./ajax/token.service";
+import { organizationService } from "./organization/organization.service";
 import type { IAjaxService } from "./ajax/types";
+import type { IOrganizationService } from "./organization/organization.service";
 
 /**
  * Application service container interface
@@ -22,6 +24,12 @@ interface IApp {
      * Handles authentication token storage, retrieval, and lifecycle
      */
     token: typeof tokenService;
+
+    /**
+     * Organization information service
+     * Manages organization context, roles, and departments
+     */
+    organization: IOrganizationService;
 
     /**
      * Check if user is authenticated (has a valid token)
@@ -62,5 +70,6 @@ interface IApp {
 export const $app: IApp = {
     ajax: ajaxService,
     token: tokenService,
+    organization: organizationService,
     isAuthenticated: () => tokenService.hasToken(),
 };
