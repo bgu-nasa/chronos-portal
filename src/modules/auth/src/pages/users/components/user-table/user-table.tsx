@@ -49,7 +49,6 @@ export function UserTable({
             stripedRows
             paginator
             rows={10}
-            rowsPerPageOptions={[5, 10, 25, 50]}
         >
             <Column selectionMode="single" headerStyle={{ width: "3rem" }} />
             <Column
