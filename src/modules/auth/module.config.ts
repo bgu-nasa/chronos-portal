@@ -1,6 +1,7 @@
 import type { ModuleConfig } from "@/infra";
 import React from "react";
-import { LoginPage, RegisterPage } from "./src/pages";
+import { LoginPage, RegisterPage, UsersPage } from "./src/pages";
+import { HiOutlineUsers } from "react-icons/hi";
 
 export const moduleConfig: ModuleConfig = {
     name: "Auth",
@@ -17,6 +18,12 @@ export const moduleConfig: ModuleConfig = {
             path: "/register", // Route will be /auth/register
             element: React.createElement(RegisterPage),
         },
+        {
+            authorize: true,
+            name: "users",
+            path: "/users",
+            element: React.createElement(UsersPage),
+        },
     ],
     navigationItems: [
         {
@@ -30,6 +37,12 @@ export const moduleConfig: ModuleConfig = {
             href: "/auth/register",
             location: "public",
             order: 20,
+        },
+        {
+            label: "User Management",
+            href: "/auth/users",
+            location: "dashboard",
+            icon: React.createElement(HiOutlineUsers),
         },
     ],
 };
