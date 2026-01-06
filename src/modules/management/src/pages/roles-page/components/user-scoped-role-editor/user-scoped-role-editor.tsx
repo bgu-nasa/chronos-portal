@@ -4,7 +4,7 @@
  * Shows user info, scope details, and toggleable role chips
  */
 
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect } from "react";
 import { Drawer, Stack, Text, Chip, Group } from "@mantine/core";
 import { UserInfo, CopiableInput } from "@/common";
 import {
@@ -12,10 +12,7 @@ import {
     useRemoveRoleAssignment,
     useRoleAssignments,
 } from "@/modules/management/src/hooks/use-roles";
-import type {
-    RoleType,
-    UserRoleAssignmentSummary,
-} from "@/modules/management/src/data/role.types";
+import type { RoleType } from "@/modules/management/src/data/role.types";
 import type { RoleTableRow } from "@/modules/management/src/pages/roles-page/components/role-table/types";
 import { $app } from "@/infra/service";
 import resources from "@/modules/management/src/pages/roles-page/roles-page.resources.json";
@@ -47,15 +44,6 @@ export function UserScopedRoleEditor({
         "Operator",
         "Viewer",
     ];
-
-    // Get user info from role assignments
-    const userSummary = useMemo(() => {
-        if (!selectedRow) return null;
-        return roleAssignments.find(
-            (summary: UserRoleAssignmentSummary) =>
-                summary.userEmail === selectedRow.userEmail
-        );
-    }, [roleAssignments, selectedRow]);
 
     // Get user details from $app (to get avatar, name, etc.)
     const organization = $app.organization.getOrganization();
