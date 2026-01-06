@@ -4,6 +4,7 @@
  */
 
 import { ajaxService } from "./ajax/ajax.service";
+import { tokenService } from "./ajax/token.service";
 import type { IAjaxService } from "./ajax/types";
 
 /**
@@ -15,6 +16,12 @@ interface IApp {
      * HTTP client for authenticated and unauthenticated requests
      */
     ajax: IAjaxService;
+
+    /**
+     * Check if user is authenticated (has a valid token)
+     * @returns true if token exists, false otherwise
+     */
+    isAuthenticated: () => boolean;
 
     // Future services can be added here:
     // auth: IAuthService;
@@ -30,6 +37,11 @@ interface IApp {
  * ```ts
  * import { $app } from '@/infra/service';
  *
+ * // Check authentication
+ * if ($app.isAuthenticated()) {
+ *   console.log('User is authenticated');
+ * }
+ *
  * // Authenticated request
  * const user = await $app.ajax.get<User>('/users/me');
  *
@@ -43,4 +55,5 @@ interface IApp {
  */
 export const $app: IApp = {
     ajax: ajaxService,
+    isAuthenticated: () => tokenService.hasToken(),
 };
