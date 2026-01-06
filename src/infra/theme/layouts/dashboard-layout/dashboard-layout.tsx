@@ -23,7 +23,7 @@ function renderNavigationItems(
             label={item.label}
             leftSection={item.icon}
             active={currentPath === item.href}
-            onClick={() => navigate(item.href)}
+            href={item.href}
         >
             {item.children &&
                 item.children.length > 0 &&
