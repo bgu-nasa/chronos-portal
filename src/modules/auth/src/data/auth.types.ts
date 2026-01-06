@@ -16,7 +16,6 @@ export interface LoginRequest {
  */
 export interface LoginResponse {
     token: string;
-    accessToken?: string; // Support both field names
     // Add other fields if backend returns them
 }
 
@@ -44,6 +43,5 @@ export interface RegisterRequest {
  */
 export interface RegisterResponse {
     token: string;
-    accessToken?: string; // Support both field names
     // Add other fields if backend returns them
 }

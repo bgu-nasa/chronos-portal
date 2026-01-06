@@ -51,15 +51,15 @@ class TokenService {
      * Get current token if valid
      */
     getToken(): string | null {
-        return this.token?.accessToken ?? null;
+        return this.token?.token ?? null;
     }
 
     /**
      * Set a new token
      */
-    setToken(accessToken: string): void {
+    setToken(token: string): void {
         this.token = {
-            accessToken,
+            token,
             issuedAt: Date.now(),
         };
         this.saveToStorage(this.token);

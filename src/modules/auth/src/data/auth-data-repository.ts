@@ -38,9 +38,8 @@ export class AuthDataRepository {
         );
 
         // Save token to storage
-        const token = (response as any).token || response.accessToken;
-        if (token) {
-            $app.token.setToken(token);
+        if (response.token) {
+            $app.token.setToken(response.token);
         }
 
         return response;
@@ -63,9 +62,8 @@ export class AuthDataRepository {
         );
 
         // Save token to storage
-        const token = (response as any).token || response.accessToken;
-        if (token) {
-            $app.token.setToken(token);
+        if (response.token) {
+            $app.token.setToken(response.token);
         }
 
         return response;

@@ -63,8 +63,7 @@ function createHttpClient(): AxiosInstance {
                                 _isRefreshRequest: true,
                             } as CustomAxiosRequestConfig
                         );
-                        return (response.data as { accessToken: string })
-                            .accessToken;
+                        return (response.data as { token: string }).token;
                     });
                 } catch (error) {
                     // Token refresh failed, request will proceed without token

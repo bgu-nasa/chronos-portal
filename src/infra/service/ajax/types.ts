@@ -6,7 +6,7 @@
  * Stored token model with issuance timestamp
  */
 export interface StoredToken {
-    accessToken: string;
+    token: string;
     issuedAt: number; // Date.now()
 }
 
