@@ -6,8 +6,6 @@ import {
     Stack,
     Group,
     Modal,
-    Text,
-    FileButton,
     Avatar,
     Alert,
 } from "@mantine/core";
@@ -16,7 +14,6 @@ import {
     useCreateUser,
     useUpdateUser,
 } from "@/modules/auth/src/hooks/use-users";
-import { useImageUpload } from "@/modules/auth/src/hooks/use-image-upload";
 import { generateSecurePassword } from "@/modules/auth/src/common/password-generator";
 import {
     validateEmail,
@@ -51,11 +48,8 @@ export function UserEditor() {
     } = useUserEditorStore();
     const { createUser, isLoading: isCreating } = useCreateUser();
     const { updateUser, isLoading: isUpdating } = useUpdateUser();
-    const { uploadImage, isUploading, error: uploadError } = useImageUpload();
 
     const [showPasswordModal, setShowPasswordModal] = useState(false);
-    const [avatarFile, setAvatarFile] = useState<File | null>(null);
-    const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
     const [formValues, setFormValues] = useState<UserFormValues>({
         email: "",
         firstName: "",
@@ -73,7 +67,6 @@ export function UserEditor() {
                 lastName: editingUser.lastName,
                 avatarUrl: editingUser.avatarUrl || null,
             });
-            setAvatarPreview(editingUser.avatarUrl || null);
         } else if (isOpen && mode === "create") {
             setFormValues({
                 email: "",
@@ -81,29 +74,9 @@ export function UserEditor() {
                 lastName: "",
                 avatarUrl: null,
             });
-            setAvatarPreview(null);
         }
-        setAvatarFile(null);
         setFormErrors({});
     }, [isOpen, mode, editingUser]);
-
-    const handleAvatarChange = (file: File | null) => {
-        if (file) {
-            setAvatarFile(file);
-            // Create preview
-            const reader = new FileReader();
-            reader.onloadend = () => {
-                setAvatarPreview(reader.result as string);
-            };
-            reader.readAsDataURL(file);
-        }
-    };
-
-    const handleRemoveAvatar = () => {
-        setAvatarFile(null);
-        setAvatarPreview(null);
-        setFormValues((prev) => ({ ...prev, avatarUrl: null }));
-    };
 
     const validateForm = (): boolean => {
         const errors: FormErrors = {};
@@ -128,17 +101,6 @@ export function UserEditor() {
             return;
         }
 
-        let uploadedAvatarUrl = formValues.avatarUrl;
-
-        // Upload avatar if a new file was selected
-        if (avatarFile) {
-            uploadedAvatarUrl = await uploadImage(avatarFile);
-            if (!uploadedAvatarUrl) {
-                // Upload failed, error is already set in the hook
-                return;
-            }
-        }
-
         if (mode === "create") {
             // Generate password for new user
             const password = generateSecurePassword();
@@ -155,10 +117,10 @@ export function UserEditor() {
                 setShowPasswordModal(true);
             }
         } else if (mode === "edit" && editingUser) {
-            const success = await updateUser(editingUser.userId, {
+            const success = await updateUser(editingUser.id, {
                 firstName: formValues.firstName,
                 lastName: formValues.lastName,
-                avatarUrl: uploadedAvatarUrl,
+                avatarUrl: formValues.avatarUrl,
             });
 
             if (success) {
@@ -173,7 +135,7 @@ export function UserEditor() {
         close();
     };
 
-    const isLoading = isCreating || isUpdating || isUploading;
+    const isLoading = isCreating || isUpdating;
 
     return (
         <>
@@ -186,15 +148,6 @@ export function UserEditor() {
             >
                 <form onSubmit={handleSubmit}>
                     <Stack gap="md">
-                        {uploadError && (
-                            <Alert
-                                color="red"
-                                title={resources.errors.uploadFailed}
-                            >
-                                {uploadError}
-                            </Alert>
-                        )}
-
                         <TextInput
                             label={resources.form.email}
                             placeholder="user@example.com"
@@ -240,52 +193,25 @@ export function UserEditor() {
 
                         {mode === "edit" && (
                             <Stack gap="xs">
-                                <Text size="sm" fw={500}>
-                                    {resources.form.avatarUrl}
-                                </Text>
-
-                                <Group gap="md">
+                                <Group gap="md" align="flex-start">
                                     <Avatar
-                                        src={avatarPreview}
+                                        src={formValues.avatarUrl}
                                         size="lg"
                                         radius="md"
                                     />
-
-                                    <Stack gap="xs">
-                                        <FileButton
-                                            onChange={handleAvatarChange}
-                                            accept="image/png,image/jpeg,image/jpg,image/gif,image/webp"
-                                        >
-                                            {(props) => (
-                                                <Button
-                                                    {...props}
-                                                    variant="light"
-                                                    size="xs"
-                                                    disabled={isUploading}
-                                                >
-                                                    {isUploading
-                                                        ? resources.form
-                                                              .uploadingImage
-                                                        : avatarPreview
-                                                        ? resources.form
-                                                              .changeImage
-                                                        : resources.form
-                                                              .uploadImage}
-                                                </Button>
-                                            )}
-                                        </FileButton>
-
-                                        {avatarPreview && (
-                                            <Button
-                                                variant="subtle"
-                                                color="red"
-                                                size="xs"
-                                                onClick={handleRemoveAvatar}
-                                            >
-                                                {resources.form.removeImage}
-                                            </Button>
-                                        )}
-                                    </Stack>
+                                    <TextInput
+                                        label={resources.form.avatarUrl}
+                                        placeholder="https://example.com/avatar.jpg"
+                                        style={{ flex: 1 }}
+                                        value={formValues.avatarUrl || ""}
+                                        onChange={(e) =>
+                                            setFormValues((prev) => ({
+                                                ...prev,
+                                                avatarUrl:
+                                                    e.target.value || null,
+                                            }))
+                                        }
+                                    />
                                 </Group>
                             </Stack>
                         )}

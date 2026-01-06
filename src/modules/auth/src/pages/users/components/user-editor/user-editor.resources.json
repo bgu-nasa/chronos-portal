@@ -7,11 +7,7 @@
         "email": "Email",
         "firstName": "First Name",
         "lastName": "Last Name",
-        "avatarUrl": "Avatar Image",
-        "uploadImage": "Upload Image",
-        "uploadingImage": "Uploading...",
-        "changeImage": "Change Image",
-        "removeImage": "Remove Image"
+        "avatarUrl": "Avatar Image URL"
     },
     "buttons": {
         "save": "Save",
@@ -27,8 +23,7 @@
     },
     "errors": {
         "createFailed": "Failed to create user",
-        "updateFailed": "Failed to update user",
-        "uploadFailed": "Failed to upload image"
+        "updateFailed": "Failed to update user"
     },
     "validation": {
         "emailRequired": "Email is required",
