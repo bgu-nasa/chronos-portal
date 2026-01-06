@@ -7,22 +7,26 @@ import {
     Title,
 } from "@mantine/core";
 import { useState } from "react";
+import { useLogin } from "@/modules/auth/src/hooks";
 import styles from "./login-page.module.css";
 import resources from "./login-page.resources.json";
 
 export function LoginPage() {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
-    const [isLoading, setIsLoading] = useState(false);
+    const { login, isLoading, error } = useLogin();
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        setIsLoading(true);
 
-        // TODO: Implement login logic with backend
-        console.log("Login attempt:", { email, password });
-
-        setIsLoading(false);
+        try {
+            await login(email, password);
+            // TODO: Navigate to dashboard or home page after successful login
+            console.log("Login successful");
+        } catch (err) {
+            // Error is already handled by the hook
+            console.error("Login error:", err);
+        }
     };
 
     return (
@@ -41,6 +45,12 @@ export function LoginPage() {
                 </div>
 
                 <form onSubmit={handleSubmit} className={styles.loginForm}>
+                    {error && (
+                        <Text c="red" size="sm">
+                            {error}
+                        </Text>
+                    )}
+
                     <TextInput
                         label={resources.emailLabel}
                         placeholder={resources.emailPlaceholder}

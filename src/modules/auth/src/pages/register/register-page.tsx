@@ -9,6 +9,7 @@ import {
 } from "@mantine/core";
 import { useState } from "react";
 import { PLANS, type PlanType } from "@/modules/auth/.mock/plans";
+import { useRegister } from "@/modules/auth/src/hooks";
 import styles from "./register-page.module.css";
 import resources from "./register-page.resources.json";
 
@@ -24,40 +25,45 @@ export function RegisterPage() {
     const [organizationName, setOrganizationName] = useState("");
     const [plan, setPlan] = useState<PlanType | null>(null);
 
-    const [isLoading, setIsLoading] = useState(false);
+    const { register, isLoading, error: hookError } = useRegister();
+    const [validationError, setValidationError] = useState<string | null>(null);
+
+    // Combine hook error and validation error
+    const error = validationError || hookError;
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
+        setValidationError(null);
 
         if (password !== confirmPassword) {
-            // TODO: Show error notification
-            console.error("Passwords do not match");
+            setValidationError("Passwords do not match");
             return;
         }
 
         if (!plan) {
-            // TODO: Show error notification
-            console.error("Please select a plan");
+            setValidationError("Please select a plan");
             return;
         }
 
-        setIsLoading(true);
+        try {
+            const registerRequest = {
+                AdminUser: {
+                    Email: email,
+                    FirstName: firstName,
+                    LastName: lastName,
+                    Password: password,
+                },
+                OrganizationName: organizationName,
+                Plan: plan,
+            };
 
-        // TODO: Implement registration logic with backend
-        const registerRequest = {
-            AdminUser: {
-                Email: email,
-                FirstName: firstName,
-                LastName: lastName,
-                Password: password,
-            },
-            OrganizationName: organizationName,
-            Plan: plan,
-        };
-
-        console.log("Registration attempt:", registerRequest);
-
-        setIsLoading(false);
+            await register(registerRequest);
+            // TODO: Navigate to dashboard or home page after successful registration
+            console.log("Registration successful");
+        } catch (err) {
+            // Error is already handled by the hook
+            console.error("Registration error:", err);
+        }
     };
 
     return (
@@ -76,6 +82,12 @@ export function RegisterPage() {
                 </div>
 
                 <form onSubmit={handleSubmit} className={styles.registerForm}>
+                    {error && (
+                        <Text c="red" size="sm">
+                            {error}
+                        </Text>
+                    )}
+
                     <div className={styles.formSplit}>
                         {/* Left side - User Info */}
                         <div className={styles.formSection}>
