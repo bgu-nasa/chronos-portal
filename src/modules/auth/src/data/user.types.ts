@@ -8,11 +8,11 @@
  * Matches the UserResponse from the backend
  */
 export interface UserResponse {
-    userId: string; // Guid from C#
+    id: string; // Guid from C# (backend returns 'id', not 'userId')
     email: string;
     firstName: string;
     lastName: string;
-    emailVerified: boolean;
+    verified: boolean; // backend returns 'verified', not 'emailVerified'
     avatarUrl?: string | null;
 }
 

@@ -26,12 +26,12 @@ export function UsersPage() {
 
     // Map UserResponse to UserData for the table component
     const userData: UserData[] = users.map((user) => ({
-        id: user.userId,
+        id: user.id,
         firstName: user.firstName,
         lastName: user.lastName,
         email: user.email,
         avatarUrl: user.avatarUrl || undefined,
-        verified: user.emailVerified,
+        verified: user.verified,
     }));
 
     return (
