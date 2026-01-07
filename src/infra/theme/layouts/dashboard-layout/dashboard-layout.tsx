@@ -7,6 +7,8 @@ import {
     Group,
     ActionIcon,
     Tooltip,
+    HoverCard,
+    Paper,
 } from "@mantine/core";
 import { useEffect } from "react";
 import styles from "./dashboard-layout.module.css";
@@ -28,27 +30,58 @@ function renderNavigationItems(
     collapsed: boolean
 ) {
     return items.map((item) => {
-        const navItem = (
-            <NavLink
-                key={item.href}
-                label={collapsed ? "" : item.label}
-                leftSection={item.icon}
-                active={currentPath === item.href}
-                href={item.href}
-                className={collapsed ? styles.collapsedNavLink : ""}
-            >
-                {!collapsed &&
-                    item.children &&
-                    item.children.length > 0 &&
-                    renderNavigationItems(
-                        item.children,
-                        navigate,
-                        currentPath,
-                        collapsed
-                    )}
-            </NavLink>
-        );
+        const hasChildren = item.children && item.children.length > 0;
 
+        // For collapsed state with children, show popover on hover
+        if (collapsed && hasChildren) {
+            return (
+                <HoverCard
+                    key={item.href}
+                    position="right"
+                    withArrow
+                    shadow="md"
+                    openDelay={200}
+                    closeDelay={100}
+                >
+                    <HoverCard.Target>
+                        <div>
+                            <NavLink
+                                label=""
+                                leftSection={item.icon}
+                                active={currentPath === item.href}
+                                href={item.href}
+                                className={styles.collapsedNavLink}
+                            />
+                        </div>
+                    </HoverCard.Target>
+                    <HoverCard.Dropdown>
+                        <Stack gap="xs">
+                            {/* Show parent as first item if it has an href */}
+                            {item.href && (
+                                <NavLink
+                                    label={item.label}
+                                    leftSection={item.icon}
+                                    active={currentPath === item.href}
+                                    href={item.href}
+                                />
+                            )}
+                            {/* Show children */}
+                            {item.children?.map((child) => (
+                                <NavLink
+                                    key={child.href}
+                                    label={child.label}
+                                    leftSection={child.icon}
+                                    active={currentPath === child.href}
+                                    href={child.href}
+                                />
+                            ))}
+                        </Stack>
+                    </HoverCard.Dropdown>
+                </HoverCard>
+            );
+        }
+
+        // For collapsed state without children, show simple tooltip
         if (collapsed) {
             return (
                 <Tooltip
@@ -57,12 +90,38 @@ function renderNavigationItems(
                     position="right"
                     withArrow
                 >
-                    {navItem}
+                    <div>
+                        <NavLink
+                            label=""
+                            leftSection={item.icon}
+                            active={currentPath === item.href}
+                            href={item.href}
+                            className={styles.collapsedNavLink}
+                        />
+                    </div>
                 </Tooltip>
             );
         }
 
-        return navItem;
+        // For expanded state, render normally with children
+        return (
+            <NavLink
+                key={item.href}
+                label={item.label}
+                leftSection={item.icon}
+                active={currentPath === item.href}
+                href={item.href}
+            >
+                {hasChildren &&
+                    item.children &&
+                    renderNavigationItems(
+                        item.children,
+                        navigate,
+                        currentPath,
+                        collapsed
+                    )}
+            </NavLink>
+        );
     });
 }
 
@@ -94,6 +153,7 @@ export default function DashboardLayout() {
             navbar={{
                 width: collapsed ? 80 : 300,
                 breakpoint: "sm",
+                collapsed: { mobile: collapsed },
             }}
         >
             <AppShell.Header>
