@@ -1,7 +1,7 @@
 import { DataTable } from "primereact/datatable";
 import type { DataTableSelectionSingleChangeEvent } from "primereact/datatable";
 import { Column } from "primereact/column";
-import { Badge, Text, Stack } from "@mantine/core";
+import { Badge, Text, Stack, useMantineTheme } from "@mantine/core";
 import type { DepartmentData } from "@/modules/management/src/pages/departments-page/components/department-table/types";
 import resources from "@/modules/management/src/pages/departments-page/departments-page.resources.json";
 
@@ -16,6 +16,8 @@ export function DepartmentTable({
     selectedDepartment,
     onSelectionChange,
 }: DepartmentTableProps) {
+    const theme = useMantineTheme();
+
     const handleSelectionChange = (
         e: DataTableSelectionSingleChangeEvent<DepartmentData[]>
     ) => {
@@ -24,7 +26,10 @@ export function DepartmentTable({
 
     const statusTemplate = (rowData: DepartmentData) => {
         return (
-            <Badge color={rowData.deleted ? "red" : "green"} variant="filled">
+            <Badge
+                color={rowData.deleted ? "gray" : theme.primaryColor}
+                variant="light"
+            >
                 {rowData.deleted ? resources.deleted : resources.active}
             </Badge>
         );
@@ -51,6 +56,11 @@ export function DepartmentTable({
             paginator
             rows={10}
             emptyMessage={emptyMessage()}
+            pt={{
+                root: { style: { backgroundColor: "transparent" } },
+                wrapper: { style: { backgroundColor: "transparent" } },
+                table: { style: { backgroundColor: "transparent" } },
+            }}
         >
             <Column selectionMode="single" headerStyle={{ width: "3rem" }} />
             <Column field="name" header={resources.nameColumn} sortable />

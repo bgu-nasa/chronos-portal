@@ -1,10 +1,10 @@
 import type { ModuleConfig } from "@/infra";
 import React from "react";
 import {
-    HiOutlineBriefcase,
-    HiOutlineClipboardList,
-    HiOutlineLockOpen,
-} from "react-icons/hi";
+    ManagementIcon,
+    DepartmentsIcon,
+    AccessControlIcon,
+} from "@/common/icons";
 import { DepartmentsPage } from "./src/pages/departments-page";
 import { RolesPage } from "./src";
 
@@ -30,19 +30,19 @@ export const moduleConfig: ModuleConfig = {
         {
             label: "Management",
             location: "dashboard",
-            icon: React.createElement(HiOutlineBriefcase),
+            icon: React.createElement(ManagementIcon),
             children: [
                 {
                     label: "Departments",
                     href: "/management/departments",
                     location: "dashboard",
-                    icon: React.createElement(HiOutlineClipboardList),
+                    icon: React.createElement(DepartmentsIcon),
                 },
                 {
                     label: "Access Control",
                     href: "/management/roles",
                     location: "dashboard",
-                    icon: React.createElement(HiOutlineLockOpen),
+                    icon: React.createElement(AccessControlIcon),
                 },
             ],
         },

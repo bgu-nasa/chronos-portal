@@ -6,8 +6,13 @@
 import { ajaxService } from "./ajax/ajax.service";
 import { tokenService } from "./ajax/token.service";
 import { organizationService } from "./organization/organization.service";
+import {
+    loggerService,
+    setOrganizationIdGetter,
+} from "./logger/logger.service";
 import type { IAjaxService } from "./ajax/types";
 import type { IOrganizationService } from "./organization/organization.service";
+import type { ILogger } from "./logger/logger.types";
 
 /**
  * Application service container interface
@@ -32,6 +37,13 @@ interface IApp {
     organization: IOrganizationService;
 
     /**
+     * Custom logger service
+     * Collects logs in a queue and periodically sends them to Discord
+     * Use this instead of console.log/error/warn/info
+     */
+    logger: ILogger;
+
+    /**
      * Check if user is authenticated (has a valid token)
      * @returns true if token exists, false otherwise
      */
@@ -53,8 +65,13 @@ interface IApp {
  *
  * // Check authentication
  * if ($app.isAuthenticated()) {
- *   console.log('User is authenticated');
+ *   $app.logger.info('User is authenticated');
  * }
+ *
+ * // Logging
+ * $app.logger.info('User logged in', { userId: user.id });
+ * $app.logger.error('Failed to load data', error);
+ * $app.logger.warn('Deprecated feature used');
  *
  * // Authenticated request
  * const user = await $app.ajax.get<User>('/users/me');
@@ -71,5 +88,21 @@ export const $app: IApp = {
     ajax: ajaxService,
     token: tokenService,
     organization: organizationService,
+    logger: loggerService,
     isAuthenticated: () => tokenService.hasToken(),
 };
+
+// Make $app globally accessible on window for debugging and console access
+if (typeof window !== "undefined") {
+    (window as any).$app = $app;
+}
+
+// Configure logger to access organization ID
+setOrganizationIdGetter(() => {
+    try {
+        const orgInfo = organizationService.getOrganization();
+        return orgInfo?.id || null;
+    } catch {
+        return null;
+    }
+});

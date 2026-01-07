@@ -3,7 +3,6 @@
  * Handles organization API calls
  */
 
-import { $app } from "@/infra/service";
 import type { OrganizationInformation } from "./organization.types";
 
 /**

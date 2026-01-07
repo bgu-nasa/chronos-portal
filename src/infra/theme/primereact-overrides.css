@@ -1,0 +1,83 @@
+/* PrimeReact DataTable transparent backgrounds */
+.p-datatable,
+.p-datatable .p-datatable-wrapper,
+.p-datatable .p-datatable-table,
+.p-datatable .p-datatable-thead,
+.p-datatable .p-datatable-tbody,
+.p-datatable .p-datatable-tfoot,
+.p-datatable .p-datatable-header,
+.p-datatable .p-datatable-footer,
+.p-datatable-wrapper,
+.p-datatable-table {
+    background-color: transparent !important;
+}
+
+/* Make individual cells and rows transparent */
+.p-datatable .p-datatable-thead > tr,
+.p-datatable .p-datatable-tbody > tr,
+.p-datatable .p-datatable-tfoot > tr,
+.p-datatable .p-datatable-thead > tr > th,
+.p-datatable .p-datatable-tbody > tr > td,
+.p-datatable .p-datatable-tfoot > tr > td {
+    background-color: transparent !important;
+}
+
+/* Override striped rows */
+.p-datatable .p-datatable-tbody > tr.p-row-odd,
+.p-datatable .p-datatable-tbody > tr.p-row-even {
+    background-color: transparent !important;
+}
+
+/* Override hover and selection states */
+.p-datatable .p-datatable-tbody > tr:not(.p-highlight):hover {
+    background-color: rgba(0, 0, 0, 0.05) !important;
+}
+
+.p-datatable .p-selectable-row:focus {
+    outline: none;
+}
+
+/* Make selection column transparent */
+.p-datatable .p-selection-column {
+    background-color: transparent !important;
+}
+
+/* Make checkbox/radio cell transparent */
+.p-datatable .p-datatable-tbody > tr > td.p-selection-column,
+.p-datatable .p-datatable-thead > tr > th.p-selection-column {
+    background-color: transparent !important;
+}
+
+/* Make radio button box transparent */
+.p-datatable .p-radiobutton,
+.p-datatable .p-radiobutton .p-radiobutton-box,
+.p-datatable .p-checkbox,
+.p-datatable .p-checkbox .p-checkbox-box {
+    background-color: transparent !important;
+}
+
+/* Target ALL possible radio button inner elements with brand color */
+.p-datatable .p-radiobutton-box.p-highlight,
+.p-datatable .p-radiobutton-box.p-highlight::before,
+.p-datatable .p-radiobutton-box.p-highlight::after,
+/* .p-datatable .p-radiobutton-box.p-highlight > *, */
+/* .p-datatable .p-radiobutton.p-highlight .p-radiobutton-box, */
+.p-datatable .p-radiobutton.p-highlight .p-radiobutton-box::before,
+.p-datatable .p-radiobutton.p-highlight .p-radiobutton-box::after,
+.p-datatable .p-radiobutton.p-radiobutton-checked .p-radiobutton-box,
+.p-datatable .p-radiobutton.p-radiobutton-checked .p-radiobutton-box::before,
+.p-datatable .p-radiobutton.p-radiobutton-checked .p-radiobutton-box::after,
+.p-datatable .p-radiobutton-box .p-radiobutton-icon {
+    background-color: #4338ca !important; /* Mantine brand primary color */
+    color: #4338ca !important;
+}
+
+/* Make checkbox checkmark use brand color */
+.p-datatable .p-checkbox-checked .p-checkbox-box .p-checkbox-icon {
+    color: #4338ca !important; /* Mantine brand primary color */
+}
+
+/* Transparent paginator */
+.p-datatable .p-paginator {
+    background-color: transparent !important;
+}

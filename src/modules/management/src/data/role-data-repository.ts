@@ -3,7 +3,6 @@
  * Handles role assignment API calls with organization context
  */
 
-import { $app } from "@/infra/service";
 import type {
     RoleAssignmentResponse,
     UserRoleAssignmentSummary,

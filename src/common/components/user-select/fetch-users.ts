@@ -4,7 +4,6 @@
  * This allows common components to fetch users without depending on auth module
  */
 
-import { $app } from "@/infra/service";
 import type { User } from "./user.types";
 
 /**

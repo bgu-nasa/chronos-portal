@@ -23,3 +23,11 @@ export {
     type RoleAssignmentResponse,
     type DepartmentResponse,
 } from "./organization";
+
+// Logger service exports
+export {
+    loggerService,
+    type ILogger,
+    type LogLevel,
+    type LogEntry,
+} from "./logger";

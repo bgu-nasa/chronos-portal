@@ -76,7 +76,17 @@ export const useOrganizationStore = create<OrganizationState>((set, get) => ({
         try {
             const organization =
                 await organizationDataRepository.getOrganizationInfo();
-            set({ organization, isLoading: false });
+
+            // Sort departments so deleted departments are last
+            const sortedOrganization = {
+                ...organization,
+                departments: [...organization.departments].sort((a, b) => {
+                    if (a.deleted === b.deleted) return 0;
+                    return a.deleted ? 1 : -1;
+                }),
+            };
+
+            set({ organization: sortedOrganization, isLoading: false });
         } catch (error) {
             const errorMessage =
                 error instanceof Error
