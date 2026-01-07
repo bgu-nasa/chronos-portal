@@ -18,6 +18,9 @@ import { HiOutlineCog, HiOutlineLogout } from "react-icons/hi";
 // Alert icons
 import { HiOutlineExclamationTriangle } from "react-icons/hi2";
 
+// Navigation icons
+import { HiChevronLeft, HiChevronRight } from "react-icons/hi";
+
 // Theme Icons
 export const MoonIcon = IoMoon;
 export const SunIcon = MdOutlineWbSunny;
@@ -35,3 +38,7 @@ export const LogoutIcon = HiOutlineLogout;
 
 // Alert Icons
 export const AlertTriangleIcon = HiOutlineExclamationTriangle;
+
+// Navigation Icons
+export const ChevronLeftIcon = HiChevronLeft;
+export const ChevronRightIcon = HiChevronRight;
