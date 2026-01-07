@@ -10,6 +10,7 @@ import { useOrganization } from "@/infra/service";
 import type { NavigationItem } from "@/infra/federation/module.types";
 import { DashboardLoadingScreen } from "./dashboard-loading-screen";
 import { ChronosLogo } from "@/common";
+import { DeletedOrganizationAlert } from "./deleted-organization-alert";
 
 function renderNavigationItems(
     items: NavigationItem[],
@@ -83,6 +84,8 @@ export default function DashboardLayout() {
             </AppShell.Navbar>
 
             <AppShell.Main>
+                <DeletedOrganizationAlert />
+
                 {isLoading && <DashboardLoadingScreen />}
                 {error}
                 {!isLoading && !error && <Outlet />}
