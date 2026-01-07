@@ -176,7 +176,10 @@ export default function DashboardLayout() {
                         >
                             <MenuIcon size={24} />
                         </ActionIcon>
-                        <div style={{ flexShrink: 0 }}>
+                        <div
+                            style={{ flexShrink: 0, cursor: "pointer" }}
+                            onClick={() => navigate("/")}
+                        >
                             <ChronosLogo height={40} />
                         </div>
                     </Group>
