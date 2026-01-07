@@ -24,3 +24,15 @@
 .collapsedNavLink :global(.mantine-NavLink-section) {
     margin-right: 0 !important;
 }
+
+/* Hide burger button by default (on large screens) */
+.burgerButton {
+    display: none !important;
+}
+
+/* Show burger button only on small screens (below sm breakpoint) */
+@media (max-width: 48em) {
+    .burgerButton {
+        display: flex !important;
+    }
+}

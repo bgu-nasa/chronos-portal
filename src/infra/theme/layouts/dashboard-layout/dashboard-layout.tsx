@@ -8,7 +8,6 @@ import {
     ActionIcon,
     Tooltip,
     HoverCard,
-    Paper,
 } from "@mantine/core";
 import { useEffect } from "react";
 import styles from "./dashboard-layout.module.css";
@@ -18,7 +17,12 @@ import { ThemeToggleButton } from "@/infra/theme/components/theme-toggle-button"
 import { useOrganization } from "@/infra/service";
 import type { NavigationItem } from "@/infra/federation/module.types";
 import { DashboardLoadingScreen } from "./dashboard-loading-screen";
-import { ChronosLogo, ChevronLeftIcon, ChevronRightIcon } from "@/common";
+import {
+    ChronosLogo,
+    ChevronLeftIcon,
+    ChevronRightIcon,
+    MenuIcon,
+} from "@/common";
 import { DeletedOrganizationAlert } from "./deleted-organization-alert";
 import { useNavbarStore } from "./navbar.store";
 import resources from "./navbar-collapse.resources.json";
@@ -158,9 +162,24 @@ export default function DashboardLayout() {
         >
             <AppShell.Header>
                 <div className={styles.headerContainer}>
-                    <div style={{ flexShrink: 0 }}>
-                        <ChronosLogo height={40} />
-                    </div>
+                    <Group gap="md">
+                        <ActionIcon
+                            variant="subtle"
+                            size="lg"
+                            onClick={toggleCollapsed}
+                            className={styles.burgerButton}
+                            aria-label={
+                                collapsed
+                                    ? resources.expandSidebarAriaLabel
+                                    : resources.collapseSidebarAriaLabel
+                            }
+                        >
+                            <MenuIcon size={24} />
+                        </ActionIcon>
+                        <div style={{ flexShrink: 0 }}>
+                            <ChronosLogo height={40} />
+                        </div>
+                    </Group>
                     <Group gap="sm">
                         <ThemeToggleButton />
                         <UserCard />
