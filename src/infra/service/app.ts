@@ -92,6 +92,11 @@ export const $app: IApp = {
     isAuthenticated: () => tokenService.hasToken(),
 };
 
+// Make $app globally accessible on window for debugging and console access
+if (typeof window !== "undefined") {
+    (window as any).$app = $app;
+}
+
 // Configure logger to access organization ID
 setOrganizationIdGetter(() => {
     try {

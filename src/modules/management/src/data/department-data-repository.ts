@@ -3,7 +3,6 @@
  * Handles department API calls with organization context
  */
 
-import { $app } from "@/infra/service";
 import type {
     DepartmentResponse,
     DepartmentRequest,

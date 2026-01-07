@@ -3,7 +3,6 @@
  * Handles authentication API calls including login and onboarding
  */
 
-import { $app } from "@/infra/service";
 import type {
     LoginRequest,
     LoginResponse,
