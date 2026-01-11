@@ -7,14 +7,18 @@
 .dayHeader {
   flex: 1;
   padding: 8px;
-  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
   border-right: 1px solid var(--mantine-color-gray-3);
 }
 
 .dayNumber {
   width: 32px;
   height: 32px;
-  line-height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   border-radius: 50%;
   margin: 4px auto 0;
 }

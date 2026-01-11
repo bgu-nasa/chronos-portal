@@ -1,0 +1,10 @@
+{
+  "titles": {
+    "modal": "Event Details"
+  },
+  "labels": {
+    "time": "Time",
+    "location": "Location",
+    "description": "Description"
+  }
+}
