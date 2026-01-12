@@ -11,16 +11,10 @@ export const moduleConfig: ModuleConfig = {
     routes: [
         {
             name: "calendar",
-            path: "/",
+            path: "/*",
             authorize: true,
             element: React.createElement(CalendarPage),
         },
     ],
-    navigationItems: [
-        // {
-        //   label: "Calendar",
-        //   href: "/calendar",
-        //   location: "dashboard",
-        // }
-    ],
+    navigationItems: [],
 };

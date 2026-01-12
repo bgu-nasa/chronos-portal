@@ -7,7 +7,11 @@
 }
 
 .todayColumn {
-  background-color: var(--mantine-color-blue-0);
+  background-color: var(--mantine-color-blue-light);
+}
+
+:root[data-mantine-color-scheme='dark'] .todayColumn {
+  background-color: rgba(24, 100, 171, 0.15);
 }
 
 .notTodayColumn {
@@ -19,8 +23,8 @@
   left: 0;
   right: 0;
   height: 1px;
-  background-color: var(--mantine-color-gray-1);
-  border-bottom: 1px solid var(--mantine-color-gray-0);
+  background-color: var(--mantine-color-default-border);
+  opacity: 0.5;
 }
 
 .nowLine {
