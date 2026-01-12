@@ -2,6 +2,7 @@
 import type { ModuleConfig } from "@/infra";
 import CalendarPage from "./src/pages/CalendarPage";
 import React from "react";
+import { CalendarIcon } from "@/common/icons";
 
 export const moduleConfig: ModuleConfig = {
     name: "calendar",
@@ -11,16 +12,18 @@ export const moduleConfig: ModuleConfig = {
     routes: [
         {
             name: "calendar",
-            path: "/",
+            path: "/*",
             authorize: true,
             element: React.createElement(CalendarPage),
         },
     ],
     navigationItems: [
-        // {
-        //   label: "Calendar",
-        //   href: "/calendar",
-        //   location: "dashboard",
-        // }
+        {
+            location: "dashboard",
+            label: "Calendar",
+            href: "/calendar",
+            icon: React.createElement(CalendarIcon),
+            order: 1,
+        },
     ],
 };

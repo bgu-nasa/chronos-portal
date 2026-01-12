@@ -2,6 +2,7 @@
 import React, { useMemo } from 'react';
 import { Box, Text, Popover, Stack, Group } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
+import { useNavigate } from 'react-router';
 import type { CalendarEvent } from '@/modules/calendar/src/types';
 
 import styles from './EventItem.module.css';
@@ -22,6 +23,12 @@ export const EventItem: React.FC<EventItemProps> = ({
   width = 100
 }) => {
   const [opened, { open, close }] = useDisclosure(false);
+  const navigate = useNavigate();
+
+  const handleClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    navigate(`/calendar/event/${event.id}`);
+  };
 
   const startHour = event.start.getHours() + event.start.getMinutes() / 60;
   const endHour = event.end.getHours() + event.end.getMinutes() / 60;
@@ -46,6 +53,7 @@ export const EventItem: React.FC<EventItemProps> = ({
           className={styles.eventItem}
           onMouseEnter={open}
           onMouseLeave={close}
+          onClick={handleClick}
           bg={event.color ? `${event.color}.6` : 'blue.6'}
           style={{
             top: `${top}px`,

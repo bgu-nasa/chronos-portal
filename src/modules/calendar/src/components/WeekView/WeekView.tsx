@@ -85,6 +85,7 @@ export const WeekView: React.FC<WeekViewProps> = ({
           events={events}
           dayStartHour={dayStartHour}
           hoursPerDay={hoursPerDay}
+          hourHeight={resources.config.hourHeight || 60}
         />
       </Box>
     </Paper>
