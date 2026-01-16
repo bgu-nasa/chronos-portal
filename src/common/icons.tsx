@@ -10,6 +10,7 @@ import {
     HiOutlineBriefcase,
     HiOutlineClipboardList,
     HiOutlineLockOpen,
+    HiOutlineCalendar,
 } from "react-icons/hi";
 
 // User menu icons
@@ -28,6 +29,8 @@ export const UsersIcon = HiOutlineUsers;
 export const ManagementIcon = HiOutlineBriefcase;
 export const DepartmentsIcon = HiOutlineClipboardList;
 export const AccessControlIcon = HiOutlineLockOpen;
+export const ScheduleIcon = HiOutlineCalendar;
+export const SchedulingPeriodsIcon = HiOutlineCalendar;
 
 // User Menu Icons
 export const SettingsIcon = HiOutlineCog;

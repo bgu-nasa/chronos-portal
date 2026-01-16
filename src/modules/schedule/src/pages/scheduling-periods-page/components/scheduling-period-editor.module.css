@@ -1,0 +1,165 @@
+/**
+ * Scheduling Period Editor Styles
+ * Custom styles for the PrimeReact Calendar
+ */
+
+/* Calendar input field styling */
+.calendarInput {
+    width: 100%;
+}
+
+.calendarInput :global(.p-inputtext) {
+    width: 100%;
+    padding: 0.75rem 1rem;
+    font-size: 0.9rem;
+    border-radius: var(--mantine-radius-md);
+    border: 1px solid var(--mantine-color-dark-4);
+    background-color: var(--mantine-color-dark-6);
+    color: var(--mantine-color-text);
+    transition: border-color 150ms ease, box-shadow 150ms ease;
+}
+
+.calendarInput :global(.p-inputtext:focus) {
+    border-color: var(--mantine-color-blue-6);
+    box-shadow: 0 0 0 2px rgba(34, 139, 230, 0.2);
+    outline: none;
+}
+
+.calendarInput :global(.p-inputtext::placeholder) {
+    color: var(--mantine-color-placeholder);
+}
+
+/* Calendar icon button */
+.calendarInput :global(.p-datepicker-trigger) {
+    background-color: transparent;
+    border: none;
+    color: var(--mantine-color-dimmed);
+    padding: 0.75rem;
+}
+
+.calendarInput :global(.p-datepicker-trigger:hover) {
+    background-color: var(--mantine-color-dark-5);
+    color: var(--mantine-color-text);
+}
+
+/* Calendar panel (dropdown) styling */
+.calendarPanel {
+    background-color: var(--mantine-color-dark-7) !important;
+    border: 1px solid var(--mantine-color-dark-4) !important;
+    border-radius: var(--mantine-radius-lg) !important;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3) !important;
+    padding: 1rem !important;
+}
+
+/* Calendar header (month/year navigation) */
+.calendarPanel :global(.p-datepicker-header) {
+    background-color: transparent !important;
+    border-bottom: 1px solid var(--mantine-color-dark-5) !important;
+    padding-bottom: 0.75rem !important;
+    margin-bottom: 0.75rem !important;
+}
+
+/* Month/Year title */
+.calendarPanel :global(.p-datepicker-title) {
+    display: flex;
+    gap: 0.5rem;
+    justify-content: center;
+}
+
+.calendarPanel :global(.p-datepicker-month),
+.calendarPanel :global(.p-datepicker-year) {
+    color: var(--mantine-color-text) !important;
+    font-weight: 600 !important;
+    font-size: 1rem !important;
+    padding: 0.25rem 0.5rem !important;
+    border-radius: var(--mantine-radius-sm) !important;
+}
+
+.calendarPanel :global(.p-datepicker-month:hover),
+.calendarPanel :global(.p-datepicker-year:hover) {
+    background-color: var(--mantine-color-dark-5) !important;
+}
+
+/* Navigation arrows (prev/next) */
+.calendarPanel :global(.p-datepicker-prev),
+.calendarPanel :global(.p-datepicker-next) {
+    width: 2rem !important;
+    height: 2rem !important;
+    color: var(--mantine-color-dimmed) !important;
+    border-radius: var(--mantine-radius-md) !important;
+    transition: all 150ms ease !important;
+}
+
+.calendarPanel :global(.p-datepicker-prev:hover),
+.calendarPanel :global(.p-datepicker-next:hover) {
+    background-color: var(--mantine-color-dark-5) !important;
+    color: var(--mantine-color-text) !important;
+}
+
+/* Weekday headers */
+.calendarPanel :global(.p-datepicker-weekday) {
+    color: var(--mantine-color-dimmed) !important;
+    font-weight: 600 !important;
+    font-size: 0.8rem !important;
+    padding: 0.5rem !important;
+}
+
+/* Day cells */
+.calendarPanel :global(.p-datepicker-day) {
+    width: 2.5rem !important;
+    height: 2.5rem !important;
+    border-radius: var(--mantine-radius-md) !important;
+    transition: all 150ms ease !important;
+}
+
+.calendarPanel :global(.p-datepicker-day span) {
+    width: 100% !important;
+    height: 100% !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    border-radius: var(--mantine-radius-md) !important;
+}
+
+/* Normal day styling */
+.calendarPanel :global(.p-datepicker-day:not(.p-datepicker-day-selected):not(.p-disabled) span) {
+    color: var(--mantine-color-text) !important;
+}
+
+.calendarPanel :global(.p-datepicker-day:not(.p-datepicker-day-selected):not(.p-disabled):hover span) {
+    background-color: var(--mantine-color-blue-light) !important;
+}
+
+/* Selected day */
+.calendarPanel :global(.p-datepicker-day-selected span) {
+    background-color: var(--mantine-color-blue-filled) !important;
+    color: white !important;
+    font-weight: 600 !important;
+}
+
+/* Today indicator */
+.calendarPanel :global(.p-datepicker-today span) {
+    border: 2px solid var(--mantine-color-blue-6) !important;
+}
+
+/* Disabled days (past dates) - clearly visible as blocked */
+.calendarPanel :global(.p-disabled span) {
+    color: var(--mantine-color-gray-6) !important;
+    opacity: 0.4 !important;
+    cursor: not-allowed !important;
+}
+
+/* Days from other months (outside current month) */
+.calendarPanel :global(.p-datepicker-other-month span) {
+    color: var(--mantine-color-gray-6) !important;
+    opacity: 0.3 !important;
+}
+
+/* Calendar table */
+.calendarPanel :global(.p-datepicker-calendar) {
+    width: 100% !important;
+}
+
+.calendarPanel :global(.p-datepicker-calendar td) {
+    padding: 0.125rem !important;
+}
