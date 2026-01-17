@@ -46,10 +46,16 @@ export const useSchedulingPeriodStore = create<SchedulingPeriodStore>((set, get)
             const data = await schedulingPeriodDataRepository.getAllSchedulingPeriods();
             set({ schedulingPeriods: data, isLoading: false });
         } catch (err) {
-            const errorMessage =
-                err instanceof Error
-                    ? err.message
-                    : "Failed to fetch scheduling periods";
+            // Extract error message with HTTP status code if available
+            let errorMessage = "Failed to fetch scheduling periods";
+            if (err && typeof err === "object" && "status" in err && "message" in err) {
+                const apiError = err as { status: number; message: string };
+                errorMessage = apiError.status
+                    ? `Error ${apiError.status}: ${apiError.message}`
+                    : apiError.message;
+            } else if (err instanceof Error) {
+                errorMessage = err.message;
+            }
             set({ error: errorMessage, isLoading: false });
             console.error("Error fetching scheduling periods:", err);
         }
@@ -68,10 +74,16 @@ export const useSchedulingPeriodStore = create<SchedulingPeriodStore>((set, get)
 
             return newPeriod;
         } catch (err) {
-            const errorMessage =
-                err instanceof Error
-                    ? err.message
-                    : "Failed to create scheduling period";
+            // Extract error message with HTTP status code if available
+            let errorMessage = "Failed to create scheduling period";
+            if (err && typeof err === "object" && "status" in err && "message" in err) {
+                const apiError = err as { status: number; message: string };
+                errorMessage = apiError.status
+                    ? `Error ${apiError.status}: ${apiError.message}`
+                    : apiError.message;
+            } else if (err instanceof Error) {
+                errorMessage = err.message;
+            }
             set({ error: errorMessage, isLoading: false });
             console.error("Error creating scheduling period:", err);
             return null;
@@ -96,10 +108,16 @@ export const useSchedulingPeriodStore = create<SchedulingPeriodStore>((set, get)
 
             return true;
         } catch (err) {
-            const errorMessage =
-                err instanceof Error
-                    ? err.message
-                    : "Failed to update scheduling period";
+            // Extract error message with HTTP status code if available
+            let errorMessage = "Failed to update scheduling period";
+            if (err && typeof err === "object" && "status" in err && "message" in err) {
+                const apiError = err as { status: number; message: string };
+                errorMessage = apiError.status
+                    ? `Error ${apiError.status}: ${apiError.message}`
+                    : apiError.message;
+            } else if (err instanceof Error) {
+                errorMessage = err.message;
+            }
             set({ error: errorMessage, isLoading: false });
             console.error("Error updating scheduling period:", err);
             return false;
@@ -118,10 +136,16 @@ export const useSchedulingPeriodStore = create<SchedulingPeriodStore>((set, get)
 
             return true;
         } catch (err) {
-            const errorMessage =
-                err instanceof Error
-                    ? err.message
-                    : "Failed to delete scheduling period";
+            // Extract error message with HTTP status code if available
+            let errorMessage = "Failed to delete scheduling period";
+            if (err && typeof err === "object" && "status" in err && "message" in err) {
+                const apiError = err as { status: number; message: string };
+                errorMessage = apiError.status
+                    ? `Error ${apiError.status}: ${apiError.message}`
+                    : apiError.message;
+            } else if (err instanceof Error) {
+                errorMessage = err.message;
+            }
             set({ error: errorMessage, isLoading: false });
             console.error("Error deleting scheduling period:", err);
             return false;

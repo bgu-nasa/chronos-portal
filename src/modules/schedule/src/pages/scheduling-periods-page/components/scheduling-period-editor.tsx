@@ -16,8 +16,8 @@ import styles from "@/modules/schedule/src/pages/scheduling-periods-page/compone
 
 export function SchedulingPeriodEditor() {
     const { isOpen, mode, schedulingPeriod, close } = useSchedulingPeriodEditorStore();
-    const { createSchedulingPeriod, isLoading: isCreating } = useCreateSchedulingPeriod();
-    const { updateSchedulingPeriod, isLoading: isUpdating } = useUpdateSchedulingPeriod();
+    const { createSchedulingPeriod, isLoading: isCreating, error: createError, clearError: clearCreateError } = useCreateSchedulingPeriod();
+    const { updateSchedulingPeriod, isLoading: isUpdating, error: updateError, clearError: clearUpdateError } = useUpdateSchedulingPeriod();
 
     const [name, setName] = useState("");
     const [fromDate, setFromDate] = useState<Date | null>(null);
@@ -62,10 +62,18 @@ export function SchedulingPeriodEditor() {
         setError(null);
         let success = false;
 
+        // Helper to format date as YYYY-MM-DD to avoid timezone shifts
+        const formatDate = (date: Date) => {
+            const year = date.getFullYear();
+            const month = String(date.getMonth() + 1).padStart(2, '0');
+            const day = String(date.getDate()).padStart(2, '0');
+            return `${year}-${month}-${day}`;
+        };
+
         const request = {
             name: name.trim(),
-            fromDate: fromDate.toISOString(),
-            toDate: toDate.toISOString(),
+            fromDate: formatDate(fromDate),
+            toDate: formatDate(toDate),
         };
 
         if (mode === "create") {
@@ -86,9 +94,14 @@ export function SchedulingPeriodEditor() {
         setFromDate(null);
         setToDate(null);
         setError(null);
+        // Clear API errors from store
+        clearCreateError();
+        clearUpdateError();
     };
 
     const isLoading = isCreating || isUpdating;
+    // Combine local validation errors with API errors
+    const apiError = createError || updateError;
     const title =
         mode === "create"
             ? resources.editorCreateTitle
@@ -98,26 +111,42 @@ export function SchedulingPeriodEditor() {
             ? resources.editorCreateButton
             : resources.editorSaveButton;
 
-    // Date constraints: can't select dates before today
-    const today = useMemo(() => {
+    // Date constraints: can select dates from tomorrow onwards (today is disabled)
+    const { today, minFromDate } = useMemo(() => {
         const now = new Date();
         now.setHours(0, 0, 0, 0);
-        return now;
+
+        const tomorrow = new Date(now);
+        tomorrow.setDate(now.getDate() + 1);
+
+        return { today: now, minFromDate: tomorrow };
     }, []);
 
-    // The minimum date for "To Date" is either today or the selected "From Date", whichever is later
+    // The minimum date for "To Date" is at least 1 day after "From Date"
     const minToDate = useMemo(() => {
-        if (!fromDate) return today;
-        return fromDate > today ? fromDate : today;
+        const tomorrow = new Date(today);
+        tomorrow.setDate(today.getDate() + 1);
+
+        if (!fromDate) return tomorrow;
+
+        // To Date must be at least 1 day after From Date
+        const dayAfterFromDate = new Date(fromDate);
+        dayAfterFromDate.setDate(dayAfterFromDate.getDate() + 1);
+
+        return dayAfterFromDate > tomorrow ? dayAfterFromDate : tomorrow;
     }, [fromDate, today]);
 
     // Handle From Date change - clear To Date if it's now invalid
     const handleFromDateChange = (value: Date | null) => {
         setFromDate(value);
 
-        // If the new from date is after the current to date, clear to date
-        if (value && toDate && value > toDate) {
-            setToDate(null);
+        // If the new from date makes to date invalid (to date must be > from date)
+        if (value && toDate) {
+            const dayAfterFromDate = new Date(value);
+            dayAfterFromDate.setDate(dayAfterFromDate.getDate() + 1);
+            if (toDate < dayAfterFromDate) {
+                setToDate(null);
+            }
         }
     };
 
@@ -143,13 +172,14 @@ export function SchedulingPeriodEditor() {
                     <Calendar
                         value={fromDate}
                         onChange={(e) => handleFromDateChange(e.value as Date | null)}
-                        minDate={today}
+                        minDate={minFromDate}
                         dateFormat="M dd, yy"
                         placeholder={resources.editorFromDatePlaceholder}
                         showIcon
                         disabled={isLoading}
                         className={styles.calendarInput}
                         panelClassName={styles.calendarPanel}
+                        touchUI
                     />
                     {error && error === resources.editorFromDateRequired && (
                         <Text size="xs" c="red">{error}</Text>
@@ -164,17 +194,26 @@ export function SchedulingPeriodEditor() {
                         value={toDate}
                         onChange={(e) => setToDate(e.value as Date | null)}
                         minDate={minToDate}
+                        viewDate={minToDate}
                         dateFormat="M dd, yy"
                         placeholder={resources.editorToDatePlaceholder}
                         showIcon
                         disabled={isLoading}
                         className={styles.calendarInput}
                         panelClassName={styles.calendarPanel}
+                        touchUI
                     />
                     {error && error === resources.editorToDateRequired && (
                         <Text size="xs" c="red">{error}</Text>
                     )}
                 </Stack>
+
+                {/* Display API errors */}
+                {apiError && (
+                    <Text size="sm" c="red" mb="md" style={{ padding: '0.5rem', backgroundColor: 'var(--mantine-color-red-light)', borderRadius: 'var(--mantine-radius-sm)' }}>
+                        {apiError}
+                    </Text>
+                )}
 
                 <Group justify="flex-end" mt="md">
                     <Button

@@ -13,8 +13,8 @@
     padding: 0.75rem 1rem;
     font-size: 0.9rem;
     border-radius: var(--mantine-radius-md);
-    border: 1px solid var(--mantine-color-dark-4);
-    background-color: var(--mantine-color-dark-6);
+    border: 1px solid var(--mantine-color-default-border);
+    background-color: var(--mantine-color-default);
     color: var(--mantine-color-text);
     transition: border-color 150ms ease, box-shadow 150ms ease;
 }
@@ -38,25 +38,37 @@
 }
 
 .calendarInput :global(.p-datepicker-trigger:hover) {
-    background-color: var(--mantine-color-dark-5);
+    background-color: var(--mantine-color-default-hover);
     color: var(--mantine-color-text);
 }
 
 /* Calendar panel (dropdown) styling */
 .calendarPanel {
-    background-color: var(--mantine-color-dark-7) !important;
-    border: 1px solid var(--mantine-color-dark-4) !important;
+    background-color: var(--mantine-color-body) !important;
+    border: 1px solid var(--mantine-color-default-border) !important;
     border-radius: var(--mantine-radius-lg) !important;
     box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3) !important;
     padding: 1rem !important;
+    /* TouchUI constraints */
+    width: 360px !important;
+    min-width: 0 !important;
+    /* Override PrimeReact defaults */
+    max-width: 90vw !important;
 }
 
 /* Calendar header (month/year navigation) */
 .calendarPanel :global(.p-datepicker-header) {
     background-color: transparent !important;
-    border-bottom: 1px solid var(--mantine-color-dark-5) !important;
+    border-bottom: 1px solid var(--mantine-color-default-border) !important;
     padding-bottom: 0.75rem !important;
     margin-bottom: 0.75rem !important;
+}
+
+/* Ensure media query doesn't force it wide */
+@media screen and (max-width: 768px) {
+    .calendarPanel {
+        width: 320px !important;
+    }
 }
 
 /* Month/Year title */
@@ -77,7 +89,7 @@
 
 .calendarPanel :global(.p-datepicker-month:hover),
 .calendarPanel :global(.p-datepicker-year:hover) {
-    background-color: var(--mantine-color-dark-5) !important;
+    background-color: var(--mantine-color-default-hover) !important;
 }
 
 /* Navigation arrows (prev/next) */
@@ -92,7 +104,7 @@
 
 .calendarPanel :global(.p-datepicker-prev:hover),
 .calendarPanel :global(.p-datepicker-next:hover) {
-    background-color: var(--mantine-color-dark-5) !important;
+    background-color: var(--mantine-color-default-hover) !important;
     color: var(--mantine-color-text) !important;
 }
 
@@ -121,41 +133,107 @@
     border-radius: var(--mantine-radius-md) !important;
 }
 
-/* Normal day styling */
-.calendarPanel :global(.p-datepicker-day:not(.p-datepicker-day-selected):not(.p-disabled) span) {
-    color: var(--mantine-color-text) !important;
+/* ============================================
+   ENABLED DAYS (Darker and bolder in both modes)
+   ============================================ */
+.calendarPanel :global(.p-datepicker-day:not(.p-disabled):not(.p-datepicker-other-month) span) {
+    color: #000 !important;
+    font-weight: 900 !important;
+    border: none !important;
+    background-color: transparent !important;
+    visibility: visible !important;
+    display: flex !important;
 }
 
-.calendarPanel :global(.p-datepicker-day:not(.p-datepicker-day-selected):not(.p-disabled):hover span) {
+.calendarPanel :global(.p-datepicker-day:not(.p-disabled):not(.p-datepicker-other-month)) {
+    background-color: transparent !important;
+    visibility: visible !important;
+    display: table-cell !important;
+}
+
+/* Dark mode support for enabled days */
+@media (prefers-color-scheme: dark) {
+    .calendarPanel :global(.p-datepicker-day:not(.p-disabled):not(.p-datepicker-other-month) span) {
+        color: #fff !important;
+    }
+}
+
+/* HOVER on Enabled Days */
+.calendarPanel :global(.p-datepicker-day:not(.p-disabled):not(.p-datepicker-other-month):hover span) {
     background-color: var(--mantine-color-blue-light) !important;
+    cursor: pointer !important;
 }
 
-/* Selected day */
-.calendarPanel :global(.p-datepicker-day-selected span) {
+/* ============================================
+   SELECTED DAYS (Blue Filled)
+   ============================================ */
+.calendarPanel :global(.p-datepicker-day-selected span),
+.calendarPanel :global(.p-highlight),
+.calendarPanel :global(.p-datepicker-today.p-datepicker-day-selected span) {
     background-color: var(--mantine-color-blue-filled) !important;
     color: white !important;
-    font-weight: 600 !important;
+    font-weight: 900 !important;
+    border: none !important;
 }
 
-/* Today indicator */
-.calendarPanel :global(.p-datepicker-today span) {
-    border: 2px solid var(--mantine-color-blue-6) !important;
+/* ============================================
+   TODAY - Always visible, remove gray background when not selected
+   ============================================ */
+.calendarPanel :global(.p-datepicker-today) {
+    visibility: visible !important;
+    display: table-cell !important;
 }
 
-/* Disabled days (past dates) - clearly visible as blocked */
+.calendarPanel :global(.p-datepicker-today:not(.p-datepicker-day-selected)) {
+    background-color: transparent !important;
+}
+
+.calendarPanel :global(.p-datepicker-today) span {
+    visibility: visible !important;
+    display: flex !important;
+}
+
+.calendarPanel :global(.p-datepicker-today:not(.p-datepicker-day-selected)) span {
+    background-color: transparent !important;
+}
+
+/* ============================================
+   DISABLED DAYS (Dimmed, Gray) - Same as other month
+   ============================================ */
 .calendarPanel :global(.p-disabled span) {
-    color: var(--mantine-color-gray-6) !important;
-    opacity: 0.4 !important;
+    color: var(--mantine-color-dimmed) !important;
+    font-weight: 400 !important;
+    opacity: 0.25 !important;
     cursor: not-allowed !important;
+    border: none !important;
+    background-color: transparent !important;
 }
 
-/* Days from other months (outside current month) */
+.calendarPanel :global(.p-disabled) {
+    opacity: 0.25 !important;
+}
+
+/* TODAY when DISABLED - Higher specificity to override enabled/today styling */
+.calendarPanel :global(.p-datepicker-day.p-datepicker-today.p-disabled span) {
+    color: var(--mantine-color-dimmed) !important;
+    opacity: 0.25 !important;
+    font-weight: 400 !important;
+    cursor: not-allowed !important;
+    background-color: transparent !important;
+    border: none !important;
+}
+
+/* No hover on disabled */
+.calendarPanel :global(.p-disabled:hover span) {
+    background-color: transparent !important;
+}
+
+/* Other Month */
 .calendarPanel :global(.p-datepicker-other-month span) {
-    color: var(--mantine-color-gray-6) !important;
-    opacity: 0.3 !important;
+    color: var(--mantine-color-dimmed) !important;
+    opacity: 0.25 !important;
 }
 
-/* Calendar table */
 .calendarPanel :global(.p-datepicker-calendar) {
     width: 100% !important;
 }

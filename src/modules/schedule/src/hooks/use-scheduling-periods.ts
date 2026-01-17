@@ -33,11 +33,13 @@ export function useCreateSchedulingPeriod() {
     );
     const isLoading = useSchedulingPeriodStore((state) => state.isLoading);
     const error = useSchedulingPeriodStore((state) => state.error);
+    const clearError = useSchedulingPeriodStore((state) => state.clearError);
 
     return {
         createSchedulingPeriod,
         isLoading,
         error,
+        clearError,
     };
 }
 
@@ -50,11 +52,13 @@ export function useUpdateSchedulingPeriod() {
     );
     const isLoading = useSchedulingPeriodStore((state) => state.isLoading);
     const error = useSchedulingPeriodStore((state) => state.error);
+    const clearError = useSchedulingPeriodStore((state) => state.clearError);
 
     return {
         updateSchedulingPeriod,
         isLoading,
         error,
+        clearError,
     };
 }
 
