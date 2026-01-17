@@ -53,7 +53,6 @@ function TimeSpinner({ label, totalMinutes, onChange, error }: TimeSpinnerProps)
             <Stack gap={4} align="center" style={{ width: "fit-content" }}>
                 <ActionIcon
                     variant="light"
-                    color="violet"
                     size="lg"
                     onClick={handleIncrement}
                     aria-label="Add 30 minutes"
@@ -63,20 +62,19 @@ function TimeSpinner({ label, totalMinutes, onChange, error }: TimeSpinnerProps)
                 <Box
                     style={{
                         padding: "8px 16px",
-                        border: "1px solid var(--mantine-color-gray-4)",
-                        borderRadius: "4px",
+                        border: "1px solid var(--mantine-color-default-border)",
+                        borderRadius: "var(--mantine-radius-sm)",
                         fontWeight: 600,
                         fontSize: "1.1rem",
                         minWidth: "80px",
                         textAlign: "center",
-                        backgroundColor: "var(--mantine-color-gray-0)",
+                        backgroundColor: "var(--mantine-color-default)",
                     }}
                 >
                     {displayTime}
                 </Box>
                 <ActionIcon
                     variant="light"
-                    color="violet"
                     size="lg"
                     onClick={handleDecrement}
                     aria-label="Subtract 30 minutes"

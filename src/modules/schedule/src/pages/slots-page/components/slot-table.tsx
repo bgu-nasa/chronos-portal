@@ -63,7 +63,7 @@ export function SlotTable({
 
                 return (
                     <Paper key={day} p="sm" withBorder>
-                        <Text fw={600} size="sm" mb="xs" c="violet">
+                        <Text fw={600} size="sm" mb="xs">
                             {day}
                         </Text>
                         <Group gap="xs" wrap="wrap">
@@ -73,7 +73,6 @@ export function SlotTable({
                                     size="lg"
                                     radius="sm"
                                     variant={selectedSlot?.id === slot.id ? "filled" : "light"}
-                                    color={selectedSlot?.id === slot.id ? "violet" : "gray"}
                                     onClick={() => onSelectionChange(
                                         selectedSlot?.id === slot.id ? null : slot
                                     )}

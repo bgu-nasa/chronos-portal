@@ -34,7 +34,6 @@ export function SlotActions({
             </Button>
             <Button
                 variant="light"
-                color="red"
                 leftSection={<HiOutlineTrash size={16} />}
                 disabled={!selectedSlot}
                 onClick={onDeleteClick}

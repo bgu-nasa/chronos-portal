@@ -34,7 +34,6 @@ export function SchedulingPeriodActions({
             </Button>
             <Button
                 variant="light"
-                color="red"
                 leftSection={<HiOutlineTrash size={16} />}
                 onClick={onDeleteClick}
                 disabled={!selectedPeriod || isExpired}
@@ -43,7 +42,6 @@ export function SchedulingPeriodActions({
             </Button>
             <Button
                 variant="light"
-                color="violet"
                 leftSection={<HiOutlineViewList size={16} />}
                 onClick={onViewSlotsClick}
                 disabled={!selectedPeriod}

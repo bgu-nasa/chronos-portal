@@ -181,7 +181,6 @@ export function SchedulingPeriodsPage() {
                                     </Title>
                                     <Button
                                         variant="subtle"
-                                        color="gray"
                                         size="sm"
                                         onClick={() => setShowSlots(false)}
                                         style={{ padding: "4px 8px" }}
