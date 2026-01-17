@@ -20,3 +20,6 @@ export type {
     ConfirmationState,
     UseConfirmationReturn,
 } from "./hooks/use-confirmation";
+
+// Icons
+export { ChevronLeftIcon, ChevronRightIcon, MenuIcon } from "./icons";
