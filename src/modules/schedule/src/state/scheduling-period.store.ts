@@ -14,13 +14,11 @@ import type {
 interface SchedulingPeriodStore {
     // State
     schedulingPeriods: SchedulingPeriodResponse[];
-    currentSchedulingPeriods: SchedulingPeriodResponse[];
     isLoading: boolean;
     error: string | null;
 
     // Actions
     fetchSchedulingPeriods: () => Promise<void>;
-    fetchCurrentSchedulingPeriods: () => Promise<void>;
     createSchedulingPeriod: (
         request: CreateSchedulingPeriodRequest
     ) => Promise<SchedulingPeriodResponse | null>;
@@ -38,7 +36,6 @@ interface SchedulingPeriodStore {
 export const useSchedulingPeriodStore = create<SchedulingPeriodStore>((set, get) => ({
     // Initial state
     schedulingPeriods: [],
-    currentSchedulingPeriods: [],
     isLoading: false,
     error: null,
 
@@ -49,7 +46,6 @@ export const useSchedulingPeriodStore = create<SchedulingPeriodStore>((set, get)
             const data = await schedulingPeriodDataRepository.getAllSchedulingPeriods();
             set({ schedulingPeriods: data, isLoading: false });
         } catch (err) {
-            // Extract error message with HTTP status code if available
             let errorMessage = "Failed to fetch scheduling periods";
             if (err && typeof err === "object" && "status" in err && "message" in err) {
                 const apiError = err as { status: number; message: string };
@@ -60,28 +56,7 @@ export const useSchedulingPeriodStore = create<SchedulingPeriodStore>((set, get)
                 errorMessage = err.message;
             }
             set({ error: errorMessage, isLoading: false });
-            console.error("Error fetching scheduling periods:", err);
-        }
-    },
-
-    // Fetch current (active) scheduling periods
-    fetchCurrentSchedulingPeriods: async () => {
-        set({ isLoading: true, error: null });
-        try {
-            const data = await schedulingPeriodDataRepository.getCurrentSchedulingPeriods();
-            set({ currentSchedulingPeriods: data, isLoading: false });
-        } catch (err) {
-            let errorMessage = "Failed to fetch current scheduling periods";
-            if (err && typeof err === "object" && "status" in err && "message" in err) {
-                const apiError = err as { status: number; message: string };
-                errorMessage = apiError.status
-                    ? `Error ${apiError.status}: ${apiError.message}`
-                    : apiError.message;
-            } else if (err instanceof Error) {
-                errorMessage = err.message;
-            }
-            set({ error: errorMessage, isLoading: false });
-            console.error("Error fetching current scheduling periods:", err);
+            $app.logger.error("Error fetching scheduling periods:", err);
         }
     },
 
@@ -89,16 +64,11 @@ export const useSchedulingPeriodStore = create<SchedulingPeriodStore>((set, get)
     createSchedulingPeriod: async (request: CreateSchedulingPeriodRequest) => {
         set({ isLoading: true, error: null });
         try {
-            const newPeriod =
-                await schedulingPeriodDataRepository.createSchedulingPeriod(request);
+            const newPeriod = await schedulingPeriodDataRepository.createSchedulingPeriod(request);
             set({ isLoading: false });
-
-            // Refetch to update the list
             await get().fetchSchedulingPeriods();
-
             return newPeriod;
         } catch (err) {
-            // Extract error message with HTTP status code if available
             let errorMessage = "Failed to create scheduling period";
             if (err && typeof err === "object" && "status" in err && "message" in err) {
                 const apiError = err as { status: number; message: string };
@@ -109,7 +79,7 @@ export const useSchedulingPeriodStore = create<SchedulingPeriodStore>((set, get)
                 errorMessage = err.message;
             }
             set({ error: errorMessage, isLoading: false });
-            console.error("Error creating scheduling period:", err);
+            $app.logger.error("Error creating scheduling period:", err);
             return null;
         }
     },
@@ -126,13 +96,9 @@ export const useSchedulingPeriodStore = create<SchedulingPeriodStore>((set, get)
                 request
             );
             set({ isLoading: false });
-
-            // Refetch to update the list
             await get().fetchSchedulingPeriods();
-
             return true;
         } catch (err) {
-            // Extract error message with HTTP status code if available
             let errorMessage = "Failed to update scheduling period";
             if (err && typeof err === "object" && "status" in err && "message" in err) {
                 const apiError = err as { status: number; message: string };
@@ -143,7 +109,7 @@ export const useSchedulingPeriodStore = create<SchedulingPeriodStore>((set, get)
                 errorMessage = err.message;
             }
             set({ error: errorMessage, isLoading: false });
-            console.error("Error updating scheduling period:", err);
+            $app.logger.error("Error updating scheduling period:", err);
             return false;
         }
     },
@@ -154,13 +120,9 @@ export const useSchedulingPeriodStore = create<SchedulingPeriodStore>((set, get)
         try {
             await schedulingPeriodDataRepository.deleteSchedulingPeriod(schedulingPeriodId);
             set({ isLoading: false });
-
-            // Refetch to update the list
             await get().fetchSchedulingPeriods();
-
             return true;
         } catch (err) {
-            // Extract error message with HTTP status code if available
             let errorMessage = "Failed to delete scheduling period";
             if (err && typeof err === "object" && "status" in err && "message" in err) {
                 const apiError = err as { status: number; message: string };
@@ -171,7 +133,7 @@ export const useSchedulingPeriodStore = create<SchedulingPeriodStore>((set, get)
                 errorMessage = err.message;
             }
             set({ error: errorMessage, isLoading: false });
-            console.error("Error deleting scheduling period:", err);
+            $app.logger.error("Error deleting scheduling period:", err);
             return false;
         }
     },

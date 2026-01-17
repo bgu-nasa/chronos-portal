@@ -54,7 +54,7 @@ export const useSlotStore = create<SlotStore>((set, get) => ({
                 errorMessage = err.message;
             }
             set({ error: errorMessage, isLoading: false });
-            console.error("Error fetching slots:", err);
+            $app.logger.error("Error fetching slots:", err);
         }
     },
 
@@ -80,7 +80,7 @@ export const useSlotStore = create<SlotStore>((set, get) => ({
                 errorMessage = err.message;
             }
             set({ error: errorMessage, isLoading: false });
-            console.error("Error creating slot:", err);
+            $app.logger.error("Error creating slot:", err);
             return null;
         }
     },
@@ -113,7 +113,7 @@ export const useSlotStore = create<SlotStore>((set, get) => ({
                 errorMessage = err.message;
             }
             set({ error: errorMessage, isLoading: false });
-            console.error("Error updating slot:", err);
+            $app.logger.error("Error updating slot:", err);
             return false;
         }
     },
@@ -146,7 +146,7 @@ export const useSlotStore = create<SlotStore>((set, get) => ({
                 errorMessage = err.message;
             }
             set({ error: errorMessage, isLoading: false });
-            console.error("Error deleting slot:", err);
+            $app.logger.error("Error deleting slot:", err);
             return false;
         }
     },
