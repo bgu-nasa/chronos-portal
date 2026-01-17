@@ -10,10 +10,6 @@
   background-color: var(--mantine-color-blue-light);
 }
 
-:root[data-mantine-color-scheme='dark'] .todayColumn {
-  background-color: rgba(24, 100, 171, 0.15);
-}
-
 .notTodayColumn {
   background-color: var(--mantine-color-body);
 }
