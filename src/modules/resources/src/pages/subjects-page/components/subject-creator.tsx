@@ -1,35 +1,35 @@
 import { Modal, TextInput, Button, Stack } from "@mantine/core";
 import { useState } from "react";
+import { $app } from "@/infra/service";
 
-interface CourseCreatorProps {
+interface SubjectCreatorProps {
     opened: boolean;
     onClose: () => void;
     onSubmit: (data: { code: string; name: string }) => Promise<void>;
     loading?: boolean;
 }
 
-export function CourseCreator({
+export function SubjectCreator({
     opened,
     onClose,
     onSubmit,
     loading = false,
-}: CourseCreatorProps) {
+}: SubjectCreatorProps) {
     const [code, setCode] = useState("");
     const [name, setName] = useState("");
 
     const handleSubmit = async () => {
-        console.log("🟡 [CourseCreator] handleSubmit called", { code, name });
+        $app.logger.info("[SubjectCreator] handleSubmit called", { code, name });
         
         if (!code.trim() || !name.trim()) {
-            console.warn("🟡 [CourseCreator] Validation failed - empty fields");
+            $app.logger.warn("[SubjectCreator] Validation failed - empty fields");
             return;
         }
         
-        console.log("🟡 [CourseCreator] Calling onSubmit...");
+        $app.logger.info("[SubjectCreator] Calling onSubmit...");
         await onSubmit({ code, name });
         
-        console.log("🟡 [CourseCreator] onSubmit completed, resetting form");
-        // Reset form only after successful submission
+        $app.logger.info("[SubjectCreator] onSubmit completed, resetting form");
         setCode("");
         setName("");
     };

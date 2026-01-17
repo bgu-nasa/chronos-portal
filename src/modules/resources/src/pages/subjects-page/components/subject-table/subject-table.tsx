@@ -2,24 +2,24 @@ import { DataTable } from "primereact/datatable";
 import type { DataTableSelectionSingleChangeEvent } from "primereact/datatable";
 import { Column } from "primereact/column";
 import { Text, Stack } from "@mantine/core";
-import type { CourseData } from "./types";
-import resources from "../../courses-page.resources.json";
+import type { SubjectData } from "./types";
+import resources from "../../subjects-page.resources.json";
 
-interface CourseTableProps {
-    courses: CourseData[];
-    selectedCourse: CourseData | null;
-    onSelectionChange: (course: CourseData | null) => void;
+interface SubjectTableProps {
+    subjects: SubjectData[];
+    selectedSubject: SubjectData | null;
+    onSelectionChange: (subject: SubjectData | null) => void;
 }
 
-export function CourseTable({
-    courses,
-    selectedCourse,
+export function SubjectTable({
+    subjects,
+    selectedSubject,
     onSelectionChange,
-}: CourseTableProps) {
+}: SubjectTableProps) {
     const handleSelectionChange = (
-        e: DataTableSelectionSingleChangeEvent<CourseData[]>
+        e: DataTableSelectionSingleChangeEvent<SubjectData[]>
     ) => {
-        onSelectionChange(e.value as CourseData | null);
+        onSelectionChange(e.value as SubjectData | null);
     };
 
     const emptyMessage = () => {
@@ -34,8 +34,8 @@ export function CourseTable({
 
     return (
         <DataTable
-            value={courses}
-            selection={selectedCourse}
+            value={subjects}
+            selection={selectedSubject}
             onSelectionChange={handleSelectionChange}
             selectionMode="single"
             dataKey="id"

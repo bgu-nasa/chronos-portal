@@ -2,5 +2,5 @@
  * Pages layer exports
  */
 
-export * from "./courses-page";
-export * from "./groups-page";
+export * from "./subjects-page";
+export * from "./activities-page";

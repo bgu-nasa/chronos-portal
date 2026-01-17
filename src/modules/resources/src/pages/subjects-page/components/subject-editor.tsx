@@ -1,7 +1,8 @@
 import { Modal, TextInput, Button, Stack } from "@mantine/core";
 import { useState, useEffect } from "react";
+import { $app } from "@/infra/service";
 
-interface CourseEditorProps {
+interface SubjectEditorProps {
     opened: boolean;
     onClose: () => void;
     onSubmit: (data: { code: string; name: string }) => Promise<void>;
@@ -9,13 +10,13 @@ interface CourseEditorProps {
     initialData?: { code: string; name: string };
 }
 
-export function CourseEditor({
+export function SubjectEditor({
     opened,
     onClose,
     onSubmit,
     loading = false,
     initialData,
-}: CourseEditorProps) {
+}: SubjectEditorProps) {
     const [code, setCode] = useState("");
     const [name, setName] = useState("");
 
@@ -27,18 +28,17 @@ export function CourseEditor({
     }, [initialData]);
 
     const handleSubmit = async () => {
-        console.log("🟠 [CourseEditor] handleSubmit called", { code, name });
+        $app.logger.info("[SubjectEditor] handleSubmit called", { code, name });
         
         if (!code.trim() || !name.trim()) {
-            console.warn("🟠 [CourseEditor] Validation failed - empty fields");
+            $app.logger.warn("[SubjectEditor] Validation failed - empty fields");
             return;
         }
         
-        console.log("🟠 [CourseEditor] Calling onSubmit...");
+        $app.logger.info("[SubjectEditor] Calling onSubmit...");
         await onSubmit({ code, name });
         
-        console.log("🟠 [CourseEditor] onSubmit completed, resetting form");
-        // Reset form only after successful submission
+        $app.logger.info("[SubjectEditor] onSubmit completed, resetting form");
         setCode("");
         setName("");
     };

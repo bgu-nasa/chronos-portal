@@ -2,11 +2,11 @@ import { useEffect, useState } from "react";
 import { Container, Divider, Title, Button, Alert, Text, Group } from "@mantine/core";
 import { useNavigate, useSearchParams } from "react-router";
 import { ConfirmationDialog, useConfirmation } from "@/common";
-import { GroupActions } from "./components/group-actions";
-import { GroupTable } from "./components/group-table/group-table";
-import { GroupCreator } from "./components/group-creator";
-import { GroupEditor } from "./components/group-editor";
-import type { GroupData } from "./components/group-table/types";
+import { ActivityActions } from "./components/activity-actions";
+import { ActivityTable } from "./components/activity-table/activity-table";
+import { ActivityCreator } from "./components/activity-creator";
+import { ActivityEditor } from "./components/activity-editor";
+import type { ActivityData } from "./components/activity-table/types";
 import type { CreateActivityRequest, UpdateActivityRequest } from "@/modules/resources/src/data";
 import {
     useActivities,
@@ -14,17 +14,17 @@ import {
     useUpdateActivity,
     useDeleteActivity,
 } from "@/modules/resources/src/hooks";
-import resources from "./groups-page.resources.json";
-import styles from "./groups-page.module.css";
+import resources from "./activities-page.resources.json";
+import styles from "./activities-page.module.css";
+import { $app } from "@/infra/service";
 
-export function GroupsPage() {
+export function ActivitiesPage() {
     const navigate = useNavigate();
     const [searchParams] = useSearchParams();
-    const courseId = searchParams.get("courseId");
-    const courseName = searchParams.get("courseName");
-    const departmentId = searchParams.get("departmentId"); // Get from URL
+    const subjectId = searchParams.get("subjectId");
+    const departmentId = searchParams.get("departmentId");
     
-    const [selectedGroup, setSelectedGroup] = useState<GroupData | null>(null);
+    const [selectedActivity, setSelectedActivity] = useState<ActivityData | null>(null);
     const [createModalOpened, setCreateModalOpened] = useState(false);
     const [editModalOpened, setEditModalOpened] = useState(false);
     
@@ -43,23 +43,23 @@ export function GroupsPage() {
 
     // Load activities when page loads
     useEffect(() => {
-        console.log("🔷 [GroupsPage] Initializing with:", { courseId, departmentId });
+        $app.logger.info("[ActivitiesPage] Initializing with:", { subjectId, departmentId });
         
         if (departmentId) {
             setCurrentDepartment(departmentId);
             fetchActivities();
         } else {
-            console.warn("🔷 [GroupsPage] No departmentId in URL params");
+            $app.logger.warn("[ActivitiesPage] No departmentId in URL params");
         }
     }, [departmentId, fetchActivities, setCurrentDepartment]);
 
     const handleBackClick = () => {
-        navigate("/resources/courses");
+        navigate("/resources/subjects");
     };
 
     const handleCreateClick = () => {
-        if (!courseId || !departmentId) {
-            alert("Missing course or department context");
+        if (!subjectId || !departmentId) {
+            alert("Missing subject or department context");
             return;
         }
         setCreateModalOpened(true);
@@ -70,42 +70,42 @@ export function GroupsPage() {
         assignedUserId: string; 
         expectedStudents: number | null;
     }) => {
-        console.log("🟢 [GroupsPage] handleCreateSubmit called with:", data);
+        $app.logger.info("[ActivitiesPage] handleCreateSubmit called with:", data);
         
-        if (!courseId || !departmentId) {
-            console.error("❌ Missing courseId or departmentId");
-            alert("Missing course or department context");
+        if (!subjectId || !departmentId) {
+            $app.logger.error("[ActivitiesPage] Missing subjectId or departmentId");
+            alert("Missing subject or department context");
             return;
         }
 
         const org = $app.organization.getOrganization();
-        console.log("🟢 [GroupsPage] Organization from context:", org);
+        $app.logger.info("[ActivitiesPage] Organization from context:", org);
 
         const request: CreateActivityRequest = {
             id: crypto.randomUUID(),
             organizationId: org?.id || "00000000-0000-0000-0000-000000000000",
-            subjectId: courseId,
+            subjectId: subjectId,
             assignedUserId: data.assignedUserId || "00000000-0000-0000-0000-000000000000",
             activityType: data.activityType,
             expectedStudents: data.expectedStudents,
         };
 
-        console.log("🟢 [GroupsPage] Sending create request:", request);
+        $app.logger.info("[ActivitiesPage] Sending create request:", request);
 
         try {
-            const result = await createActivity(courseId, request);
-            console.log("✅ [GroupsPage] Create activity result:", result);
+            const result = await createActivity(subjectId, request);
+            $app.logger.info("[ActivitiesPage] Create activity result:", result);
             
             if (result) {
                 setCreateModalOpened(false);
-                fetchActivities(); // Refresh the list
+                fetchActivities();
             } else {
-                console.error("❌ Create activity returned null");
+                $app.logger.error("[ActivitiesPage] Create activity returned null");
                 setCreateModalOpened(false);
                 alert("Failed to create activity. Please check the console for details.");
             }
         } catch (error) {
-            console.error("❌ Error creating activity:", error);
+            $app.logger.error("[ActivitiesPage] Error creating activity:", error);
             setCreateModalOpened(false);
             const errorMessage = error instanceof Error ? error.message : "Unknown error";
             alert(`Error creating activity: ${errorMessage}`);
@@ -113,7 +113,7 @@ export function GroupsPage() {
     };
 
     const handleEditClick = () => {
-        if (selectedGroup) {
+        if (selectedActivity) {
             setEditModalOpened(true);
         }
     };
@@ -123,43 +123,43 @@ export function GroupsPage() {
         assignedUserId: string;
         expectedStudents: number | null;
     }) => {
-        console.log("🟣 [GroupsPage] handleEditSubmit called with:", data);
-        console.log("🟣 [GroupsPage] selectedGroup:", selectedGroup);
+        $app.logger.info("[ActivitiesPage] handleEditSubmit called with:", data);
+        $app.logger.info("[ActivitiesPage] selectedActivity:", selectedActivity);
         
-        if (!selectedGroup || !courseId || !departmentId) {
-            console.error("❌ Missing selectedGroup, courseId, or departmentId");
+        if (!selectedActivity || !subjectId || !departmentId) {
+            $app.logger.error("[ActivitiesPage] Missing selectedActivity, subjectId, or departmentId");
             alert("Missing required context for edit");
             return;
         }
 
         const org = $app.organization.getOrganization();
-        console.log("🟣 [GroupsPage] Organization from context:", org);
+        $app.logger.info("[ActivitiesPage] Organization from context:", org);
 
         const request: UpdateActivityRequest = {
             organizationId: org?.id || "00000000-0000-0000-0000-000000000000",
-            subjectId: courseId,
+            subjectId: subjectId,
             assignedUserId: data.assignedUserId || "00000000-0000-0000-0000-000000000000",
             activityType: data.activityType,
             expectedStudents: data.expectedStudents,
         };
 
-        console.log("🟣 [GroupsPage] Sending update request:", request);
+        $app.logger.info("[ActivitiesPage] Sending update request:", request);
 
         try {
-            const success = await updateActivity(selectedGroup.id, request);
-            console.log("✅ [GroupsPage] Update activity result:", success);
+            const success = await updateActivity(selectedActivity.id, request);
+            $app.logger.info("[ActivitiesPage] Update activity result:", success);
             
             if (success) {
                 setEditModalOpened(false);
-                setSelectedGroup(null);
-                fetchActivities(); // Refresh the list
+                setSelectedActivity(null);
+                fetchActivities();
             } else {
-                console.error("❌ Update activity returned false");
+                $app.logger.error("[ActivitiesPage] Update activity returned false");
                 setEditModalOpened(false);
                 alert("Failed to update activity. Please check the console for details.");
             }
         } catch (error) {
-            console.error("❌ Error updating activity:", error);
+            $app.logger.error("[ActivitiesPage] Error updating activity:", error);
             setEditModalOpened(false);
             const errorMessage = error instanceof Error ? error.message : "Unknown error";
             alert(`Error updating activity: ${errorMessage}`);
@@ -167,7 +167,7 @@ export function GroupsPage() {
     };
 
     const handleDeleteClick = () => {
-        if (!selectedGroup) {
+        if (!selectedActivity) {
             return;
         }
 
@@ -175,18 +175,18 @@ export function GroupsPage() {
             title: resources.deleteConfirmTitle,
             message: resources.deleteConfirmMessage,
             onConfirm: async () => {
-                console.log("🗑️ [GroupsPage] Deleting activity:", selectedGroup.id);
-                const success = await deleteActivity(selectedGroup.id);
+                $app.logger.info("[ActivitiesPage] Deleting activity:", selectedActivity.id);
+                const success = await deleteActivity(selectedActivity.id);
                 if (success) {
-                    setSelectedGroup(null);
+                    setSelectedActivity(null);
                 }
             },
         });
     };
 
-    // Filter activities for the current course
-    const courseActivities: GroupData[] = activities
-        .filter((activity) => activity.subjectId === courseId)
+    // Filter activities for the current subject
+    const subjectActivities: ActivityData[] = activities
+        .filter((activity) => activity.subjectId === subjectId)
         .map((activity) => ({
             id: activity.id,
             activityType: activity.activityType,
@@ -194,14 +194,14 @@ export function GroupsPage() {
             expectedStudents: activity.expectedStudents || 0,
         }));
 
-    console.log("🔷 [GroupsPage] Filtered course activities:", courseActivities.length);
+    $app.logger.info("[ActivitiesPage] Filtered subject activities:", subjectActivities.length);
 
-    if (!courseId) {
+    if (!subjectId) {
         return (
             <Container size="xl" py="xl">
                 <Title order={1}>No course selected</Title>
                 <Button onClick={handleBackClick} mt="md">
-                    {resources.backToCourses}
+                    {resources.backToSubjects}
                 </Button>
             </Container>
         );
@@ -213,7 +213,7 @@ export function GroupsPage() {
                 <Title order={1}>Missing Department Context</Title>
                 <Text>Department ID is required to load groups.</Text>
                 <Button onClick={handleBackClick} mt="md">
-                    {resources.backToCourses}
+                    {resources.backToSubjects}
                 </Button>
             </Container>
         );
@@ -225,55 +225,50 @@ export function GroupsPage() {
                 <div className={styles.header}>
                     <div>
                         <Title order={1}>{resources.title}</Title>
-                        {courseName && (
-                            <Text size="lg" c="dimmed">
-                                {decodeURIComponent(courseName)}
-                            </Text>
-                        )}
                     </div>
                     <Button variant="outline" onClick={handleBackClick}>
-                        {resources.backToCourses}
+                        {resources.backToSubjects}
                     </Button>
                 </div>
                 <Divider className={styles.divider} />
 
                 <Group justify="space-between" mb="md">
-                    <GroupActions
-                        selectedGroup={selectedGroup}
+                    <ActivityActions
+                        selectedActivity={selectedActivity}
                         onCreateClick={handleCreateClick}
                         onEditClick={handleEditClick}
                         onDeleteClick={handleDeleteClick}
                     />
                     <Button variant="default" onClick={handleBackClick}>
-                        Back to Courses
+                        Back to Subjects
                     </Button>
                 </Group>
 
-                <GroupTable
-                    groups={courseActivities}
-                    selectedGroup={selectedGroup}
-                    onSelectionChange={setSelectedGroup}
+                <ActivityTable
+                    activities={subjectActivities}
+                    selectedActivity={selectedActivity}
+                    onSelectionChange={setSelectedActivity}
                     loading={isLoading}
                 />
 
-                <GroupCreator
+                <ActivityCreator
                     opened={createModalOpened}
                     onClose={() => setCreateModalOpened(false)}
                     onSubmit={handleCreateSubmit}
                     loading={isCreating}
                 />
 
-                <GroupEditor
+                <ActivityEditor
                     opened={editModalOpened}
                     onClose={() => setEditModalOpened(false)}
                     onSubmit={handleEditSubmit}
                     loading={isEditing}
                     initialData={
-                        selectedGroup
+                        selectedActivity
                             ? {
-                                  activityType: selectedGroup.activityType,
-                                  assignedUserId: selectedGroup.assignedUserId,
-                                  expectedStudents: selectedGroup.expectedStudents,
+                                  activityType: selectedActivity.activityType,
+                                  assignedUserId: selectedActivity.assignedUserId,
+                                  expectedStudents: selectedActivity.expectedStudents,
                               }
                             : undefined
                     }

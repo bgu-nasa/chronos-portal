@@ -1,7 +1,8 @@
 import { Modal, TextInput, Button, Stack, NumberInput } from "@mantine/core";
 import { useState } from "react";
+import { $app } from "@/infra/service";
 
-interface GroupCreatorProps {
+interface ActivityCreatorProps {
     opened: boolean;
     onClose: () => void;
     onSubmit: (data: {
@@ -12,37 +13,36 @@ interface GroupCreatorProps {
     loading?: boolean;
 }
 
-export function GroupCreator({
+export function ActivityCreator({
     opened,
     onClose,
     onSubmit,
     loading = false,
-}: GroupCreatorProps) {
+}: ActivityCreatorProps) {
     const [activityType, setActivityType] = useState("");
     const [assignedUserId, setAssignedUserId] = useState("");
     const [expectedStudents, setExpectedStudents] = useState<number | null>(null);
 
     const handleSubmit = async () => {
-        console.log("🟡 [GroupCreator] handleSubmit called", {
+        $app.logger.info("[ActivityCreator] handleSubmit called", {
             activityType,
             assignedUserId,
             expectedStudents,
         });
 
         if (!activityType.trim()) {
-            console.warn("🟡 [GroupCreator] Validation failed - empty activity type");
+            $app.logger.warn("[ActivityCreator] Validation failed - empty activity type");
             return;
         }
 
-        console.log("🟡 [GroupCreator] Calling onSubmit...");
+        $app.logger.info("[ActivityCreator] Calling onSubmit...");
         await onSubmit({
             activityType,
             assignedUserId: assignedUserId.trim() || "00000000-0000-0000-0000-000000000000",
             expectedStudents,
         });
 
-        console.log("🟡 [GroupCreator] onSubmit completed, resetting form");
-        // Reset form only after successful submission
+        $app.logger.info("[ActivityCreator] onSubmit completed, resetting form");
         setActivityType("");
         setAssignedUserId("");
         setExpectedStudents(null);

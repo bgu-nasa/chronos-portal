@@ -1,7 +1,8 @@
 import { Modal, TextInput, Button, Stack, NumberInput } from "@mantine/core";
 import { useState, useEffect } from "react";
+import { $app } from "@/infra/service";
 
-interface GroupEditorProps {
+interface ActivityEditorProps {
     opened: boolean;
     onClose: () => void;
     onSubmit: (data: {
@@ -17,13 +18,13 @@ interface GroupEditorProps {
     };
 }
 
-export function GroupEditor({
+export function ActivityEditor({
     opened,
     onClose,
     onSubmit,
     loading = false,
     initialData,
-}: GroupEditorProps) {
+}: ActivityEditorProps) {
     const [activityType, setActivityType] = useState("");
     const [assignedUserId, setAssignedUserId] = useState("");
     const [expectedStudents, setExpectedStudents] = useState<number | null>(null);
@@ -37,26 +38,25 @@ export function GroupEditor({
     }, [initialData]);
 
     const handleSubmit = async () => {
-        console.log("🟠 [GroupEditor] handleSubmit called", {
+        $app.logger.info("[ActivityEditor] handleSubmit called", {
             activityType,
             assignedUserId,
             expectedStudents,
         });
 
         if (!activityType.trim()) {
-            console.warn("🟠 [GroupEditor] Validation failed - empty activity type");
+            $app.logger.warn("[ActivityEditor] Validation failed - empty activity type");
             return;
         }
 
-        console.log("🟠 [GroupEditor] Calling onSubmit...");
+        $app.logger.info("[ActivityEditor] Calling onSubmit...");
         await onSubmit({
             activityType,
             assignedUserId: assignedUserId.trim() || "00000000-0000-0000-0000-000000000000",
             expectedStudents,
         });
 
-        console.log("🟠 [GroupEditor] onSubmit completed, resetting form");
-        // Reset form only after successful submission
+        $app.logger.info("[ActivityEditor] onSubmit completed, resetting form");
         setActivityType("");
         setAssignedUserId("");
         setExpectedStudents(null);

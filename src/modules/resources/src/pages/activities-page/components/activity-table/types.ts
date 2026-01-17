@@ -1,4 +1,4 @@
-export type GroupData = {
+export type ActivityData = {
     id: string;
     activityType: string;
     assignedUserId: string;

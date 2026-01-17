@@ -10,6 +10,7 @@ import type {
     CreateSubjectRequest,
     UpdateSubjectRequest,
 } from "@/modules/resources/src/data";
+import { $app } from "@/infra/service";
 
 interface SubjectStore {
     // State
@@ -65,29 +66,29 @@ export const useSubjectStore = create<SubjectStore>((set, get) => ({
                     ? err.message
                     : "Failed to fetch subjects";
             set({ error: errorMessage, isLoading: false });
-            console.error("Error fetching subjects:", err);
+            $app.logger.error("[SubjectStore] Error fetching subjects:", err);
         }
     },
 
     // Create a subject and refetch
     createSubject: async (request: CreateSubjectRequest) => {
-        console.log("🟢 [SubjectStore] createSubject called");
+        $app.logger.info("[SubjectStore] createSubject called");
         set({ isLoading: true, error: null });
         try {
             const departmentId = get().getDepartmentId();
-            console.log("🟢 [SubjectStore] Department ID:", departmentId);
-            console.log("🟢 [SubjectStore] Request:", JSON.stringify(request, null, 2));
+            $app.logger.info("[SubjectStore] Department ID:", departmentId);
+            $app.logger.info("[SubjectStore] Request:", JSON.stringify(request, null, 2));
             
             const newSubject = await subjectDataRepository.createSubject(
                 departmentId,
                 request
             );
             
-            console.log("🟢 [SubjectStore] Subject created successfully:", newSubject);
+            $app.logger.info("[SubjectStore] Subject created successfully:", newSubject);
             set({ isLoading: false });
 
             // Refetch to update the list
-            console.log("🟢 [SubjectStore] Refetching subjects...");
+            $app.logger.info("[SubjectStore] Refetching subjects...");
             await get().fetchSubjects();
 
             return newSubject;
@@ -97,7 +98,7 @@ export const useSubjectStore = create<SubjectStore>((set, get) => ({
                     ? err.message
                     : "Failed to create subject";
             set({ error: errorMessage, isLoading: false });
-            console.error("❌ [SubjectStore] Error creating subject:", err);
+            $app.logger.error("[SubjectStore] Error creating subject:", err);
             return null;
         }
     },
@@ -107,14 +108,14 @@ export const useSubjectStore = create<SubjectStore>((set, get) => ({
         subjectId: string,
         request: UpdateSubjectRequest
     ) => {
-        console.log("🟣 [SubjectStore] updateSubject called");
-        console.log("🟣 [SubjectStore] Subject ID:", subjectId);
-        console.log("🟣 [SubjectStore] Request:", JSON.stringify(request, null, 2));
+        $app.logger.info("[SubjectStore] updateSubject called");
+        $app.logger.info("[SubjectStore] Subject ID:", subjectId);
+        $app.logger.info("[SubjectStore] Request:", JSON.stringify(request, null, 2));
         
         set({ isLoading: true, error: null });
         try {
             const departmentId = get().getDepartmentId();
-            console.log("🟣 [SubjectStore] Department ID:", departmentId);
+            $app.logger.info("[SubjectStore] Department ID:", departmentId);
             
             await subjectDataRepository.updateSubject(
                 departmentId,
@@ -122,11 +123,11 @@ export const useSubjectStore = create<SubjectStore>((set, get) => ({
                 request
             );
             
-            console.log("🟣 [SubjectStore] Subject updated successfully");
+            $app.logger.info("[SubjectStore] Subject updated successfully");
             set({ isLoading: false });
 
             // Refetch to update the list
-            console.log("🟣 [SubjectStore] Refetching subjects...");
+            $app.logger.info("[SubjectStore] Refetching subjects...");
             await get().fetchSubjects();
 
             return true;
@@ -136,7 +137,7 @@ export const useSubjectStore = create<SubjectStore>((set, get) => ({
                     ? err.message
                     : "Failed to update subject";
             set({ error: errorMessage, isLoading: false });
-            console.error("❌ [SubjectStore] Error updating subject:", err);
+            $app.logger.error("[SubjectStore] Error updating subject:", err);
             return false;
         }
     },
@@ -159,7 +160,7 @@ export const useSubjectStore = create<SubjectStore>((set, get) => ({
                     ? err.message
                     : "Failed to delete subject";
             set({ error: errorMessage, isLoading: false });
-            console.error("Error deleting subject:", err);
+            $app.logger.error("[SubjectStore] Error deleting subject:", err);
             return false;
         }
     },

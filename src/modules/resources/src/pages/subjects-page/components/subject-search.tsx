@@ -2,18 +2,18 @@ import { Button, TextInput, Group, Paper } from "@mantine/core";
 import { DepartmentSelect } from "@/common/components/department-select";
 import { useState } from "react";
 
-export interface CourseSearchFilters {
+export interface SubjectSearchFilters {
     departmentId: string;
     code: string;
     name: string;
 }
 
-interface CourseSearchProps {
-    onSearch: (filters: CourseSearchFilters) => void;
+interface SubjectSearchProps {
+    onSearch: (filters: SubjectSearchFilters) => void;
     onClear: () => void;
 }
 
-export function CourseSearch({ onSearch, onClear }: CourseSearchProps) {
+export function SubjectSearch({ onSearch, onClear }: SubjectSearchProps) {
     const [departmentId, setDepartmentId] = useState<string>("");
     const [code, setCode] = useState("");
     const [name, setName] = useState("");

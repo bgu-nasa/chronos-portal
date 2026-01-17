@@ -1,4 +1,4 @@
-export type CourseData = {
+export type SubjectData = {
     id: string;
     code: string;
     name: string;

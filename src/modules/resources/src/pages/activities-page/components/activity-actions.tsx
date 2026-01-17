@@ -1,19 +1,19 @@
 import { Button, Group } from "@mantine/core";
-import resources from "../groups-page.resources.json";
+import resources from "../activities-page.resources.json";
 
-interface GroupActionsProps {
-    selectedGroup: any | null;
+interface ActivityActionsProps {
+    selectedActivity: any | null;
     onCreateClick: () => void;
     onEditClick: () => void;
     onDeleteClick: () => void;
 }
 
-export function GroupActions({
-    selectedGroup,
+export function ActivityActions({
+    selectedActivity,
     onCreateClick,
     onEditClick,
     onDeleteClick,
-}: GroupActionsProps) {
+}: ActivityActionsProps) {
     return (
         <Group mb="md">
             <Button onClick={onCreateClick}>
@@ -21,14 +21,14 @@ export function GroupActions({
             </Button>
             <Button 
                 onClick={onEditClick} 
-                disabled={!selectedGroup}
+                disabled={!selectedActivity}
             >
                 {resources.editButton}
             </Button>
             <Button 
                 onClick={onDeleteClick} 
-                disabled={!selectedGroup}
-                color="red"
+                disabled={!selectedActivity}
+                variant={selectedActivity ? "filled" : "default"}
             >
                 {resources.deleteButton}
             </Button>

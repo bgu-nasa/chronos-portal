@@ -2,12 +2,12 @@ import { useState } from "react";
 import { Container, Divider, Title } from "@mantine/core";
 import { useNavigate } from "react-router";
 import { ConfirmationDialog, useConfirmation } from "@/common";
-import { CourseActions } from "./components/course-actions";
-import { CourseTable } from "./components/course-table/course-table";
-import { CourseSearch, type CourseSearchFilters } from "./components/course-search";
-import { CourseCreator } from "./components/course-creator";
-import { CourseEditor } from "./components/course-editor";
-import type { CourseData } from "./components/course-table/types";
+import { SubjectActions } from "./components/subject-actions";
+import { SubjectTable } from "./components/subject-table/subject-table";
+import { SubjectSearch, type SubjectSearchFilters } from "./components/subject-search";
+import { SubjectCreator } from "./components/subject-creator";
+import { SubjectEditor } from "./components/subject-editor";
+import type { SubjectData } from "./components/subject-table/types";
 import type { UpdateSubjectRequest } from "@/modules/resources/src/data";
 import {
     useSubjects,
@@ -15,12 +15,13 @@ import {
     useUpdateSubject,
     useDeleteSubject,
 } from "@/modules/resources/src/hooks";
-import resources from "./courses-page.resources.json";
-import styles from "./courses-page.module.css";
+import resources from "./subjects-page.resources.json";
+import styles from "./subjects-page.module.css";
+import { $app } from "@/infra/service";
 
-export function CoursesPage() {
+export function SubjectsPage() {
     const navigate = useNavigate();
-    const [selectedCourse, setSelectedCourse] = useState<CourseData | null>(null);
+    const [selectedSubject, setSelectedSubject] = useState<SubjectData | null>(null);
     const [createModalOpened, setCreateModalOpened] = useState(false);
     const [editModalOpened, setEditModalOpened] = useState(false);
     const [currentDepartmentId, setCurrentDepartmentId] = useState<string | null>(null);
@@ -38,13 +39,13 @@ export function CoursesPage() {
         isLoading: isDeleting,
     } = useConfirmation();
 
-    const handleSearch = (filters: CourseSearchFilters) => {
+    const handleSearch = (filters: SubjectSearchFilters) => {
         // TODO: Backend endpoint needed for filtered search
         // Expected endpoint: GET /api/department/{departmentId}/resources/subjects/subject
         // Query params: ?code={code}&name={name}
         
         if (!filters.departmentId) {
-            console.warn("Department ID is required for search");
+            $app.logger.warn("[SubjectsPage] Department ID is required for search");
             return;
         }
 
@@ -69,17 +70,17 @@ export function CoursesPage() {
     };
 
     const handleCreateSubmit = async (data: { code: string; name: string }) => {
-        console.log("🔵 handleCreateSubmit called with:", data);
-        console.log("🔵 currentDepartmentId:", currentDepartmentId);
+        $app.logger.info("[SubjectsPage] handleCreateSubmit called with:", data);
+        $app.logger.info("[SubjectsPage] currentDepartmentId:", currentDepartmentId);
         
         if (!currentDepartmentId) {
-            console.error("❌ No department ID set");
+            $app.logger.error("[SubjectsPage] No department ID set");
             return;
         }
 
         // Get organization from context
         const org = $app.organization.getOrganization();
-        console.log("🔵 Organization from context:", org);
+        $app.logger.info("[SubjectsPage] Organization from context:", org);
 
         // TODO: Get schedulingPeriodId from context (using placeholder for now)
         const request = {
@@ -91,100 +92,100 @@ export function CoursesPage() {
             name: data.name,
         };
 
-        console.log("🔵 Sending create request:", request);
+        $app.logger.info("[SubjectsPage] Sending create request:", request);
 
         try {
             const result = await createSubject(request);
-            console.log("✅ Create subject result:", result);
+            $app.logger.info("[SubjectsPage] Create subject result:", result);
             
             if (result) {
                 setCreateModalOpened(false);
                 fetchSubjects(); // Refresh the list
             } else {
-                console.error("❌ Create subject returned null");
+                $app.logger.error("[SubjectsPage] Create subject returned null");
             }
         } catch (error) {
-            console.error("❌ Error creating subject:", error);
+            $app.logger.error("[SubjectsPage] Error creating subject:", error);
         }
     };
 
     const handleEditClick = () => {
-        if (selectedCourse) {
+        if (selectedSubject) {
             setEditModalOpened(true);
         }
     };
 
     const handleEditSubmit = async (data: { code: string; name: string }) => {
-        console.log("🟣 handleEditSubmit called with:", data);
-        console.log("🟣 selectedCourse:", selectedCourse);
-        console.log("🟣 currentDepartmentId:", currentDepartmentId);
+        $app.logger.info("[SubjectsPage] handleEditSubmit called with:", data);
+        $app.logger.info("[SubjectsPage] selectedSubject:", selectedSubject);
+        $app.logger.info("[SubjectsPage] currentDepartmentId:", currentDepartmentId);
         
-        if (!selectedCourse || !currentDepartmentId) {
-            console.error("❌ Missing selectedCourse or currentDepartmentId");
+        if (!selectedSubject || !currentDepartmentId) {
+            $app.logger.error("[SubjectsPage] Missing selectedSubject or currentDepartmentId");
             return;
         }
 
         // Get organization from context
         const org = $app.organization.getOrganization();
-        console.log("🟣 Organization from context:", org);
+        $app.logger.info("[SubjectsPage] Organization from context:", org);
 
         // TODO: Get schedulingPeriodId from context (using placeholder for now)
         const request: UpdateSubjectRequest = {
             organizationId: org?.id || "00000000-0000-0000-0000-000000000000",
             departmentId: currentDepartmentId,
-            schedulingPeriodId: selectedCourse.schedulingPeriodId, // Use existing value from course
+            schedulingPeriodId: selectedSubject.schedulingPeriodId, // Use existing value from subject
             code: data.code,
             name: data.name,
         };
 
-        console.log("🟣 Sending update request:", request);
+        $app.logger.info("[SubjectsPage] Sending update request:", request);
 
         try {
-            const success = await updateSubject(selectedCourse.id, request);
-            console.log("✅ Update subject result:", success);
+            const success = await updateSubject(selectedSubject.id, request);
+            $app.logger.info("[SubjectsPage] Update subject result:", success);
             
             if (success) {
                 setEditModalOpened(false);
-                setSelectedCourse(null);
+                setSelectedSubject(null);
                 fetchSubjects(); // Refresh the list
             } else {
-                console.error("❌ Update subject returned false");
+                $app.logger.error("[SubjectsPage] Update subject returned false");
             }
         } catch (error) {
-            console.error("❌ Error updating subject:", error);
+            $app.logger.error("[SubjectsPage] Error updating subject:", error);
         }
     };
 
     const handleDeleteClick = () => {
-        if (!selectedCourse) return;
+        if (!selectedSubject) return;
 
         openConfirmation({
             title: resources.deleteConfirmTitle,
             message: resources.deleteConfirmMessage.replace(
                 "{name}",
-                selectedCourse.name
+                selectedSubject.name
             ),
             onConfirm: async () => {
-                const success = await deleteSubject(selectedCourse.id);
+                const success = await deleteSubject(selectedSubject.id);
                 if (success) {
-                    setSelectedCourse(null);
+                    setSelectedSubject(null);
                     fetchSubjects(); // Refresh the list
                 }
             },
         });
     };
 
-    const handleViewGroupsClick = () => {
-        if (selectedCourse && currentDepartmentId) {
+    const handleViewActivitiesClick = () => {
+        if (selectedSubject && currentDepartmentId) {
             navigate(
-                `/resources/groups?courseId=${selectedCourse.id}&courseName=${encodeURIComponent(selectedCourse.name)}&departmentId=${currentDepartmentId}`
+                `/resources/activities?subjectId=${selectedSubject.id}&departmentId=${currentDepartmentId}`
             );
         }
     };
 
-    // Convert SubjectResponse to CourseData with display names
+    // Convert SubjectResponse to SubjectData with display names
     // TODO: Fetch actual organization and department names from backend
-    const courseData: CourseData[] = subjects.map((subject) => ({
+    const subjectData: SubjectData[] = subjects.map((subject) => ({
         id: subject.id,
         code: subject.code,
         name: subject.name,
@@ -200,40 +201,40 @@ export function CoursesPage() {
                 <Title order={1}>{resources.title}</Title>
                 <Divider className={styles.divider} />
 
-                <CourseSearch 
+                <SubjectSearch 
                     onSearch={handleSearch}
                     onClear={handleClearFilters}
                 />
 
-                <CourseActions
-                    selectedCourse={selectedCourse}
+                <SubjectActions
+                    selectedSubject={selectedSubject}
                     onCreateClick={handleCreateClick}
                     onEditClick={handleEditClick}
                     onDeleteClick={handleDeleteClick}
-                    onViewGroupsClick={handleViewGroupsClick}
+                    onViewActivitiesClick={handleViewActivitiesClick}
                 />
 
-                <CourseTable
-                    courses={courseData}
-                    selectedCourse={selectedCourse}
-                    onSelectionChange={setSelectedCourse}
+                <SubjectTable
+                    subjects={subjectData}
+                    selectedSubject={selectedSubject}
+                    onSelectionChange={setSelectedSubject}
                 />
 
-                <CourseCreator
+                <SubjectCreator
                     opened={createModalOpened}
                     onClose={() => setCreateModalOpened(false)}
                     onSubmit={handleCreateSubmit}
                     loading={isCreating}
                 />
 
-                <CourseEditor
+                <SubjectEditor
                     opened={editModalOpened}
                     onClose={() => setEditModalOpened(false)}
                     onSubmit={handleEditSubmit}
                     loading={isEditing}
                     initialData={
-                        selectedCourse
-                            ? { code: selectedCourse.code, name: selectedCourse.name }
+                        selectedSubject
+                            ? { code: selectedSubject.code, name: selectedSubject.name }
                             : undefined
                     }
                 />

@@ -61,16 +61,14 @@ export class ActivityDataRepository {
         const url = this.getBaseUrl(departmentId);
         const headers = this.getHeaders();
         
-        console.log("📥 [ActivityDataRepository] Fetching all activities:");
-        console.log("  URL:", url);
-        console.log("  Headers:", headers);
+        $app.logger.info("[ActivityDataRepository] Fetching all activities:", { url, headers });
         
         try {
             const response = await $app.ajax.get<ActivityResponse[]>(url, { headers });
-            console.log("✅ [ActivityDataRepository] Fetched activities:", response.length);
+            $app.logger.info("[ActivityDataRepository] Fetched activities:", response.length);
             return response;
         } catch (error) {
-            console.error("❌ [ActivityDataRepository] Fetch activities failed:", error);
+            $app.logger.error("[ActivityDataRepository] Fetch activities failed:", error);
             throw error;
         }
     }
@@ -88,16 +86,14 @@ export class ActivityDataRepository {
         const url = this.getSubjectActivitiesUrl(departmentId, subjectId);
         const headers = this.getHeaders();
         
-        console.log("📥 [ActivityDataRepository] Fetching activities by subject:");
-        console.log("  URL:", url);
-        console.log("  Subject ID:", subjectId);
+        $app.logger.info("[ActivityDataRepository] Fetching activities by subject:", { url, subjectId });
         
         try {
             const response = await $app.ajax.get<ActivityResponse[]>(url, { headers });
-            console.log("✅ [ActivityDataRepository] Fetched activities:", response.length);
+            $app.logger.info("[ActivityDataRepository] Fetched activities:", response.length);
             return response;
         } catch (error) {
-            console.error("❌ [ActivityDataRepository] Fetch activities by subject failed:", error);
+            $app.logger.error("[ActivityDataRepository] Fetch activities by subject failed:", error);
             throw error;
         }
     }
@@ -117,15 +113,14 @@ export class ActivityDataRepository {
         const url = `${this.getSubjectActivitiesUrl(departmentId, subjectId)}/${activityId}`;
         const headers = this.getHeaders();
         
-        console.log("📥 [ActivityDataRepository] Fetching activity by ID:");
-        console.log("  URL:", url);
+        $app.logger.info("[ActivityDataRepository] Fetching activity by ID:", { url });
         
         try {
             const response = await $app.ajax.get<ActivityResponse>(url, { headers });
-            console.log("✅ [ActivityDataRepository] Fetched activity:", response);
+            $app.logger.info("[ActivityDataRepository] Fetched activity:", response);
             return response;
         } catch (error) {
-            console.error("❌ [ActivityDataRepository] Fetch activity failed:", error);
+            $app.logger.error("[ActivityDataRepository] Fetch activity failed:", error);
             throw error;
         }
     }
@@ -145,11 +140,7 @@ export class ActivityDataRepository {
         const url = this.getSubjectActivitiesUrl(departmentId, subjectId);
         const headers = this.getHeaders();
         
-        console.log("📤 [ActivityDataRepository] Creating activity:");
-        console.log("  URL:", url);
-        console.log("  Subject ID:", subjectId);
-        console.log("  Headers:", headers);
-        console.log("  Request body:", JSON.stringify(request, null, 2));
+        $app.logger.info("[ActivityDataRepository] Creating activity:", { url, subjectId, headers, request });
         
         try {
             const response = await $app.ajax.post<ActivityResponse>(
@@ -157,10 +148,10 @@ export class ActivityDataRepository {
                 request,
                 { headers }
             );
-            console.log("✅ [ActivityDataRepository] Create activity response:", response);
+            $app.logger.info("[ActivityDataRepository] Create activity response:", response);
             return response;
         } catch (error) {
-            console.error("❌ [ActivityDataRepository] Create activity failed:", error);
+            $app.logger.error("[ActivityDataRepository] Create activity failed:", error);
             throw error;
         }
     }
@@ -180,16 +171,13 @@ export class ActivityDataRepository {
         const url = `${this.getBaseUrl(departmentId)}/${activityId}`;
         const headers = this.getHeaders();
         
-        console.log("🔄 [ActivityDataRepository] Updating activity:");
-        console.log("  URL:", url);
-        console.log("  Headers:", headers);
-        console.log("  Request body:", JSON.stringify(request, null, 2));
+        $app.logger.info("[ActivityDataRepository] Updating activity:", { url, headers, request });
         
         try {
             await $app.ajax.patch<void>(url, request, { headers });
-            console.log("✅ [ActivityDataRepository] Update activity successful");
+            $app.logger.info("[ActivityDataRepository] Update activity successful");
         } catch (error) {
-            console.error("❌ [ActivityDataRepository] Update activity failed:", error);
+            $app.logger.error("[ActivityDataRepository] Update activity failed:", error);
             throw error;
         }
     }
@@ -207,15 +195,13 @@ export class ActivityDataRepository {
         const url = `${this.getBaseUrl(departmentId)}/${activityId}`;
         const headers = this.getHeaders();
         
-        console.log("🗑️ [ActivityDataRepository] Deleting activity:");
-        console.log("  URL:", url);
-        console.log("  Headers:", headers);
+        $app.logger.info("[ActivityDataRepository] Deleting activity:", { url, headers });
         
         try {
             await $app.ajax.delete<void>(url, { headers });
-            console.log("✅ [ActivityDataRepository] Delete activity successful");
+            $app.logger.info("[ActivityDataRepository] Delete activity successful");
         } catch (error) {
-            console.error("❌ [ActivityDataRepository] Delete activity failed:", error);
+            $app.logger.error("[ActivityDataRepository] Delete activity failed:", error);
             throw error;
         }
     }

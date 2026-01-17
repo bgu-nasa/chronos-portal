@@ -3,7 +3,7 @@
     "createButton": "Create",
     "editButton": "Edit",
     "deleteButton": "Delete",
-    "viewGroupsButton": "View Groups",
+    "viewActivitiesButton": "View Groups",
     "organizationColumn": "Organization",
     "departmentColumn": "Department",
     "codeColumn": "Code",

@@ -1,21 +1,21 @@
 import { Button, Group } from "@mantine/core";
-import resources from "../courses-page.resources.json";
+import resources from "../subjects-page.resources.json";
 
-interface CourseActionsProps {
-    selectedCourse: any | null;
+interface SubjectActionsProps {
+    selectedSubject: any | null;
     onCreateClick: () => void;
     onEditClick: () => void;
     onDeleteClick: () => void;
-    onViewGroupsClick: () => void;
+    onViewActivitiesClick: () => void;
 }
 
-export function CourseActions({
-    selectedCourse,
+export function SubjectActions({
+    selectedSubject,
     onCreateClick,
     onEditClick,
     onDeleteClick,
-    onViewGroupsClick,
-}: CourseActionsProps) {
+    onViewActivitiesClick,
+}: SubjectActionsProps) {
     return (
         <Group mb="md">
             <Button onClick={onCreateClick}>
@@ -23,25 +23,24 @@ export function CourseActions({
             </Button>
             <Button 
                 onClick={onEditClick} 
-                disabled={!selectedCourse}
+                disabled={!selectedSubject}
                 variant="outline"
             >
                 {resources.editButton}
             </Button>
             <Button 
                 onClick={onDeleteClick} 
-                disabled={!selectedCourse}
-                color="red"
+                disabled={!selectedSubject}
                 variant="outline"
             >
                 {resources.deleteButton}
             </Button>
             <Button 
-                onClick={onViewGroupsClick} 
-                disabled={!selectedCourse}
+                onClick={onViewActivitiesClick} 
+                disabled={!selectedSubject}
                 variant="light"
             >
-                {resources.viewGroupsButton}
+                {resources.viewActivitiesButton}
             </Button>
         </Group>
     );
