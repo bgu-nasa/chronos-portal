@@ -14,11 +14,13 @@ import type {
 interface SchedulingPeriodStore {
     // State
     schedulingPeriods: SchedulingPeriodResponse[];
+    currentSchedulingPeriods: SchedulingPeriodResponse[];
     isLoading: boolean;
     error: string | null;
 
     // Actions
     fetchSchedulingPeriods: () => Promise<void>;
+    fetchCurrentSchedulingPeriods: () => Promise<void>;
     createSchedulingPeriod: (
         request: CreateSchedulingPeriodRequest
     ) => Promise<SchedulingPeriodResponse | null>;
@@ -36,6 +38,7 @@ interface SchedulingPeriodStore {
 export const useSchedulingPeriodStore = create<SchedulingPeriodStore>((set, get) => ({
     // Initial state
     schedulingPeriods: [],
+    currentSchedulingPeriods: [],
     isLoading: false,
     error: null,
 
@@ -58,6 +61,27 @@ export const useSchedulingPeriodStore = create<SchedulingPeriodStore>((set, get)
             }
             set({ error: errorMessage, isLoading: false });
             console.error("Error fetching scheduling periods:", err);
+        }
+    },
+
+    // Fetch current (active) scheduling periods
+    fetchCurrentSchedulingPeriods: async () => {
+        set({ isLoading: true, error: null });
+        try {
+            const data = await schedulingPeriodDataRepository.getCurrentSchedulingPeriods();
+            set({ currentSchedulingPeriods: data, isLoading: false });
+        } catch (err) {
+            let errorMessage = "Failed to fetch current scheduling periods";
+            if (err && typeof err === "object" && "status" in err && "message" in err) {
+                const apiError = err as { status: number; message: string };
+                errorMessage = apiError.status
+                    ? `Error ${apiError.status}: ${apiError.message}`
+                    : apiError.message;
+            } else if (err instanceof Error) {
+                errorMessage = err.message;
+            }
+            set({ error: errorMessage, isLoading: false });
+            console.error("Error fetching current scheduling periods:", err);
         }
     },
 

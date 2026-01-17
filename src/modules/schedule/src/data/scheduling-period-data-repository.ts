@@ -48,6 +48,19 @@ export class SchedulingPeriodDataRepository {
     }
 
     /**
+     * Fetch current (active) scheduling periods for the current organization
+     * These are periods that are currently active based on their date range
+     * @returns Array of current scheduling periods
+     */
+    async getCurrentSchedulingPeriods(): Promise<SchedulingPeriodResponse[]> {
+        const response = await $app.ajax.get<SchedulingPeriodResponse[]>(
+            "/api/schedule/scheduling/periods/current",
+            { headers: this.getHeaders() }
+        );
+        return response;
+    }
+
+    /**
      * Fetch a single scheduling period by ID
      * @param schedulingPeriodId - The ID of the scheduling period to fetch
      * @returns Scheduling period details

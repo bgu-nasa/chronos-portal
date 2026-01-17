@@ -25,6 +25,28 @@ export function useSchedulingPeriods() {
 }
 
 /**
+ * Hook for accessing current (active) scheduling periods
+ * These are periods that are currently active based on their date range
+ */
+export function useCurrentSchedulingPeriods() {
+    const currentSchedulingPeriods = useSchedulingPeriodStore(
+        (state) => state.currentSchedulingPeriods
+    );
+    const isLoading = useSchedulingPeriodStore((state) => state.isLoading);
+    const error = useSchedulingPeriodStore((state) => state.error);
+    const fetchCurrentSchedulingPeriods = useSchedulingPeriodStore(
+        (state) => state.fetchCurrentSchedulingPeriods
+    );
+
+    return {
+        currentSchedulingPeriods,
+        isLoading,
+        error,
+        fetchCurrentSchedulingPeriods,
+    };
+}
+
+/**
  * Hook for creating a scheduling period
  */
 export function useCreateSchedulingPeriod() {
