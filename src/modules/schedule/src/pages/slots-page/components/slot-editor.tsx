@@ -48,7 +48,7 @@ function TimeSpinner({ label, totalMinutes, onChange, error }: TimeSpinnerProps)
     return (
         <Box>
             <Text size="sm" fw={500} mb={4}>
-                {label} <span style={{ color: "var(--mantine-color-red-6)" }}>*</span>
+                {label} <span style={{ color: "var(--mantine-color-error)" }}>*</span>
             </Text>
             <Stack gap={4} align="center" style={{ width: "fit-content" }}>
                 <ActionIcon
