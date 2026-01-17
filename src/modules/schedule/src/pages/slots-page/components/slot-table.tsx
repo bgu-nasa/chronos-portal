@@ -1,6 +1,6 @@
 import { useMemo } from "react";
 import { Paper, Text, Group, Stack, Badge } from "@mantine/core";
-import { getWeekdayName, Weekday, WeekdayFromString } from "@/modules/schedule/src/data/slot.types";
+import { Weekday, WeekdayOrder } from "@/modules/schedule/src/data/slot.types";
 import type { SlotResponse } from "@/modules/schedule/src/data/slot.types";
 import resources from "@/modules/schedule/src/pages/slots-page/slots-page.resources.json";
 
@@ -10,17 +10,6 @@ interface SlotTableProps {
     onSelectionChange: (slot: SlotResponse | null) => void;
 }
 
-// Order of days (Sunday first)
-const dayOrder = [
-    Weekday.Sunday,
-    Weekday.Monday,
-    Weekday.Tuesday,
-    Weekday.Wednesday,
-    Weekday.Thursday,
-    Weekday.Friday,
-    Weekday.Saturday,
-];
-
 export function SlotTable({
     slots,
     selectedSlot,
@@ -28,30 +17,25 @@ export function SlotTable({
 }: SlotTableProps) {
     // Group slots by day and sort by time within each day
     const groupedSlots = useMemo(() => {
-        const groups: Record<number, SlotResponse[]> = {};
+        const groups: Record<string, SlotResponse[]> = {};
 
         // Initialize groups for all days
-        dayOrder.forEach((day) => {
+        WeekdayOrder.forEach((day) => {
             groups[day] = [];
         });
 
         // Group slots by weekday
         slots.forEach((slot) => {
-            let weekdayNum: number;
-            if (typeof slot.weekday === "string") {
-                weekdayNum = WeekdayFromString[slot.weekday] ?? 0;
-            } else {
-                weekdayNum = slot.weekday;
+            const weekday = slot.weekday;
+            if (!groups[weekday]) {
+                groups[weekday] = [];
             }
-            if (!groups[weekdayNum]) {
-                groups[weekdayNum] = [];
-            }
-            groups[weekdayNum].push(slot);
+            groups[weekday].push(slot);
         });
 
         // Sort slots within each day by fromTime
         Object.keys(groups).forEach((day) => {
-            groups[Number(day)].sort((a, b) => a.fromTime.localeCompare(b.fromTime));
+            groups[day].sort((a, b) => a.fromTime.localeCompare(b.fromTime));
         });
 
         return groups;
@@ -73,14 +57,14 @@ export function SlotTable({
 
     return (
         <Stack gap="md">
-            {dayOrder.map((day) => {
+            {WeekdayOrder.map((day) => {
                 const daySlots = groupedSlots[day];
-                if (daySlots.length === 0) return null;
+                if (!daySlots || daySlots.length === 0) return null;
 
                 return (
                     <Paper key={day} p="sm" withBorder>
                         <Text fw={600} size="sm" mb="xs" c="violet">
-                            {getWeekdayName(day)}
+                            {day}
                         </Text>
                         <Group gap="xs" wrap="wrap">
                             {daySlots.map((slot) => (

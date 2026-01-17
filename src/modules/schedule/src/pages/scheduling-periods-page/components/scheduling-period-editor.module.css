@@ -137,7 +137,7 @@
    ENABLED DAYS (Darker and bolder in both modes)
    ============================================ */
 .calendarPanel :global(.p-datepicker-day:not(.p-disabled):not(.p-datepicker-other-month) span) {
-    color: #000 !important;
+    color: var(--mantine-color-text) !important;
     font-weight: 900 !important;
     border: none !important;
     background-color: transparent !important;
@@ -154,7 +154,7 @@
 /* Dark mode support for enabled days */
 @media (prefers-color-scheme: dark) {
     .calendarPanel :global(.p-datepicker-day:not(.p-disabled):not(.p-datepicker-other-month) span) {
-        color: #fff !important;
+        color: var(--mantine-color-text) !important;
     }
 }
 

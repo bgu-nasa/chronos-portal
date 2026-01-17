@@ -57,10 +57,10 @@ export function SchedulingPeriodTable({
                 {`
                     .expired-row {
                         opacity: 0.5;
-                        background-color: #f0f0f0 !important;
+                        background-color: var(--mantine-color-gray-1) !important;
                     }
                     .expired-row td {
-                        color: #888 !important;
+                        color: var(--mantine-color-gray-6) !important;
                     }
                 `}
             </style>

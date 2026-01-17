@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react";
-import { Modal, Select, Button, Stack, Text, Group, Chip } from "@mantine/core";
+import { Modal, Select, Button, Stack, Text, Group, Chip, Box, ActionIcon } from "@mantine/core";
 import { useSlotEditorStore } from "@/modules/schedule/src/stores/slot-editor.store";
 import { useCreateSlot, useUpdateSlot } from "@/modules/schedule/src/hooks/use-slots";
-import { Weekday, WeekdayFromString } from "@/modules/schedule/src/data/slot.types";
+import { Weekday, WeekdayOrder } from "@/modules/schedule/src/data/slot.types";
 import resources from "@/modules/schedule/src/pages/slots-page/slots-page.resources.json";
 
 interface SlotEditorProps {
@@ -19,54 +19,124 @@ const durationOptions = [
     { value: "180", label: "3 hours" },
 ];
 
-// Time options from 8:00 to 22:00
-const generateTimeOptions = () => {
-    const options = [];
-    for (let hour = 6; hour <= 22; hour++) {
-        options.push({
-            value: `${hour.toString().padStart(2, "0")}:00`,
-            label: `${hour.toString().padStart(2, "0")}:00`,
-        });
-        if (hour < 22) {
-            options.push({
-                value: `${hour.toString().padStart(2, "0")}:30`,
-                label: `${hour.toString().padStart(2, "0")}:30`,
-            });
-        }
-    }
-    return options;
-};
+// TimeSpinner component with + above and - below, stepping by 30 minutes with wrap-around
+interface TimeSpinnerProps {
+    label: string;
+    totalMinutes: number; // 0-1439 (24 hours * 60 minutes)
+    onChange: (totalMinutes: number) => void;
+    error?: string;
+}
 
-const timeOptions = generateTimeOptions();
+function TimeSpinner({ label, totalMinutes, onChange, error }: TimeSpinnerProps) {
+    const hours = Math.floor(totalMinutes / 60);
+    const minutes = totalMinutes % 60;
 
-// Day options for multi-select (Sunday first)
-const dayOptions = [
-    { value: Weekday.Sunday.toString(), label: "Sunday" },
-    { value: Weekday.Monday.toString(), label: "Monday" },
-    { value: Weekday.Tuesday.toString(), label: "Tuesday" },
-    { value: Weekday.Wednesday.toString(), label: "Wednesday" },
-    { value: Weekday.Thursday.toString(), label: "Thursday" },
-    { value: Weekday.Friday.toString(), label: "Friday" },
-    { value: Weekday.Saturday.toString(), label: "Saturday" },
-];
+    const displayTime = `${hours.toString().padStart(2, "0")}:${minutes.toString().padStart(2, "0")}`;
+
+    const handleIncrement = () => {
+        // Add 30 minutes with wrap-around (1440 = 24 hours in minutes)
+        const newValue = (totalMinutes + 30) % 1440;
+        onChange(newValue);
+    };
+
+    const handleDecrement = () => {
+        // Subtract 30 minutes with wrap-around
+        const newValue = (totalMinutes - 30 + 1440) % 1440;
+        onChange(newValue);
+    };
+
+    return (
+        <Box>
+            <Text size="sm" fw={500} mb={4}>
+                {label} <span style={{ color: "var(--mantine-color-red-6)" }}>*</span>
+            </Text>
+            <Stack gap={4} align="center" style={{ width: "fit-content" }}>
+                <ActionIcon
+                    variant="light"
+                    color="violet"
+                    size="lg"
+                    onClick={handleIncrement}
+                    aria-label="Add 30 minutes"
+                >
+                    +
+                </ActionIcon>
+                <Box
+                    style={{
+                        padding: "8px 16px",
+                        border: "1px solid var(--mantine-color-gray-4)",
+                        borderRadius: "4px",
+                        fontWeight: 600,
+                        fontSize: "1.1rem",
+                        minWidth: "80px",
+                        textAlign: "center",
+                        backgroundColor: "var(--mantine-color-gray-0)",
+                    }}
+                >
+                    {displayTime}
+                </Box>
+                <ActionIcon
+                    variant="light"
+                    color="violet"
+                    size="lg"
+                    onClick={handleDecrement}
+                    aria-label="Subtract 30 minutes"
+                >
+                    −
+                </ActionIcon>
+            </Stack>
+            {error && <Text size="xs" c="red" mt={4}>{error}</Text>}
+        </Box>
+    );
+}
+
+// Day options for multi-select (Sunday first) - uses string values directly
+const dayOptions = WeekdayOrder.map((day) => ({
+    value: day,
+    label: day,
+}));
 
 export function SlotEditor({ schedulingPeriodId }: SlotEditorProps) {
     const { isOpen, mode, slot, close } = useSlotEditorStore();
     const { createSlot, error: createError, clearError: clearCreateError } = useCreateSlot();
     const { updateSlot, error: updateError, clearError: clearUpdateError } = useUpdateSlot();
 
-    // Form state
+    // Form state - Create mode (using total minutes)
     const [selectedDays, setSelectedDays] = useState<string[]>([]);
-    const [startTime, setStartTime] = useState<string | null>("08:00");
-    const [endTime, setEndTime] = useState<string | null>("16:00");
+    const [startTime, setStartTime] = useState(8 * 60); // 08:00 in minutes
+    const [endTime, setEndTime] = useState(16 * 60); // 16:00 in minutes
     const [duration, setDuration] = useState<string | null>("60");
     const [errors, setErrors] = useState<Record<string, string>>({});
     const [isSubmitting, setIsSubmitting] = useState(false);
 
     // For edit mode - single day and times
     const [editWeekday, setEditWeekday] = useState<string | null>(null);
-    const [editFromTime, setEditFromTime] = useState<string | null>(null);
-    const [editToTime, setEditToTime] = useState<string | null>(null);
+    const [editFromTime, setEditFromTime] = useState(8 * 60);
+    const [editToTime, setEditToTime] = useState(9 * 60);
+
+    // Clear related errors when values change
+    const handleStartTimeChange = (value: number) => {
+        setStartTime(value);
+        setErrors((prev) => {
+            const { startTime: _, endTime: __, duration: ___, ...rest } = prev;
+            return rest;
+        });
+    };
+
+    const handleEndTimeChange = (value: number) => {
+        setEndTime(value);
+        setErrors((prev) => {
+            const { endTime: _, duration: __, ...rest } = prev;
+            return rest;
+        });
+    };
+
+    const handleDurationChange = (value: string | null) => {
+        setDuration(value);
+        setErrors((prev) => {
+            const { duration: _, ...rest } = prev;
+            return rest;
+        });
+    };
 
     // Reset form when modal opens
     useEffect(() => {
@@ -77,22 +147,17 @@ export function SlotEditor({ schedulingPeriodId }: SlotEditorProps) {
 
             if (mode === "edit" && slot) {
                 // Edit mode: single slot
-                let weekdayValue: string;
-                if (typeof slot.weekday === "string") {
-                    const weekdayNum = WeekdayFromString[slot.weekday];
-                    weekdayValue = weekdayNum !== undefined ? weekdayNum.toString() : "0";
-                } else {
-                    weekdayValue = slot.weekday.toString();
-                }
-                setEditWeekday(weekdayValue);
-                // Extract HH:mm from time
-                setEditFromTime(slot.fromTime.substring(0, 5));
-                setEditToTime(slot.toTime.substring(0, 5));
+                setEditWeekday(slot.weekday);
+                // Parse time to total minutes
+                const fromParts = slot.fromTime.split(":");
+                const toParts = slot.toTime.split(":");
+                setEditFromTime(parseInt(fromParts[0], 10) * 60 + parseInt(fromParts[1], 10));
+                setEditToTime(parseInt(toParts[0], 10) * 60 + parseInt(toParts[1], 10));
             } else {
                 // Create mode: bulk creation
                 setSelectedDays([]);
-                setStartTime("08:00");
-                setEndTime("16:00");
+                setStartTime(8 * 60);
+                setEndTime(16 * 60);
                 setDuration("60");
             }
         }
@@ -101,11 +166,19 @@ export function SlotEditor({ schedulingPeriodId }: SlotEditorProps) {
     const validateCreate = () => {
         const newErrors: Record<string, string> = {};
         if (selectedDays.length === 0) newErrors.days = "Please select at least one day";
-        if (!startTime) newErrors.startTime = "Start time is required";
-        if (!endTime) newErrors.endTime = "End time is required";
         if (!duration) newErrors.duration = "Duration is required";
-        if (startTime && endTime && startTime >= endTime) {
+        if (startTime >= endTime) {
             newErrors.endTime = "End time must be after start time";
+        }
+        // Check if time range is divisible by duration
+        if (duration && startTime < endTime) {
+            const timeRange = endTime - startTime;
+            const durationMinutes = parseInt(duration);
+            if (timeRange < durationMinutes) {
+                newErrors.duration = "Time range is too short for this duration";
+            } else if (timeRange % durationMinutes !== 0) {
+                newErrors.duration = "Time range must be evenly divisible by duration";
+            }
         }
         setErrors(newErrors);
         return Object.keys(newErrors).length === 0;
@@ -114,13 +187,20 @@ export function SlotEditor({ schedulingPeriodId }: SlotEditorProps) {
     const validateEdit = () => {
         const newErrors: Record<string, string> = {};
         if (!editWeekday) newErrors.weekday = "Day is required";
-        if (!editFromTime) newErrors.fromTime = "Start time is required";
-        if (!editToTime) newErrors.toTime = "End time is required";
-        if (editFromTime && editToTime && editFromTime >= editToTime) {
+        if (editFromTime >= editToTime) {
             newErrors.toTime = "End time must be after start time";
         }
         setErrors(newErrors);
         return Object.keys(newErrors).length === 0;
+    };
+
+    // Format total minutes to time string
+    const formatTimeStr = (totalMinutes: number, withSeconds = false) => {
+        const hours = Math.floor(totalMinutes / 60);
+        const mins = totalMinutes % 60;
+        const h = hours.toString().padStart(2, "0");
+        const m = mins.toString().padStart(2, "0");
+        return withSeconds ? `${h}:${m}:00` : `${h}:${m}`;
     };
 
     const handleSubmit = async (e: React.FormEvent) => {
@@ -136,30 +216,18 @@ export function SlotEditor({ schedulingPeriodId }: SlotEditorProps) {
 
                 // Generate slots based on time range, duration, and days
                 const durationMinutes = parseInt(duration!);
-                const startHour = parseInt(startTime!.split(":")[0]);
-                const startMin = parseInt(startTime!.split(":")[1]);
-                const endHour = parseInt(endTime!.split(":")[0]);
-                const endMin = parseInt(endTime!.split(":")[1]);
 
-                const startTotalMinutes = startHour * 60 + startMin;
-                const endTotalMinutes = endHour * 60 + endMin;
-
-                const slotsToCreate: { day: number; fromTime: string; toTime: string }[] = [];
+                const slotsToCreate: { day: Weekday; fromTime: string; toTime: string }[] = [];
 
                 // Generate slot times
-                let currentStart = startTotalMinutes;
-                while (currentStart + durationMinutes <= endTotalMinutes) {
-                    const fromHour = Math.floor(currentStart / 60);
-                    const fromMin = currentStart % 60;
-                    const toHour = Math.floor((currentStart + durationMinutes) / 60);
-                    const toMin = (currentStart + durationMinutes) % 60;
-
-                    const fromTimeStr = `${fromHour.toString().padStart(2, "0")}:${fromMin.toString().padStart(2, "0")}:00`;
-                    const toTimeStr = `${toHour.toString().padStart(2, "0")}:${toMin.toString().padStart(2, "0")}:00`;
+                let currentStart = startTime;
+                while (currentStart + durationMinutes <= endTime) {
+                    const fromTimeStr = formatTimeStr(currentStart, true);
+                    const toTimeStr = formatTimeStr(currentStart + durationMinutes, true);
 
                     selectedDays.forEach((dayStr) => {
                         slotsToCreate.push({
-                            day: parseInt(dayStr),
+                            day: dayStr as Weekday,
                             fromTime: fromTimeStr,
                             toTime: toTimeStr,
                         });
@@ -172,7 +240,7 @@ export function SlotEditor({ schedulingPeriodId }: SlotEditorProps) {
                 for (const slotData of slotsToCreate) {
                     await createSlot({
                         schedulingPeriodId,
-                        weekday: slotData.day as Weekday,
+                        weekday: slotData.day,
                         fromTime: slotData.fromTime,
                         toTime: slotData.toTime,
                     });
@@ -186,9 +254,9 @@ export function SlotEditor({ schedulingPeriodId }: SlotEditorProps) {
                 }
 
                 const success = await updateSlot(slot.id, {
-                    weekday: parseInt(editWeekday!) as Weekday,
-                    fromTime: `${editFromTime}:00`,
-                    toTime: `${editToTime}:00`,
+                    weekday: editWeekday as Weekday,
+                    fromTime: formatTimeStr(editFromTime, true),
+                    toTime: formatTimeStr(editToTime, true),
                 });
 
                 if (success) {
@@ -202,6 +270,13 @@ export function SlotEditor({ schedulingPeriodId }: SlotEditorProps) {
 
     const title = mode === "create" ? resources.editorCreateTitle : resources.editorEditTitle;
     const apiError = createError || updateError;
+
+    // Calculate slot count for preview
+    const calculateSlotCount = () => {
+        if (!duration || selectedDays.length === 0) return 0;
+        if (startTime >= endTime) return 0;
+        return Math.floor((endTime - startTime) / parseInt(duration)) * selectedDays.length;
+    };
 
     return (
         <Modal opened={isOpen} onClose={close} title={title} size="md">
@@ -223,26 +298,18 @@ export function SlotEditor({ schedulingPeriodId }: SlotEditorProps) {
                                 {errors.days && <Text size="xs" c="red" mt="xs">{errors.days}</Text>}
                             </div>
 
-                            <Group grow>
-                                <Select
+                            <Group grow align="flex-start">
+                                <TimeSpinner
                                     label="Start Time"
-                                    placeholder="Select start time"
-                                    data={timeOptions}
-                                    value={startTime}
-                                    onChange={setStartTime}
+                                    totalMinutes={startTime}
+                                    onChange={handleStartTimeChange}
                                     error={errors.startTime}
-                                    required
-                                    searchable
                                 />
-                                <Select
+                                <TimeSpinner
                                     label="End Time"
-                                    placeholder="Select end time"
-                                    data={timeOptions}
-                                    value={endTime}
-                                    onChange={setEndTime}
+                                    totalMinutes={endTime}
+                                    onChange={handleEndTimeChange}
                                     error={errors.endTime}
-                                    required
-                                    searchable
                                 />
                             </Group>
 
@@ -251,21 +318,15 @@ export function SlotEditor({ schedulingPeriodId }: SlotEditorProps) {
                                 placeholder="Select duration"
                                 data={durationOptions}
                                 value={duration}
-                                onChange={setDuration}
+                                onChange={handleDurationChange}
                                 error={errors.duration}
                                 required
                             />
 
-                            {startTime && endTime && duration && selectedDays.length > 0 && (
+                            {selectedDays.length > 0 && duration && calculateSlotCount() > 0 && (
                                 <Text size="sm" c="dimmed">
                                     This will create{" "}
-                                    <strong>
-                                        {Math.floor(
-                                            ((parseInt(endTime.split(":")[0]) * 60 + parseInt(endTime.split(":")[1])) -
-                                                (parseInt(startTime.split(":")[0]) * 60 + parseInt(startTime.split(":")[1]))) /
-                                            parseInt(duration)
-                                        ) * selectedDays.length}
-                                    </strong>{" "}
+                                    <strong>{calculateSlotCount()}</strong>{" "}
                                     slots total
                                 </Text>
                             )}
@@ -282,26 +343,18 @@ export function SlotEditor({ schedulingPeriodId }: SlotEditorProps) {
                                 required
                             />
 
-                            <Group grow>
-                                <Select
+                            <Group grow align="flex-start">
+                                <TimeSpinner
                                     label={resources.editorStartTimeLabel}
-                                    placeholder="Select time"
-                                    data={timeOptions}
-                                    value={editFromTime}
+                                    totalMinutes={editFromTime}
                                     onChange={setEditFromTime}
                                     error={errors.fromTime}
-                                    required
-                                    searchable
                                 />
-                                <Select
+                                <TimeSpinner
                                     label={resources.editorEndTimeLabel}
-                                    placeholder="Select time"
-                                    data={timeOptions}
-                                    value={editToTime}
+                                    totalMinutes={editToTime}
                                     onChange={setEditToTime}
                                     error={errors.toTime}
-                                    required
-                                    searchable
                                 />
                             </Group>
                         </>

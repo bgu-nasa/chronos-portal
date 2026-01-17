@@ -4,46 +4,33 @@
  */
 
 /**
- * Weekday type and constants
- * Matches backend WeekDays enum: Monday=0, Tuesday=1, ... Sunday=6
+ * Weekday constants with string values
+ * The value IS the display string, no need for separate mapping
  */
 export const Weekday = {
-    Monday: 0,
-    Tuesday: 1,
-    Wednesday: 2,
-    Thursday: 3,
-    Friday: 4,
-    Saturday: 5,
-    Sunday: 6
+    Sunday: "Sunday",
+    Monday: "Monday",
+    Tuesday: "Tuesday",
+    Wednesday: "Wednesday",
+    Thursday: "Thursday",
+    Friday: "Friday",
+    Saturday: "Saturday"
 } as const;
 
 export type Weekday = typeof Weekday[keyof typeof Weekday];
 
 /**
- * Map from weekday number to display name
+ * Array of weekdays in order (Sunday first)
  */
-export const WeekdayNames: Record<Weekday, string> = {
-    [Weekday.Monday]: "Monday",
-    [Weekday.Tuesday]: "Tuesday",
-    [Weekday.Wednesday]: "Wednesday",
-    [Weekday.Thursday]: "Thursday",
-    [Weekday.Friday]: "Friday",
-    [Weekday.Saturday]: "Saturday",
-    [Weekday.Sunday]: "Sunday"
-};
-
-/**
- * Map from string weekday name to number (for parsing backend responses)
- */
-export const WeekdayFromString: Record<string, Weekday> = {
-    "Monday": Weekday.Monday,
-    "Tuesday": Weekday.Tuesday,
-    "Wednesday": Weekday.Wednesday,
-    "Thursday": Weekday.Thursday,
-    "Friday": Weekday.Friday,
-    "Saturday": Weekday.Saturday,
-    "Sunday": Weekday.Sunday
-};
+export const WeekdayOrder: Weekday[] = [
+    Weekday.Sunday,
+    Weekday.Monday,
+    Weekday.Tuesday,
+    Weekday.Wednesday,
+    Weekday.Thursday,
+    Weekday.Friday,
+    Weekday.Saturday
+];
 
 /**
  * Slot Response Interface
@@ -52,7 +39,7 @@ export interface SlotResponse {
     id: string;
     organizationId: string;
     schedulingPeriodId: string;
-    weekday: Weekday | string;  // Can be number or string from backend
+    weekday: Weekday;
     fromTime: string;
     toTime: string;
 }
@@ -74,14 +61,4 @@ export interface UpdateSlotRequest {
     weekday: Weekday;
     fromTime: string;
     toTime: string;
-}
-
-/**
- * Helper to get weekday name from response (handles both string and number)
- */
-export function getWeekdayName(weekday: Weekday | string): string {
-    if (typeof weekday === "string") {
-        return weekday;  // Already a string name
-    }
-    return WeekdayNames[weekday] || "Unknown";
 }
