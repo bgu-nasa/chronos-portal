@@ -3,9 +3,9 @@ import React, { useMemo } from 'react';
 import { Box, Text, Popover, Stack, Group } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
 import { useNavigate } from 'react-router';
-import type { CalendarEvent } from '@/modules/calendar/src/types';
+import type { CalendarEvent } from "../../../types";
 
-import styles from './EventItem.module.css';
+import styles from './event-item.module.css';
 
 interface EventItemProps {
   event: CalendarEvent;

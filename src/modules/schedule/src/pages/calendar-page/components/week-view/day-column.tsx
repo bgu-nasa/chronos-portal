@@ -2,11 +2,11 @@
 import React, { useMemo, useState, useEffect } from 'react';
 import { Box } from '@mantine/core';
 import { useInterval } from '@mantine/hooks';
-import type { CalendarEvent } from '@/modules/calendar/src/types';
-import { EventItem } from './EventItem';
+import type { CalendarEvent } from "../../../types";
+import { EventItem } from './event-item';
 
-import styles from './DayColumn.module.css';
-import resources from './DayColumn.resources.json';
+import styles from './day-column.module.css';
+import resources from './day-column.resources.json';
 
 interface DayColumnProps {
   date: Date;

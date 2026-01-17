@@ -2,10 +2,10 @@
 import React from 'react';
 import { Modal, Text, Card, Stack, Group, Badge, Divider } from '@mantine/core';
 import { useNavigate, useParams } from 'react-router';
-import { MOCK_ACADEMIC_SCHEDULE } from '@/modules/calendar/.mock';
-import styles from './EventDetailsModal.module.css';
-import resources from './EventDetailsModal.resources.json';
-import type { CalendarEvent } from '@/modules/calendar/src/types';
+import { MOCK_ACADEMIC_SCHEDULE } from "@/modules/schedule/.mock";
+import styles from './event-details-modal.module.css';
+import resources from './event-details-modal.resources.json';
+import type { CalendarEvent } from "../../../types";
 
 export const EventDetailsModal: React.FC = () => {
   const { id } = useParams<{ id: string }>();

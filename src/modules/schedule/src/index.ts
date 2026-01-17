@@ -1,1 +1,1 @@
-export { SchedulingPeriodsPage } from "./pages/scheduling-periods-page";
+export * from "./pages";

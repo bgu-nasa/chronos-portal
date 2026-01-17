@@ -2,12 +2,12 @@
 import React, { useState, useMemo } from 'react';
 import { Box, Button, Group, Text, Paper } from '@mantine/core';
 import { useHotkeys } from '@mantine/hooks';
-import { WeekHeader } from './WeekHeader';
-import { TimeGrid } from './TimeGrid';
-import type { CalendarEvent } from '@/modules/calendar/src/types';
+import { WeekHeader } from './week-header';
+import { TimeGrid } from './time-grid';
+import type { CalendarEvent } from "../../../types";
 
-import styles from './WeekView.module.css';
-import resources from './WeekView.resources.json';
+import styles from './week-view.module.css';
+import resources from './week-view.resources.json';
 
 interface WeekViewProps {
   initialDate?: Date;

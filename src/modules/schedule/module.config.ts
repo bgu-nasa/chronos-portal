@@ -1,7 +1,10 @@
 import type { ModuleConfig } from "@/infra";
 import React from "react";
-import { ScheduleIcon, SchedulingPeriodsIcon } from "@/common/icons";
-import { SchedulingPeriodsPage } from "./src";
+import { CalendarIcon, ScheduleIcon, SchedulingPeriodsIcon } from "@/common/icons";
+import { CalendarPage, SchedulingPeriodsPage } from "./src";
+import { EventDetailsModal, WeekView } from "./src/pages/calendar-page/components/week-view";
+import { MOCK_ACADEMIC_SCHEDULE } from "./.mock";
+
 
 export const moduleConfig: ModuleConfig = {
     name: "Schedule",
@@ -14,6 +17,31 @@ export const moduleConfig: ModuleConfig = {
             path: "/scheduling-periods",
             element: React.createElement(SchedulingPeriodsPage),
         },
+        {
+            name: "calendar",
+            path: "/calendar",
+            authorize: true,
+            element: React.createElement(
+                CalendarPage,
+                null,
+                React.createElement(WeekView, { events: MOCK_ACADEMIC_SCHEDULE }),
+            ),
+        },
+        {
+            name: "calendar-event",
+            path: "/calendar/event/:id",
+            authorize: true,
+            element: React.createElement(
+                CalendarPage,
+                null,
+                React.createElement(
+                    React.Fragment,
+                    null,
+                    React.createElement(WeekView, { events: MOCK_ACADEMIC_SCHEDULE }),
+                    React.createElement(EventDetailsModal),
+                ),
+            ),
+        },
     ],
     navigationItems: [
         {
@@ -21,6 +49,12 @@ export const moduleConfig: ModuleConfig = {
             location: "dashboard",
             icon: React.createElement(ScheduleIcon),
             children: [
+                {
+                    label: "Calendar",
+                    href: "/schedule/calendar",
+                    location: "dashboard",
+                    icon: React.createElement(CalendarIcon),
+                },
                 {
                     label: "Scheduling Periods",
                     href: "/schedule/scheduling-periods",
@@ -31,3 +65,4 @@ export const moduleConfig: ModuleConfig = {
         },
     ],
 };
+
