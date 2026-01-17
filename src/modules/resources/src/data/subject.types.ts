@@ -29,9 +29,9 @@ export interface CreateSubjectRequest {
 
 /**
  * Subject update request contract for API
+ * Note: id is passed in URL, not in the body
  */
 export interface UpdateSubjectRequest {
-    id: string; // Guid from C#
     organizationId: string; // Guid from C#
     departmentId: string; // Guid from C#
     schedulingPeriodId: string; // Guid from C#

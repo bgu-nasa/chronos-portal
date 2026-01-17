@@ -40,7 +40,16 @@ export class ActivityDataRepository {
      * @param departmentId - The department ID (required in route)
      */
     private getBaseUrl(departmentId: string): string {
-        return `/api/department/${departmentId}/resources/subjects/subject`;
+        return `/api/department/${departmentId}/resources/subjects/Subject/activities`;
+    }
+
+    /**
+     * Build URL with subjectId for endpoints that require it
+     * @param departmentId - The department ID
+     * @param subjectId - The subject ID
+     */
+    private getSubjectActivitiesUrl(departmentId: string, subjectId: string): string {
+        return `/api/department/${departmentId}/resources/subjects/Subject/${subjectId}/activities`;
     }
 
     /**
@@ -49,11 +58,21 @@ export class ActivityDataRepository {
      * @returns Array of activities
      */
     async getAllActivities(departmentId: string): Promise<ActivityResponse[]> {
-        const response = await $app.ajax.get<ActivityResponse[]>(
-            `${this.getBaseUrl(departmentId)}/activities`,
-            { headers: this.getHeaders() }
-        );
-        return response;
+        const url = this.getBaseUrl(departmentId);
+        const headers = this.getHeaders();
+        
+        console.log("📥 [ActivityDataRepository] Fetching all activities:");
+        console.log("  URL:", url);
+        console.log("  Headers:", headers);
+        
+        try {
+            const response = await $app.ajax.get<ActivityResponse[]>(url, { headers });
+            console.log("✅ [ActivityDataRepository] Fetched activities:", response.length);
+            return response;
+        } catch (error) {
+            console.error("❌ [ActivityDataRepository] Fetch activities failed:", error);
+            throw error;
+        }
     }
 
     /**
@@ -66,11 +85,21 @@ export class ActivityDataRepository {
         departmentId: string,
         subjectId: string
     ): Promise<ActivityResponse[]> {
-        const response = await $app.ajax.get<ActivityResponse[]>(
-            `${this.getBaseUrl(departmentId)}/${subjectId}/activities`,
-            { headers: this.getHeaders() }
-        );
-        return response;
+        const url = this.getSubjectActivitiesUrl(departmentId, subjectId);
+        const headers = this.getHeaders();
+        
+        console.log("📥 [ActivityDataRepository] Fetching activities by subject:");
+        console.log("  URL:", url);
+        console.log("  Subject ID:", subjectId);
+        
+        try {
+            const response = await $app.ajax.get<ActivityResponse[]>(url, { headers });
+            console.log("✅ [ActivityDataRepository] Fetched activities:", response.length);
+            return response;
+        } catch (error) {
+            console.error("❌ [ActivityDataRepository] Fetch activities by subject failed:", error);
+            throw error;
+        }
     }
 
     /**
@@ -85,11 +114,20 @@ export class ActivityDataRepository {
         subjectId: string,
         activityId: string
     ): Promise<ActivityResponse> {
-        const response = await $app.ajax.get<ActivityResponse>(
-            `${this.getBaseUrl(departmentId)}/${subjectId}/activities/${activityId}`,
-            { headers: this.getHeaders() }
-        );
-        return response;
+        const url = `${this.getSubjectActivitiesUrl(departmentId, subjectId)}/${activityId}`;
+        const headers = this.getHeaders();
+        
+        console.log("📥 [ActivityDataRepository] Fetching activity by ID:");
+        console.log("  URL:", url);
+        
+        try {
+            const response = await $app.ajax.get<ActivityResponse>(url, { headers });
+            console.log("✅ [ActivityDataRepository] Fetched activity:", response);
+            return response;
+        } catch (error) {
+            console.error("❌ [ActivityDataRepository] Fetch activity failed:", error);
+            throw error;
+        }
     }
 
     /**
@@ -104,12 +142,27 @@ export class ActivityDataRepository {
         subjectId: string,
         request: CreateActivityRequest
     ): Promise<ActivityResponse> {
-        const response = await $app.ajax.post<ActivityResponse>(
-            `${this.getBaseUrl(departmentId)}/${subjectId}/activities`,
-            request,
-            { headers: this.getHeaders() }
-        );
-        return response;
+        const url = this.getSubjectActivitiesUrl(departmentId, subjectId);
+        const headers = this.getHeaders();
+        
+        console.log("📤 [ActivityDataRepository] Creating activity:");
+        console.log("  URL:", url);
+        console.log("  Subject ID:", subjectId);
+        console.log("  Headers:", headers);
+        console.log("  Request body:", JSON.stringify(request, null, 2));
+        
+        try {
+            const response = await $app.ajax.post<ActivityResponse>(
+                url,
+                request,
+                { headers }
+            );
+            console.log("✅ [ActivityDataRepository] Create activity response:", response);
+            return response;
+        } catch (error) {
+            console.error("❌ [ActivityDataRepository] Create activity failed:", error);
+            throw error;
+        }
     }
 
     /**
@@ -124,11 +177,21 @@ export class ActivityDataRepository {
         activityId: string,
         request: UpdateActivityRequest
     ): Promise<void> {
-        await $app.ajax.patch<void>(
-            `${this.getBaseUrl(departmentId)}/activities/${activityId}`,
-            request,
-            { headers: this.getHeaders() }
-        );
+        const url = `${this.getBaseUrl(departmentId)}/${activityId}`;
+        const headers = this.getHeaders();
+        
+        console.log("🔄 [ActivityDataRepository] Updating activity:");
+        console.log("  URL:", url);
+        console.log("  Headers:", headers);
+        console.log("  Request body:", JSON.stringify(request, null, 2));
+        
+        try {
+            await $app.ajax.patch<void>(url, request, { headers });
+            console.log("✅ [ActivityDataRepository] Update activity successful");
+        } catch (error) {
+            console.error("❌ [ActivityDataRepository] Update activity failed:", error);
+            throw error;
+        }
     }
 
     /**
@@ -141,10 +204,20 @@ export class ActivityDataRepository {
         departmentId: string,
         activityId: string
     ): Promise<void> {
-        await $app.ajax.delete<void>(
-            `${this.getBaseUrl(departmentId)}/activities/${activityId}`,
-            { headers: this.getHeaders() }
-        );
+        const url = `${this.getBaseUrl(departmentId)}/${activityId}`;
+        const headers = this.getHeaders();
+        
+        console.log("🗑️ [ActivityDataRepository] Deleting activity:");
+        console.log("  URL:", url);
+        console.log("  Headers:", headers);
+        
+        try {
+            await $app.ajax.delete<void>(url, { headers });
+            console.log("✅ [ActivityDataRepository] Delete activity successful");
+        } catch (error) {
+            console.error("❌ [ActivityDataRepository] Delete activity failed:", error);
+            throw error;
+        }
     }
 }
 

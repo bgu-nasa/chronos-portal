@@ -98,12 +98,27 @@ export class SubjectDataRepository {
         departmentId: string,
         request: CreateSubjectRequest
     ): Promise<SubjectResponse> {
-        const response = await $app.ajax.post<SubjectResponse>(
-            this.getBaseUrl(departmentId),
-            request,
-            { headers: this.getHeaders() }
-        );
-        return response;
+        const url = this.getBaseUrl(departmentId);
+        const headers = this.getHeaders();
+        
+        console.log("📤 [SubjectDataRepository] Creating subject:");
+        console.log("  URL:", url);
+        console.log("  Headers:", headers);
+        console.log("  Request body:", JSON.stringify(request, null, 2));
+        
+        try {
+            const response = await $app.ajax.post<SubjectResponse>(
+                url,
+                request,
+                { headers }
+            );
+            
+            console.log("✅ [SubjectDataRepository] Create subject response:", response);
+            return response;
+        } catch (error) {
+            console.error("❌ [SubjectDataRepository] Create subject failed:", error);
+            throw error;
+        }
     }
 
     /**
@@ -118,11 +133,25 @@ export class SubjectDataRepository {
         subjectId: string,
         request: UpdateSubjectRequest
     ): Promise<void> {
-        await $app.ajax.patch<void>(
-            `${this.getBaseUrl(departmentId)}/${subjectId}`,
-            request,
-            { headers: this.getHeaders() }
-        );
+        const url = `${this.getBaseUrl(departmentId)}/${subjectId}`;
+        const headers = this.getHeaders();
+        
+        console.log("🔄 [SubjectDataRepository] Updating subject:");
+        console.log("  URL:", url);
+        console.log("  Headers:", headers);
+        console.log("  Request body:", JSON.stringify(request, null, 2));
+        
+        try {
+            await $app.ajax.patch<void>(
+                url,
+                request,
+                { headers }
+            );
+            console.log("✅ [SubjectDataRepository] Update subject successful");
+        } catch (error) {
+            console.error("❌ [SubjectDataRepository] Update subject failed:", error);
+            throw error;
+        }
     }
 
     /**

@@ -55,10 +55,14 @@ export const useActivityStore = create<ActivityStore>((set, get) => ({
 
     // Fetch all activities
     fetchActivities: async () => {
+        console.log("🔵 [ActivityStore] fetchActivities called");
         set({ isLoading: true, error: null });
         try {
             const departmentId = get().getDepartmentId();
+            console.log("🔵 [ActivityStore] Department ID:", departmentId);
+            
             const data = await activityDataRepository.getAllActivities(departmentId);
+            console.log("🔵 [ActivityStore] Fetched activities:", data.length);
             set({ activities: data, isLoading: false });
         } catch (err) {
             const errorMessage =
@@ -66,19 +70,21 @@ export const useActivityStore = create<ActivityStore>((set, get) => ({
                     ? err.message
                     : "Failed to fetch activities";
             set({ error: errorMessage, isLoading: false });
-            console.error("Error fetching activities:", err);
+            console.error("❌ [ActivityStore] Error fetching activities:", err);
         }
     },
 
     // Fetch activities by subject
     fetchActivitiesBySubject: async (subjectId: string) => {
+        console.log("🔵 [ActivityStore] fetchActivitiesBySubject called");
+        console.log("🔵 [ActivityStore] Subject ID:", subjectId);
         set({ isLoading: true, error: null });
         try {
             const departmentId = get().getDepartmentId();
-            const data = await activityDataRepository.getActivitiesBySubject(
-                departmentId,
-                subjectId
-            );
+            console.log("🔵 [ActivityStore] Department ID:", departmentId);
+            
+            const data = await activityDataRepository.getActivitiesBySubject(departmentId, subjectId);
+            console.log("🔵 [ActivityStore] Fetched activities:", data.length);
             set({ activities: data, isLoading: false });
         } catch (err) {
             const errorMessage =
@@ -86,23 +92,32 @@ export const useActivityStore = create<ActivityStore>((set, get) => ({
                     ? err.message
                     : "Failed to fetch activities";
             set({ error: errorMessage, isLoading: false });
-            console.error("Error fetching activities:", err);
+            console.error("❌ [ActivityStore] Error fetching activities by subject:", err);
         }
     },
 
     // Create an activity and refetch
     createActivity: async (subjectId: string, request: CreateActivityRequest) => {
+        console.log("🟢 [ActivityStore] createActivity called");
+        console.log("🟢 [ActivityStore] Subject ID:", subjectId);
+        console.log("🟢 [ActivityStore] Request:", JSON.stringify(request, null, 2));
+        
         set({ isLoading: true, error: null });
         try {
             const departmentId = get().getDepartmentId();
+            console.log("🟢 [ActivityStore] Department ID:", departmentId);
+            
             const newActivity = await activityDataRepository.createActivity(
                 departmentId,
                 subjectId,
                 request
             );
+            
+            console.log("🟢 [ActivityStore] Activity created successfully:", newActivity);
             set({ isLoading: false });
 
             // Refetch to update the list
+            console.log("🟢 [ActivityStore] Refetching activities...");
             await get().fetchActivities();
 
             return newActivity;
@@ -112,7 +127,7 @@ export const useActivityStore = create<ActivityStore>((set, get) => ({
                     ? err.message
                     : "Failed to create activity";
             set({ error: errorMessage, isLoading: false });
-            console.error("Error creating activity:", err);
+            console.error("❌ [ActivityStore] Error creating activity:", err);
             return null;
         }
     },
@@ -122,17 +137,26 @@ export const useActivityStore = create<ActivityStore>((set, get) => ({
         activityId: string,
         request: UpdateActivityRequest
     ) => {
+        console.log("🟣 [ActivityStore] updateActivity called");
+        console.log("🟣 [ActivityStore] Activity ID:", activityId);
+        console.log("🟣 [ActivityStore] Request:", JSON.stringify(request, null, 2));
+        
         set({ isLoading: true, error: null });
         try {
             const departmentId = get().getDepartmentId();
+            console.log("🟣 [ActivityStore] Department ID:", departmentId);
+            
             await activityDataRepository.updateActivity(
                 departmentId,
                 activityId,
                 request
             );
+            
+            console.log("🟣 [ActivityStore] Activity updated successfully");
             set({ isLoading: false });
 
             // Refetch to update the list
+            console.log("🟣 [ActivityStore] Refetching activities...");
             await get().fetchActivities();
 
             return true;
@@ -142,20 +166,28 @@ export const useActivityStore = create<ActivityStore>((set, get) => ({
                     ? err.message
                     : "Failed to update activity";
             set({ error: errorMessage, isLoading: false });
-            console.error("Error updating activity:", err);
+            console.error("❌ [ActivityStore] Error updating activity:", err);
             return false;
         }
     },
 
     // Delete an activity and refetch
     deleteActivity: async (activityId: string) => {
+        console.log("🗑️ [ActivityStore] deleteActivity called");
+        console.log("🗑️ [ActivityStore] Activity ID:", activityId);
+        
         set({ isLoading: true, error: null });
         try {
             const departmentId = get().getDepartmentId();
+            console.log("🗑️ [ActivityStore] Department ID:", departmentId);
+            
             await activityDataRepository.deleteActivity(departmentId, activityId);
+            
+            console.log("🗑️ [ActivityStore] Activity deleted successfully");
             set({ isLoading: false });
 
             // Refetch to update the list
+            console.log("🗑️ [ActivityStore] Refetching activities...");
             await get().fetchActivities();
 
             return true;
@@ -165,7 +197,7 @@ export const useActivityStore = create<ActivityStore>((set, get) => ({
                     ? err.message
                     : "Failed to delete activity";
             set({ error: errorMessage, isLoading: false });
-            console.error("Error deleting activity:", err);
+            console.error("❌ [ActivityStore] Error deleting activity:", err);
             return false;
         }
     },

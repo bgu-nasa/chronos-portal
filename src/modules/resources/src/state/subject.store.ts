@@ -71,16 +71,23 @@ export const useSubjectStore = create<SubjectStore>((set, get) => ({
 
     // Create a subject and refetch
     createSubject: async (request: CreateSubjectRequest) => {
+        console.log("🟢 [SubjectStore] createSubject called");
         set({ isLoading: true, error: null });
         try {
             const departmentId = get().getDepartmentId();
+            console.log("🟢 [SubjectStore] Department ID:", departmentId);
+            console.log("🟢 [SubjectStore] Request:", JSON.stringify(request, null, 2));
+            
             const newSubject = await subjectDataRepository.createSubject(
                 departmentId,
                 request
             );
+            
+            console.log("🟢 [SubjectStore] Subject created successfully:", newSubject);
             set({ isLoading: false });
 
             // Refetch to update the list
+            console.log("🟢 [SubjectStore] Refetching subjects...");
             await get().fetchSubjects();
 
             return newSubject;
@@ -90,7 +97,7 @@ export const useSubjectStore = create<SubjectStore>((set, get) => ({
                     ? err.message
                     : "Failed to create subject";
             set({ error: errorMessage, isLoading: false });
-            console.error("Error creating subject:", err);
+            console.error("❌ [SubjectStore] Error creating subject:", err);
             return null;
         }
     },
@@ -100,17 +107,26 @@ export const useSubjectStore = create<SubjectStore>((set, get) => ({
         subjectId: string,
         request: UpdateSubjectRequest
     ) => {
+        console.log("🟣 [SubjectStore] updateSubject called");
+        console.log("🟣 [SubjectStore] Subject ID:", subjectId);
+        console.log("🟣 [SubjectStore] Request:", JSON.stringify(request, null, 2));
+        
         set({ isLoading: true, error: null });
         try {
             const departmentId = get().getDepartmentId();
+            console.log("🟣 [SubjectStore] Department ID:", departmentId);
+            
             await subjectDataRepository.updateSubject(
                 departmentId,
                 subjectId,
                 request
             );
+            
+            console.log("🟣 [SubjectStore] Subject updated successfully");
             set({ isLoading: false });
 
             // Refetch to update the list
+            console.log("🟣 [SubjectStore] Refetching subjects...");
             await get().fetchSubjects();
 
             return true;
@@ -120,7 +136,7 @@ export const useSubjectStore = create<SubjectStore>((set, get) => ({
                     ? err.message
                     : "Failed to update subject";
             set({ error: errorMessage, isLoading: false });
-            console.error("Error updating subject:", err);
+            console.error("❌ [SubjectStore] Error updating subject:", err);
             return false;
         }
     },
