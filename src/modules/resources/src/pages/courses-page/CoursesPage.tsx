@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Container, Divider, Title, Alert } from "@mantine/core";
+import { Container, Divider, Title } from "@mantine/core";
 import { useNavigate } from "react-router";
 import { ConfirmationDialog, useConfirmation } from "@/common";
 import { CourseActions } from "./components/course-actions";
@@ -199,10 +199,6 @@ export function CoursesPage() {
             <div className={styles.container}>
                 <Title order={1}>{resources.title}</Title>
                 <Divider className={styles.divider} />
-
-                <Alert color="yellow" title="Backend Connected" mb="md">
-                    Using backend API. Search for a department to view courses.
-                </Alert>
 
                 <CourseSearch 
                     onSearch={handleSearch}

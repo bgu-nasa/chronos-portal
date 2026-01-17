@@ -237,10 +237,6 @@ export function GroupsPage() {
                 </div>
                 <Divider className={styles.divider} />
 
-                <Alert color="yellow" title="Backend Connected" mb="md">
-                    Using backend API for groups (activities) management.
-                </Alert>
-
                 <Group justify="space-between" mb="md">
                     <GroupActions
                         selectedGroup={selectedGroup}
