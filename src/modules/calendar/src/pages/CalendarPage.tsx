@@ -1,13 +1,11 @@
-/** @author noamarg */
-import { Box } from '@mantine/core';
-import { WeekView } from '@/modules/calendar/src/components';
-import { MOCK_ACADEMIC_SCHEDULE } from '@/modules/calendar/.mock';
-import styles from './CalendarPage.module.css';
+import type { ReactNode } from "react";
+import { Box } from "@mantine/core";
+import styles from "./CalendarPage.module.css";
 
-export default function CalendarPage() {
-  return (
-    <Box className={styles.calendarPageContainer}>
-      <WeekView events={MOCK_ACADEMIC_SCHEDULE} />
-    </Box>
-  );
+interface CalendarPageProps {
+  readonly children: ReactNode;
+}
+
+export default function CalendarPage({ children }: CalendarPageProps) {
+  return <Box className={styles.calendarPageContainer}>{children}</Box>;
 }

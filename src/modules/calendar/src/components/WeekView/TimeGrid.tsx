@@ -18,7 +18,7 @@ interface TimeGridProps {
 export const TimeGrid: React.FC<TimeGridProps> = ({
   weekDates,
   events,
-  hourHeight = 60,
+  hourHeight,
   dayStartHour = 0,
   hoursPerDay = 24
 }) => {

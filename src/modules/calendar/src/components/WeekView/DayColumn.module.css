@@ -7,7 +7,7 @@
 }
 
 .todayColumn {
-  background-color: var(--mantine-color-blue-0);
+  background-color: var(--mantine-color-blue-light);
 }
 
 .notTodayColumn {
@@ -19,8 +19,8 @@
   left: 0;
   right: 0;
   height: 1px;
-  background-color: var(--mantine-color-gray-1);
-  border-bottom: 1px solid var(--mantine-color-gray-0);
+  background-color: var(--mantine-color-default-border);
+  opacity: 0.5;
 }
 
 .nowLine {

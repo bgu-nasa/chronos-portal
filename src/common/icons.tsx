@@ -11,10 +11,10 @@ import {
     HiOutlineClipboardList,
     HiOutlineLockOpen,
     HiOutlineCalendar,
+    HiOutlineCalendar,
+    HiOutlineCog,
+    HiOutlineLogout,
 } from "react-icons/hi";
-
-// User menu icons
-import { HiOutlineCog, HiOutlineLogout } from "react-icons/hi";
 
 // Alert icons
 import { HiOutlineExclamationTriangle } from "react-icons/hi2";
@@ -34,6 +34,7 @@ export const DepartmentsIcon = HiOutlineClipboardList;
 export const AccessControlIcon = HiOutlineLockOpen;
 export const ScheduleIcon = HiOutlineCalendar;
 export const SchedulingPeriodsIcon = HiOutlineCalendar;
+export const CalendarIcon = HiOutlineCalendar;
 
 // User Menu Icons
 export const SettingsIcon = HiOutlineCog;
