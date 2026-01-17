@@ -3,7 +3,7 @@ import React, { useMemo } from 'react';
 import { Box, Text, Popover, Stack, Group } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
 import { useNavigate } from 'react-router';
-import type { CalendarEvent } from "../../../types";
+import type { CalendarEvent } from "../../../../types";
 
 import styles from './event-item.module.css';
 

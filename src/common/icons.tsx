@@ -11,7 +11,6 @@ import {
     HiOutlineClipboardList,
     HiOutlineLockOpen,
     HiOutlineCalendar,
-    HiOutlineCalendar,
     HiOutlineCog,
     HiOutlineLogout,
 } from "react-icons/hi";

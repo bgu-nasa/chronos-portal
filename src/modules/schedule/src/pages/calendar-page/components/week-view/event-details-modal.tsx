@@ -5,7 +5,7 @@ import { useNavigate, useParams } from 'react-router';
 import { MOCK_ACADEMIC_SCHEDULE } from "@/modules/schedule/.mock";
 import styles from './event-details-modal.module.css';
 import resources from './event-details-modal.resources.json';
-import type { CalendarEvent } from "../../../types";
+import type { CalendarEvent } from "../../../../types";
 
 export const EventDetailsModal: React.FC = () => {
   const { id } = useParams<{ id: string }>();

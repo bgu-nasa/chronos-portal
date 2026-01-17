@@ -3,7 +3,7 @@ import React from 'react';
 import { Box, ScrollArea } from '@mantine/core';
 import { TimeColumn } from './time-column';
 import { DayColumn } from './day-column';
-import type { CalendarEvent } from "../../../types";
+import type { CalendarEvent } from "../../../../types";
 
 import styles from './time-grid.module.css';
 
