@@ -17,6 +17,12 @@ import {
 import resources from "./activities-page.resources.json";
 import styles from "./activities-page.module.css";
 import { $app } from "@/infra/service";
+import { 
+    showSuccessNotification, 
+    showErrorNotification, 
+    showWarningNotification
+} from "../../utils/notification-functions";
+import { ResourceNotifications } from "../../utils/notifications";
 
 export function ActivitiesPage() {
     const navigate = useNavigate();
@@ -59,7 +65,7 @@ export function ActivitiesPage() {
 
     const handleCreateClick = () => {
         if (!subjectId || !departmentId) {
-            alert("Missing subject or department context");
+            showWarningNotification({ message: "Missing subject or department context" });
             return;
         }
         setCreateModalOpened(true);
@@ -74,7 +80,7 @@ export function ActivitiesPage() {
         
         if (!subjectId || !departmentId) {
             $app.logger.error("[ActivitiesPage] Missing subjectId or departmentId");
-            alert("Missing subject or department context");
+            showWarningNotification({ message: "Missing subject or department context" });
             return;
         }
 
@@ -99,16 +105,17 @@ export function ActivitiesPage() {
             if (result) {
                 setCreateModalOpened(false);
                 fetchActivities();
+                showSuccessNotification({ message: "Activity created successfully" });
             } else {
                 $app.logger.error("[ActivitiesPage] Create activity returned null");
                 setCreateModalOpened(false);
-                alert("Failed to create activity. Please check the console for details.");
+                showErrorNotification({ message: "Failed to create activity. Please check the console for details." });
             }
         } catch (error) {
             $app.logger.error("[ActivitiesPage] Error creating activity:", error);
             setCreateModalOpened(false);
             const errorMessage = error instanceof Error ? error.message : "Unknown error";
-            alert(`Error creating activity: ${errorMessage}`);
+            showErrorNotification({ message: `Error creating activity: ${errorMessage}` });
         }
     };
 
@@ -128,7 +135,7 @@ export function ActivitiesPage() {
         
         if (!selectedActivity || !subjectId || !departmentId) {
             $app.logger.error("[ActivitiesPage] Missing selectedActivity, subjectId, or departmentId");
-            alert("Missing required context for edit");
+            showWarningNotification({ message: "Missing required context for edit" });
             return;
         }
 
@@ -153,16 +160,17 @@ export function ActivitiesPage() {
                 setEditModalOpened(false);
                 setSelectedActivity(null);
                 fetchActivities();
+                showSuccessNotification({ message: "Activity updated successfully" });
             } else {
                 $app.logger.error("[ActivitiesPage] Update activity returned false");
                 setEditModalOpened(false);
-                alert("Failed to update activity. Please check the console for details.");
+                showErrorNotification({ message: "Failed to update activity. Please check the console for details." });
             }
         } catch (error) {
             $app.logger.error("[ActivitiesPage] Error updating activity:", error);
             setEditModalOpened(false);
             const errorMessage = error instanceof Error ? error.message : "Unknown error";
-            alert(`Error updating activity: ${errorMessage}`);
+            showErrorNotification({ message: `Error updating activity: ${errorMessage}` });
         }
     };
 
@@ -221,6 +229,7 @@ export function ActivitiesPage() {
 
     return (
         <Container size="xl" py="xl">
+            <ResourceNotifications />
             <div className={styles.container}>
                 <div className={styles.header}>
                     <div>
