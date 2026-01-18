@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Box, Flex, Paper } from "@mantine/core";
 import styles from "./calendar-page.module.css";
 import { SchedulingPeriodSelect } from "./components/scheduling-period-select";
-import { WeekView, EventDetailsModal } from "@/common/components/calendar";
+import { WeekView } from "@/common/components/calendar";
 
 export function CalendarPage() {
   const [selectedPeriodId, setSelectedPeriodId] = useState<string | null>(null);
@@ -14,7 +14,6 @@ export function CalendarPage() {
       </Paper>
       <Box className={styles.content}>
         <WeekView events={[]} />
-        <EventDetailsModal />
       </Box>
     </Flex>
   );
