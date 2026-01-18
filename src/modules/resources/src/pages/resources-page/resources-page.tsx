@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Container, Divider, Title } from "@mantine/core";
+import { Container, Divider, Title, Tabs } from "@mantine/core";
 import { ConfirmationDialog, useConfirmation } from "@/common";
 import { ResourceActions } from "./components/resource-actions";
 import { ResourceTable } from "./components/resource-table/resource-table";
@@ -13,21 +13,45 @@ import {
     useUpdateResource,
     useDeleteResource,
     useResourceTypes,
+    useCreateResourceType,
+    useUpdateResourceType,
+    useDeleteResourceType,
 } from "@/modules/resources/src/hooks";
-import resources from "./resources-page.resources.json";
+import { ResourceTypeActions } from "../resource-types-page/components/resource-type-actions";
+import { ResourceTypeTable } from "../resource-types-page/components/resource-type-table/resource-type-table";
+import { ResourceTypeCreator } from "../resource-types-page/components/resource-type-creator";
+import { ResourceTypeEditor } from "../resource-types-page/components/resource-type-editor";
+import type { ResourceTypeData } from "../resource-types-page/components/resource-type-table/types";
+import type { UpdateResourceTypeRequest } from "@/modules/resources/src/data";
+import resourcesJson from "./resources-page.resources.json";
+import resourceTypesJson from "../resource-types-page/resource-types-page.resources.json";
 import styles from "./resources-page.module.css";
 import { $app } from "@/infra/service";
 
 export function ResourcesPage() {
+    const [activeTab, setActiveTab] = useState<string | null>("resources");
+    
+    // Resources state
     const [selectedResource, setSelectedResource] = useState<ResourceData | null>(null);
-    const [createModalOpened, setCreateModalOpened] = useState(false);
-    const [editModalOpened, setEditModalOpened] = useState(false);
+    const [resourceCreateModalOpened, setResourceCreateModalOpened] = useState(false);
+    const [resourceEditModalOpened, setResourceEditModalOpened] = useState(false);
 
+    // Resource Types state
+    const [selectedResourceType, setSelectedResourceType] = useState<ResourceTypeData | null>(null);
+    const [resourceTypeCreateModalOpened, setResourceTypeCreateModalOpened] = useState(false);
+    const [resourceTypeEditModalOpened, setResourceTypeEditModalOpened] = useState(false);
+
+    // Resources hooks
     const { resources: resourcesList, fetchResources } = useResources();
-    const { createResource, isLoading: isCreating } = useCreateResource();
-    const { updateResource, isLoading: isEditing } = useUpdateResource();
+    const { createResource, isLoading: isCreatingResource } = useCreateResource();
+    const { updateResource, isLoading: isEditingResource } = useUpdateResource();
     const { deleteResource } = useDeleteResource();
+
+    // Resource Types hooks
     const { resourceTypes, fetchResourceTypes } = useResourceTypes();
+    const { createResourceType, isLoading: isCreatingResourceType } = useCreateResourceType();
+    const { updateResourceType, isLoading: isEditingResourceType } = useUpdateResourceType();
+    const { deleteResourceType } = useDeleteResourceType();
 
     const {
         confirmationState,
@@ -43,18 +67,19 @@ export function ResourcesPage() {
         fetchResourceTypes();
     }, [fetchResources, fetchResourceTypes]);
 
-    const handleCreateClick = () => {
-        $app.logger.info("[ResourcesPage] handleCreateClick called");
-        setCreateModalOpened(true);
+    // Resources handlers
+    const handleResourceCreateClick = () => {
+        $app.logger.info("[ResourcesPage] handleResourceCreateClick called");
+        setResourceCreateModalOpened(true);
     };
 
-    const handleCreateSubmit = async (data: {
+    const handleResourceCreateSubmit = async (data: {
         resourceTypeId: string;
         location: string;
         identifier: string;
         capacity: number | null;
     }) => {
-        $app.logger.info("[ResourcesPage] handleCreateSubmit called with:", data);
+        $app.logger.info("[ResourcesPage] handleResourceCreateSubmit called with:", data);
 
         const org = $app.organization.getOrganization();
         $app.logger.info("[ResourcesPage] Organization from context:", org);
@@ -75,7 +100,7 @@ export function ResourcesPage() {
             $app.logger.info("[ResourcesPage] Create resource result:", result);
 
             if (result) {
-                setCreateModalOpened(false);
+                setResourceCreateModalOpened(false);
             } else {
                 $app.logger.error("[ResourcesPage] Create resource returned null");
                 alert("Failed to create resource. Check console for details.");
@@ -86,20 +111,20 @@ export function ResourcesPage() {
         }
     };
 
-    const handleEditClick = () => {
-        $app.logger.info("[ResourcesPage] handleEditClick called");
+    const handleResourceEditClick = () => {
+        $app.logger.info("[ResourcesPage] handleResourceEditClick called");
         if (selectedResource) {
-            setEditModalOpened(true);
+            setResourceEditModalOpened(true);
         }
     };
 
-    const handleEditSubmit = async (data: {
+    const handleResourceEditSubmit = async (data: {
         resourceTypeId: string;
         location: string;
         identifier: string;
         capacity: number | null;
     }) => {
-        $app.logger.info("[ResourcesPage] handleEditSubmit called with:", data);
+        $app.logger.info("[ResourcesPage] handleResourceEditSubmit called with:", data);
 
         if (!selectedResource) {
             $app.logger.error("[ResourcesPage] Missing selectedResource");
@@ -121,7 +146,7 @@ export function ResourcesPage() {
             $app.logger.info("[ResourcesPage] Update resource result:", success);
 
             if (success) {
-                setEditModalOpened(false);
+                setResourceEditModalOpened(false);
                 setSelectedResource(null);
             } else {
                 $app.logger.error("[ResourcesPage] Update resource returned false");
@@ -133,13 +158,13 @@ export function ResourcesPage() {
         }
     };
 
-    const handleDeleteClick = () => {
-        $app.logger.info("[ResourcesPage] handleDeleteClick called");
+    const handleResourceDeleteClick = () => {
+        $app.logger.info("[ResourcesPage] handleResourceDeleteClick called");
         if (!selectedResource) return;
 
         openConfirmation({
-            title: resources.deleteConfirmTitle,
-            message: resources.deleteConfirmMessage.replace(
+            title: resourcesJson.deleteConfirmTitle,
+            message: resourcesJson.deleteConfirmMessage.replace(
                 "{identifier}",
                 selectedResource.identifier
             ),
@@ -152,6 +177,100 @@ export function ResourcesPage() {
         });
     };
 
+    // Resource Types handlers
+    const handleResourceTypeCreateClick = () => {
+        $app.logger.info("[ResourcesPage] handleResourceTypeCreateClick called");
+        setResourceTypeCreateModalOpened(true);
+    };
+
+    const handleResourceTypeCreateSubmit = async (data: { type: string }) => {
+        $app.logger.info("[ResourcesPage] handleResourceTypeCreateSubmit called with:", data);
+
+        const org = $app.organization.getOrganization();
+        $app.logger.info("[ResourcesPage] Organization from context:", org);
+
+        const request = {
+            organizationId: org?.id || "00000000-0000-0000-0000-000000000000",
+            type: data.type,
+        };
+
+        $app.logger.info("[ResourcesPage] Sending create request:", request);
+
+        try {
+            const result = await createResourceType(request);
+            $app.logger.info("[ResourcesPage] Create resource type result:", result);
+
+            if (result) {
+                setResourceTypeCreateModalOpened(false);
+            } else {
+                $app.logger.error("[ResourcesPage] Create resource type returned null");
+                alert("Failed to create resource type. Check console for details.");
+            }
+        } catch (error) {
+            $app.logger.error("[ResourcesPage] Error creating resource type:", error);
+            alert(`Error creating resource type: ${error instanceof Error ? error.message : "Unknown error"}`);
+        }
+    };
+
+    const handleResourceTypeEditClick = () => {
+        $app.logger.info("[ResourcesPage] handleResourceTypeEditClick called");
+        if (selectedResourceType) {
+            setResourceTypeEditModalOpened(true);
+        }
+    };
+
+    const handleResourceTypeEditSubmit = async (data: { type: string }) => {
+        $app.logger.info("[ResourcesPage] handleResourceTypeEditSubmit called with:", data);
+
+        if (!selectedResourceType) {
+            $app.logger.error("[ResourcesPage] Missing selectedResourceType");
+            alert("Missing resource type context for edit.");
+            return;
+        }
+
+        const request: UpdateResourceTypeRequest = {
+            type: data.type,
+        };
+
+        $app.logger.info("[ResourcesPage] Sending update request:", request);
+
+        try {
+            const success = await updateResourceType(selectedResourceType.id, request);
+            $app.logger.info("[ResourcesPage] Update resource type result:", success);
+
+            if (success) {
+                setResourceTypeEditModalOpened(false);
+                setSelectedResourceType(null);
+            } else {
+                $app.logger.error("[ResourcesPage] Update resource type returned false");
+                alert("Failed to update resource type. Check console for details.");
+            }
+        } catch (error) {
+            $app.logger.error("[ResourcesPage] Error updating resource type:", error);
+            alert(`Error updating resource type: ${error instanceof Error ? error.message : "Unknown error"}`);
+        }
+    };
+
+    const handleResourceTypeDeleteClick = () => {
+        $app.logger.info("[ResourcesPage] handleResourceTypeDeleteClick called");
+        if (!selectedResourceType) return;
+
+        openConfirmation({
+            title: resourceTypesJson.deleteConfirmTitle,
+            message: resourceTypesJson.deleteConfirmMessage.replace(
+                "{type}",
+                selectedResourceType.type
+            ),
+            onConfirm: async () => {
+                const success = await deleteResourceType(selectedResourceType.id);
+                if (success) {
+                    setSelectedResourceType(null);
+                }
+            },
+        });
+    };
+
+    // Prepare data for display
     const resourceData: ResourceData[] = resourcesList.map((resource) => {
         const resourceType = resourceTypes.find((rt) => rt.id === resource.resourceTypeId);
         return {
@@ -165,37 +284,68 @@ export function ResourcesPage() {
         };
     });
 
+    const resourceTypeData: ResourceTypeData[] = resourceTypes.map((resourceType) => ({
+        id: resourceType.id,
+        type: resourceType.type,
+        organizationName: "Organization",
+    }));
+
     return (
         <Container size="xl" py="xl">
             <div className={styles.container}>
-                <Title order={1}>{resources.title}</Title>
+                <Title order={1}>Resources Management</Title>
                 <Divider className={styles.divider} />
 
-                <ResourceActions
-                    selectedResource={selectedResource}
-                    onCreateClick={handleCreateClick}
-                    onEditClick={handleEditClick}
-                    onDeleteClick={handleDeleteClick}
-                />
+                <Tabs value={activeTab} onChange={setActiveTab}>
+                    <Tabs.List>
+                        <Tabs.Tab value="resources">Resources</Tabs.Tab>
+                        <Tabs.Tab value="resource-types">Resource Types</Tabs.Tab>
+                    </Tabs.List>
 
-                <ResourceTable
-                    resources={resourceData}
-                    selectedResource={selectedResource}
-                    onSelectionChange={setSelectedResource}
-                />
+                    <Tabs.Panel value="resources" pt="md">
+                        <ResourceActions
+                            selectedResource={selectedResource}
+                            onCreateClick={handleResourceCreateClick}
+                            onEditClick={handleResourceEditClick}
+                            onDeleteClick={handleResourceDeleteClick}
+                        />
 
+                        <ResourceTable
+                            resources={resourceData}
+                            selectedResource={selectedResource}
+                            onSelectionChange={setSelectedResource}
+                        />
+                    </Tabs.Panel>
+
+                    <Tabs.Panel value="resource-types" pt="md">
+                        <ResourceTypeActions
+                            selectedResourceType={selectedResourceType}
+                            onCreateClick={handleResourceTypeCreateClick}
+                            onEditClick={handleResourceTypeEditClick}
+                            onDeleteClick={handleResourceTypeDeleteClick}
+                        />
+
+                        <ResourceTypeTable
+                            resourceTypes={resourceTypeData}
+                            selectedResourceType={selectedResourceType}
+                            onSelectionChange={setSelectedResourceType}
+                        />
+                    </Tabs.Panel>
+                </Tabs>
+
+                {/* Resource Modals */}
                 <ResourceCreator
-                    opened={createModalOpened}
-                    onClose={() => setCreateModalOpened(false)}
-                    onSubmit={handleCreateSubmit}
-                    loading={isCreating}
+                    opened={resourceCreateModalOpened}
+                    onClose={() => setResourceCreateModalOpened(false)}
+                    onSubmit={handleResourceCreateSubmit}
+                    loading={isCreatingResource}
                 />
 
                 <ResourceEditor
-                    opened={editModalOpened}
-                    onClose={() => setEditModalOpened(false)}
-                    onSubmit={handleEditSubmit}
-                    loading={isEditing}
+                    opened={resourceEditModalOpened}
+                    onClose={() => setResourceEditModalOpened(false)}
+                    onSubmit={handleResourceEditSubmit}
+                    loading={isEditingResource}
                     initialData={
                         selectedResource
                             ? {
@@ -208,14 +358,42 @@ export function ResourcesPage() {
                     }
                 />
 
+                {/* Resource Type Modals */}
+                <ResourceTypeCreator
+                    opened={resourceTypeCreateModalOpened}
+                    onClose={() => setResourceTypeCreateModalOpened(false)}
+                    onSubmit={handleResourceTypeCreateSubmit}
+                    loading={isCreatingResourceType}
+                />
+
+                <ResourceTypeEditor
+                    opened={resourceTypeEditModalOpened}
+                    onClose={() => setResourceTypeEditModalOpened(false)}
+                    onSubmit={handleResourceTypeEditSubmit}
+                    loading={isEditingResourceType}
+                    initialData={
+                        selectedResourceType
+                            ? { type: selectedResourceType.type }
+                            : undefined
+                    }
+                />
+
                 <ConfirmationDialog
                     opened={confirmationState.isOpen}
                     onClose={closeConfirmation}
                     onConfirm={handleConfirm}
                     title={confirmationState.title}
                     message={confirmationState.message}
-                    confirmText={resources.deleteConfirmButton}
-                    cancelText={resources.deleteCancelButton}
+                    confirmText={
+                        activeTab === "resources"
+                            ? resourcesJson.deleteConfirmButton
+                            : resourceTypesJson.deleteConfirmButton
+                    }
+                    cancelText={
+                        activeTab === "resources"
+                            ? resourcesJson.deleteCancelButton
+                            : resourceTypesJson.deleteCancelButton
+                    }
                     loading={isDeleting}
                 />
             </div>

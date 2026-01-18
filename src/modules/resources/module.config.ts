@@ -1,6 +1,6 @@
 import type { ModuleConfig } from "@/infra";
 import React from "react";
-import { ResourceTypesPage, ResourcesPage, SubjectsPage, ActivitiesPage } from "./src/pages";
+import { ResourcesPage, SubjectsPage, ActivitiesPage } from "./src/pages";
 
 export const moduleConfig: ModuleConfig = {
     name: "Resources",
@@ -21,14 +21,8 @@ export const moduleConfig: ModuleConfig = {
         },
         {
             authorize: true,
-            name: "resource-types",
-            path: "/resource-types",
-            element: React.createElement(ResourceTypesPage),
-        },
-        {
-            authorize: true,
             name: "resources",
-            path: "/resources-list",
+            path: "/manage",
             element: React.createElement(ResourcesPage),
         },
     ],
@@ -39,13 +33,8 @@ export const moduleConfig: ModuleConfig = {
             location: "dashboard",
         },
         {
-            label: "Resource Types",
-            href: "/resources/resource-types",
-            location: "dashboard",
-        },
-        {
             label: "Resources",
-            href: "/resources/resources-list",
+            href: "/resources/manage",
             location: "dashboard",
         },
     ],

@@ -40,7 +40,7 @@ export class ResourceTypeDataRepository {
      * Build the base URL for resource type endpoints
      */
     private getBaseUrl(): string {
-        return `/api/resources/resourcetype`;
+        return `/api/resources/resource/types`;
     }
 
     /**
