@@ -1,12 +1,24 @@
 import type { ModuleConfig } from "@/infra";
 import React from "react";
-import { ResourceTypesPage, ResourcesPage } from "./src/pages";
+import { ResourceTypesPage, ResourcesPage, SubjectsPage, ActivitiesPage } from "./src/pages";
 
 export const moduleConfig: ModuleConfig = {
     name: "Resources",
     owner: "",
     basePath: "/resources",
     routes: [
+        {
+            authorize: true,
+            name: "subjects",
+            path: "/subjects",
+            element: React.createElement(SubjectsPage),
+        },
+        {
+            authorize: true,
+            name: "activities",
+            path: "/activities",
+            element: React.createElement(ActivitiesPage),
+        },
         {
             authorize: true,
             name: "resource-types",
@@ -21,6 +33,11 @@ export const moduleConfig: ModuleConfig = {
         },
     ],
     navigationItems: [
+        {
+            label: "Courses",
+            href: "/resources/subjects",
+            location: "dashboard",
+        },
         {
             label: "Resource Types",
             href: "/resources/resource-types",

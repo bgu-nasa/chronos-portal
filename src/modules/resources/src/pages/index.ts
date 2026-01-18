@@ -1,2 +1,8 @@
-export { ResourceTypesPage } from "./resource-types-page";
-export { ResourcesPage } from "./resources-page";
+/**
+ * Pages layer exports
+ */
+
+export * from "./subjects-page";
+export * from "./activities-page";
+export * from "./resource-types-page";
+export * from "./resources-page";

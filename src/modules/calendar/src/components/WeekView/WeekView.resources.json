@@ -6,6 +6,7 @@
   },
   "config": {
     "defaultStartHour": 8,
-    "defaultEndHour": 20
+    "defaultEndHour": 20,
+    "hourHeight": 55
   }
 }

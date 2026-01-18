@@ -10,13 +10,17 @@ import {
     HiOutlineBriefcase,
     HiOutlineClipboardList,
     HiOutlineLockOpen,
+    HiOutlineCalendar,
+    HiOutlineCalendar,
+    HiOutlineCog,
+    HiOutlineLogout,
 } from "react-icons/hi";
-
-// User menu icons
-import { HiOutlineCog, HiOutlineLogout } from "react-icons/hi";
 
 // Alert icons
 import { HiOutlineExclamationTriangle } from "react-icons/hi2";
+
+// Navigation icons
+import { HiChevronLeft, HiChevronRight, HiOutlineMenu } from "react-icons/hi";
 
 // Theme Icons
 export const MoonIcon = IoMoon;
@@ -28,6 +32,9 @@ export const UsersIcon = HiOutlineUsers;
 export const ManagementIcon = HiOutlineBriefcase;
 export const DepartmentsIcon = HiOutlineClipboardList;
 export const AccessControlIcon = HiOutlineLockOpen;
+export const ScheduleIcon = HiOutlineCalendar;
+export const SchedulingPeriodsIcon = HiOutlineCalendar;
+export const CalendarIcon = HiOutlineCalendar;
 
 // User Menu Icons
 export const SettingsIcon = HiOutlineCog;
@@ -35,3 +42,8 @@ export const LogoutIcon = HiOutlineLogout;
 
 // Alert Icons
 export const AlertTriangleIcon = HiOutlineExclamationTriangle;
+
+// Navigation Icons
+export const ChevronLeftIcon = HiChevronLeft;
+export const ChevronRightIcon = HiChevronRight;
+export const MenuIcon = HiOutlineMenu;
