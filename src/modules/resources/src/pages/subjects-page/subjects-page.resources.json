@@ -1,0 +1,16 @@
+{
+    "title": "Courses Management",
+    "createButton": "Create",
+    "editButton": "Edit",
+    "deleteButton": "Delete",
+    "viewActivitiesButton": "View Groups",
+    "organizationColumn": "Organization",
+    "departmentColumn": "Department",
+    "codeColumn": "Code",
+    "nameColumn": "Name",
+    "emptyStateMessage": "No courses yet. Get started by creating your first course!",
+    "deleteConfirmTitle": "Delete Course",
+    "deleteConfirmMessage": "Are you sure you want to delete the course \"{name}\"?",
+    "deleteConfirmButton": "Delete",
+    "deleteCancelButton": "Cancel"
+}
