@@ -12,9 +12,16 @@ import { useSubjects } from "@/modules/resources/src/hooks/use-subjects";
 import { useUsers } from "@/modules/auth/src/hooks/use-users";
 import { useSchedulingPeriods } from "@/modules/schedule/src/hooks/use-scheduling-periods";
 
-const COMMON_KEYS = [
+const USER_CONSTRAINT_KEYS = [
+    { label: "Unavailable Time", value: "unavailable_time" },
+];
+
+const USER_PREFERENCE_KEYS = [
+    { label: "Preferred Time", value: "preferred_time" },
     { label: "Preferred Weekdays", value: "preferred_weekdays" },
-    { label: "Time Range", value: "time_range" },
+];
+
+const ACTIVITY_CONSTRAINT_KEYS = [
     { label: "Required Capacity", value: "required_capacity" },
     { label: "Location Preference", value: "location_preference" },
     { label: "Compatible Resource Types", value: "compatible_resource_types" },
@@ -41,6 +48,16 @@ export function ConstraintEditor() {
     const [schedulingPeriodId, setSchedulingPeriodId] = useState<string | null>(null);
     const [isLoading, setIsLoading] = useState(false);
 
+    // Get the appropriate key list based on constraint type
+    const getKeyList = () => {
+        if (type === "user") return USER_CONSTRAINT_KEYS;
+        if (type === "preference") return USER_PREFERENCE_KEYS;
+        if (type === "activity") return ACTIVITY_CONSTRAINT_KEYS;
+        return [];
+    };
+
+    const availableKeys = getKeyList();
+
     useEffect(() => {
         if (isOpen) {
             fetchActivities();
@@ -50,7 +67,7 @@ export function ConstraintEditor() {
 
             if (mode === "edit" && constraint) {
                 const c = constraint as any;
-                const isCommon = COMMON_KEYS.some(k => k.value === c.key);
+                const isCommon = availableKeys.some(k => k.value === c.key);
                 if (isCommon) {
                     setKey(c.key);
                     setCustomKey("");
@@ -71,7 +88,7 @@ export function ConstraintEditor() {
                 setSchedulingPeriodId(null);
             }
         }
-    }, [isOpen, mode, constraint]);
+    }, [isOpen, mode, constraint, type]);
 
     const handleActivitySubmit = async (finalKey: string) => {
         if (mode === "edit" && !constraint) return false;
@@ -179,7 +196,7 @@ export function ConstraintEditor() {
 
                 <Select
                     label="Constraint Key"
-                    data={[...COMMON_KEYS, { label: "Custom...", value: "custom" }]}
+                    data={[...availableKeys, { label: "Custom...", value: "custom" }]}
                     value={key}
                     onChange={setKey}
                     required

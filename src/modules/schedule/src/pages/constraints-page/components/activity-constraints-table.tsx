@@ -18,7 +18,7 @@ export function ActivityConstraintsTable() {
         fetchActivityConstraints();
         fetchActivities();
         fetchSubjects();
-    }, []);
+    }, [fetchActivityConstraints, fetchActivities, fetchSubjects]);
 
     const activityNameTemplate = useCallback((rowData: any) => {
         const activity = activities.find(a => a.id === rowData.activityId);

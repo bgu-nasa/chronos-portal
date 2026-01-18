@@ -3,7 +3,7 @@ import React, { useState, useMemo } from 'react';
 import { Box, Button, Group, Text, Paper } from '@mantine/core';
 import { useHotkeys } from '@mantine/hooks';
 import { WeekHeader } from './week-header';
-import { TimeGrid } from './time-grid';
+import { TimeGrid, type TimeSelection } from './time-grid';
 import type { CalendarEvent } from "@/common/types";
 
 import styles from './week-view.module.css';
@@ -14,13 +14,15 @@ interface WeekViewProps {
   events: CalendarEvent[];
   dayStartHour?: number;
   dayEndHour?: number;
+  onTimeRangeSelected?: (selection: TimeSelection) => void;
 }
 
 export const WeekView: React.FC<WeekViewProps> = ({
   initialDate = new Date(),
   events,
   dayStartHour = resources.config.defaultStartHour,
-  dayEndHour = resources.config.defaultEndHour
+  dayEndHour = resources.config.defaultEndHour,
+  onTimeRangeSelected
 }) => {
   const [currentDate, setCurrentDate] = useState(initialDate);
 
@@ -86,6 +88,7 @@ export const WeekView: React.FC<WeekViewProps> = ({
           dayStartHour={dayStartHour}
           hoursPerDay={hoursPerDay}
           hourHeight={resources.config.hourHeight || 60}
+          onTimeRangeSelected={onTimeRangeSelected}
         />
       </Box>
     </Paper>

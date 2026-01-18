@@ -18,7 +18,7 @@ export function UserConstraintsTable() {
         fetchUserConstraints();
         fetchUsers();
         fetchSchedulingPeriods();
-    }, []);
+    }, [fetchUserConstraints, fetchUsers, fetchSchedulingPeriods]);
 
     const userNameTemplate = useCallback((rowData: any) => {
         const user = users.find(u => u.id === rowData.userId);
@@ -66,6 +66,9 @@ export function UserConstraintsTable() {
         />
     ), [openEdit, deleteUserConstraint]);
 
+    // Don't render table until all data is loaded to prevent showing IDs
+    const isDataReady = users.length > 0 && schedulingPeriods.length > 0;
+
     return (
         <Stack gap="md">
             <Group justify="flex-end">
@@ -78,19 +81,23 @@ export function UserConstraintsTable() {
                 </Button>
             </Group>
 
-            <DataTable
-                value={userConstraints}
-                dataKey="id"
-                stripedRows
-                paginator
-                rows={10}
-            >
-                <Column body={periodNameTemplate} header="Scheduling Period" sortable />
-                <Column body={userNameTemplate} header="User" sortable />
-                <Column field="key" header="Key" sortable />
-                <Column body={valueTemplate} header="Value" sortable />
-                <Column body={actionsTemplate} header="Actions" />
-            </DataTable>
+            {isDataReady ? (
+                <DataTable
+                    value={userConstraints}
+                    dataKey="id"
+                    stripedRows
+                    paginator
+                    rows={10}
+                >
+                    <Column body={periodNameTemplate} header="Scheduling Period" sortable />
+                    <Column body={userNameTemplate} header="User" sortable />
+                    <Column field="key" header="Key" sortable />
+                    <Column body={valueTemplate} header="Value" sortable />
+                    <Column body={actionsTemplate} header="Actions" />
+                </DataTable>
+            ) : (
+                <div>Loading...</div>
+            )}
         </Stack>
     );
 }

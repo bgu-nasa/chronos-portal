@@ -15,7 +15,7 @@ export function OrganizationPoliciesTable() {
     useEffect(() => {
         fetchOrganizationPolicies();
         fetchSchedulingPeriods();
-    }, []);
+    }, [fetchOrganizationPolicies, fetchSchedulingPeriods]);
 
     const periodNameTemplate = useCallback((rowData: any) => {
         const period = schedulingPeriods.find(p => p.id === rowData.schedulingPeriodId);

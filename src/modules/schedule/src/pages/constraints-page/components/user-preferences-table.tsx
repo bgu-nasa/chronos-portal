@@ -18,7 +18,7 @@ export function UserPreferencesTable() {
         fetchUserPreferences();
         fetchUsers();
         fetchSchedulingPeriods();
-    }, []);
+    }, [fetchUserPreferences, fetchUsers, fetchSchedulingPeriods]);
 
     const userNameTemplate = useCallback((rowData: any) => {
         const user = users.find(u => u.id === rowData.userId);

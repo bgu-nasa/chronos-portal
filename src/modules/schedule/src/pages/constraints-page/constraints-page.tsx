@@ -11,12 +11,12 @@ export function ConstraintsPage() {
             <Stack gap="lg">
                 <Title order={1}>Constraints Management</Title>
                 <Divider />
-                <Tabs defaultValue="activity">
+                <Tabs defaultValue="constraints">
                     <Tabs.List>
                         <Tabs.Tab value="constraints">User Constraints</Tabs.Tab>
                         <Tabs.Tab value="preference">User Preferences</Tabs.Tab>
                         <Tabs.Tab value="activity">Activity Constraints</Tabs.Tab>
-                        <Tabs.Tab value="policy">Organization Policies</Tabs.Tab>
+                        <Tabs.Tab value="policy" disabled>Organization Policies</Tabs.Tab>
                     </Tabs.List>
 
                     <Tabs.Panel value="constraints" pt="md">
