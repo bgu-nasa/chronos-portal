@@ -1,10 +1,9 @@
 import type { ModuleConfig } from "@/infra";
 import React from "react";
+import { EventDetailsModal, WeekView } from "@/common/components/calendar";
 import { CalendarIcon, ScheduleIcon, SchedulingPeriodsIcon } from "@/common/icons";
 import { CalendarPage, SchedulingPeriodsPage } from "./src";
-import { EventDetailsModal, WeekView } from "./src/pages/calendar-page/components/week-view";
 import { MOCK_ACADEMIC_SCHEDULE } from "./.mock";
-
 
 export const moduleConfig: ModuleConfig = {
     name: "Schedule",
@@ -65,4 +64,3 @@ export const moduleConfig: ModuleConfig = {
         },
     ],
 };
-

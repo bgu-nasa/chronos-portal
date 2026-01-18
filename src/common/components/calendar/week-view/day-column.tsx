@@ -2,7 +2,7 @@
 import React, { useMemo, useState, useEffect } from 'react';
 import { Box } from '@mantine/core';
 import { useInterval } from '@mantine/hooks';
-import type { CalendarEvent } from "../../../../types";
+import type { CalendarEvent } from "@/common/types";
 import { EventItem } from './event-item';
 
 import styles from './day-column.module.css';

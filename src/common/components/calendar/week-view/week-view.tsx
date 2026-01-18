@@ -4,7 +4,7 @@ import { Box, Button, Group, Text, Paper } from '@mantine/core';
 import { useHotkeys } from '@mantine/hooks';
 import { WeekHeader } from './week-header';
 import { TimeGrid } from './time-grid';
-import type { CalendarEvent } from "../../../../types";
+import type { CalendarEvent } from "@/common/types";
 
 import styles from './week-view.module.css';
 import resources from './week-view.resources.json';
