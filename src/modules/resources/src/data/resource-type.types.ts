@@ -14,9 +14,9 @@ export interface ResourceTypeResponse {
 
 /**
  * ResourceType creation request contract for API
+ * Note: Backend generates the ID automatically
  */
 export interface CreateResourceTypeRequest {
-    id: string; // Guid from C#
     organizationId: string; // Guid from C#
     type: string;
 }

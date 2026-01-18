@@ -3,6 +3,7 @@
  * Handles resource API calls with organization context
  */
 
+import { $app } from "@/infra/service";
 import type {
     ResourceResponse,
     CreateResourceRequest,
@@ -40,7 +41,7 @@ export class ResourceDataRepository {
      * @param departmentId - The department ID (required in route)
      */
     private getBaseUrl(departmentId: string): string {
-        return `/api/department/${departmentId}/resources`;
+        return `/api/department/${departmentId}/resources/resource`;
     }
 
     /**
