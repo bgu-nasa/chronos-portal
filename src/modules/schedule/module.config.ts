@@ -3,7 +3,6 @@ import React from "react";
 import { EventDetailsModal, WeekView } from "@/common/components/calendar";
 import { CalendarIcon, ScheduleIcon, SchedulingPeriodsIcon } from "@/common/icons";
 import { CalendarPage, SchedulingPeriodsPage } from "./src";
-import { MOCK_ACADEMIC_SCHEDULE } from "./.mock";
 
 export const moduleConfig: ModuleConfig = {
     name: "Schedule",
@@ -23,7 +22,7 @@ export const moduleConfig: ModuleConfig = {
             element: React.createElement(
                 CalendarPage,
                 null,
-                React.createElement(WeekView, { events: MOCK_ACADEMIC_SCHEDULE }),
+                React.createElement(WeekView, { events: [] }),
             ),
         },
         {
@@ -36,7 +35,7 @@ export const moduleConfig: ModuleConfig = {
                 React.createElement(
                     React.Fragment,
                     null,
-                    React.createElement(WeekView, { events: MOCK_ACADEMIC_SCHEDULE }),
+                    React.createElement(WeekView, { events: [] }),
                     React.createElement(EventDetailsModal),
                 ),
             ),
