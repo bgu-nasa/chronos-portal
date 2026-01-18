@@ -1,9 +1,8 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Container, Divider, Title } from "@mantine/core";
 import { ConfirmationDialog, useConfirmation } from "@/common";
 import { ResourceActions } from "./components/resource-actions";
 import { ResourceTable } from "./components/resource-table/resource-table";
-import { ResourceSearch, type ResourceSearchFilters } from "./components/resource-search";
 import { ResourceCreator } from "./components/resource-creator";
 import { ResourceEditor } from "./components/resource-editor";
 import type { ResourceData } from "./components/resource-table/types";
@@ -23,13 +22,12 @@ export function ResourcesPage() {
     const [selectedResource, setSelectedResource] = useState<ResourceData | null>(null);
     const [createModalOpened, setCreateModalOpened] = useState(false);
     const [editModalOpened, setEditModalOpened] = useState(false);
-    const [currentDepartmentId, setCurrentDepartmentId] = useState<string | null>(null);
 
-    const { resources: resourcesList, fetchResources, setCurrentDepartment } = useResources();
+    const { resources: resourcesList, fetchResources } = useResources();
     const { createResource, isLoading: isCreating } = useCreateResource();
     const { updateResource, isLoading: isEditing } = useUpdateResource();
     const { deleteResource } = useDeleteResource();
-    const { resourceTypes, fetchResourceTypes, setCurrentDepartment: setResourceTypesDepartment } = useResourceTypes();
+    const { resourceTypes, fetchResourceTypes } = useResourceTypes();
 
     const {
         confirmationState,
@@ -39,35 +37,14 @@ export function ResourcesPage() {
         isLoading: isDeleting,
     } = useConfirmation();
 
-    const handleSearch = (filters: ResourceSearchFilters) => {
-        $app.logger.info("[ResourcesPage] handleSearch called with:", filters);
-
-        if (!filters.departmentId) {
-            $app.logger.warn("[ResourcesPage] Department ID is required for search");
-            alert("Please select a department to search.");
-            return;
-        }
-
-        setCurrentDepartmentId(filters.departmentId);
-        setCurrentDepartment(filters.departmentId);
-        setResourceTypesDepartment(filters.departmentId);
+    // Fetch data on mount
+    useEffect(() => {
         fetchResources();
         fetchResourceTypes();
-    };
-
-    const handleClearFilters = () => {
-        $app.logger.info("[ResourcesPage] handleClearFilters called");
-        if (currentDepartmentId) {
-            fetchResources();
-        }
-    };
+    }, [fetchResources, fetchResourceTypes]);
 
     const handleCreateClick = () => {
         $app.logger.info("[ResourcesPage] handleCreateClick called");
-        if (!currentDepartmentId) {
-            alert("Please search for a department first");
-            return;
-        }
         setCreateModalOpened(true);
     };
 
@@ -78,12 +55,6 @@ export function ResourcesPage() {
         capacity: number | null;
     }) => {
         $app.logger.info("[ResourcesPage] handleCreateSubmit called with:", data);
-
-        if (!currentDepartmentId) {
-            $app.logger.error("[ResourcesPage] No department ID set");
-            alert("Missing department context for resource creation.");
-            return;
-        }
 
         const org = $app.organization.getOrganization();
         $app.logger.info("[ResourcesPage] Organization from context:", org);
@@ -130,9 +101,9 @@ export function ResourcesPage() {
     }) => {
         $app.logger.info("[ResourcesPage] handleEditSubmit called with:", data);
 
-        if (!selectedResource || !currentDepartmentId) {
-            $app.logger.error("[ResourcesPage] Missing selectedResource or currentDepartmentId");
-            alert("Missing resource or department context for edit.");
+        if (!selectedResource) {
+            $app.logger.error("[ResourcesPage] Missing selectedResource");
+            alert("Missing resource context for edit.");
             return;
         }
 
@@ -199,11 +170,6 @@ export function ResourcesPage() {
             <div className={styles.container}>
                 <Title order={1}>{resources.title}</Title>
                 <Divider className={styles.divider} />
-
-                <ResourceSearch
-                    onSearch={handleSearch}
-                    onClear={handleClearFilters}
-                />
 
                 <ResourceActions
                     selectedResource={selectedResource}

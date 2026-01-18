@@ -2,4 +2,3 @@ export { ResourceTable } from "./resource-table";
 export { ResourceActions } from "./resource-actions";
 export { ResourceCreator } from "./resource-creator";
 export { ResourceEditor } from "./resource-editor";
-export { ResourceSearch } from "./resource-search";

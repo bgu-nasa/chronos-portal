@@ -1,9 +1,8 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Container, Divider, Title } from "@mantine/core";
 import { ConfirmationDialog, useConfirmation } from "@/common";
 import { ResourceTypeActions } from "./components/resource-type-actions";
 import { ResourceTypeTable } from "./components/resource-type-table/resource-type-table";
-import { ResourceTypeSearch, type ResourceTypeSearchFilters } from "./components/resource-type-search";
 import { ResourceTypeCreator } from "./components/resource-type-creator";
 import { ResourceTypeEditor } from "./components/resource-type-editor";
 import type { ResourceTypeData } from "./components/resource-type-table/types";
@@ -22,9 +21,8 @@ export function ResourceTypesPage() {
     const [selectedResourceType, setSelectedResourceType] = useState<ResourceTypeData | null>(null);
     const [createModalOpened, setCreateModalOpened] = useState(false);
     const [editModalOpened, setEditModalOpened] = useState(false);
-    const [currentDepartmentId, setCurrentDepartmentId] = useState<string | null>(null);
 
-    const { resourceTypes, fetchResourceTypes, setCurrentDepartment } = useResourceTypes();
+    const { resourceTypes, fetchResourceTypes } = useResourceTypes();
     const { createResourceType, isLoading: isCreating } = useCreateResourceType();
     const { updateResourceType, isLoading: isEditing } = useUpdateResourceType();
     const { deleteResourceType } = useDeleteResourceType();
@@ -37,44 +35,18 @@ export function ResourceTypesPage() {
         isLoading: isDeleting,
     } = useConfirmation();
 
-    const handleSearch = (filters: ResourceTypeSearchFilters) => {
-        $app.logger.info("[ResourceTypesPage] handleSearch called with:", filters);
-
-        if (!filters.departmentId) {
-            $app.logger.warn("[ResourceTypesPage] Department ID is required for search");
-            alert("Please select a department to search.");
-            return;
-        }
-
-        setCurrentDepartmentId(filters.departmentId);
-        setCurrentDepartment(filters.departmentId);
+    // Fetch data on mount
+    useEffect(() => {
         fetchResourceTypes();
-    };
-
-    const handleClearFilters = () => {
-        $app.logger.info("[ResourceTypesPage] handleClearFilters called");
-        if (currentDepartmentId) {
-            fetchResourceTypes();
-        }
-    };
+    }, [fetchResourceTypes]);
 
     const handleCreateClick = () => {
         $app.logger.info("[ResourceTypesPage] handleCreateClick called");
-        if (!currentDepartmentId) {
-            alert("Please search for a department first");
-            return;
-        }
         setCreateModalOpened(true);
     };
 
     const handleCreateSubmit = async (data: { type: string }) => {
         $app.logger.info("[ResourceTypesPage] handleCreateSubmit called with:", data);
-
-        if (!currentDepartmentId) {
-            $app.logger.error("[ResourceTypesPage] No department ID set");
-            alert("Missing department context for resource type creation.");
-            return;
-        }
 
         const org = $app.organization.getOrganization();
         $app.logger.info("[ResourceTypesPage] Organization from context:", org);
@@ -112,9 +84,9 @@ export function ResourceTypesPage() {
     const handleEditSubmit = async (data: { type: string }) => {
         $app.logger.info("[ResourceTypesPage] handleEditSubmit called with:", data);
 
-        if (!selectedResourceType || !currentDepartmentId) {
-            $app.logger.error("[ResourceTypesPage] Missing selectedResourceType or currentDepartmentId");
-            alert("Missing resource type or department context for edit.");
+        if (!selectedResourceType) {
+            $app.logger.error("[ResourceTypesPage] Missing selectedResourceType");
+            alert("Missing resource type context for edit.");
             return;
         }
 
@@ -171,11 +143,6 @@ export function ResourceTypesPage() {
             <div className={styles.container}>
                 <Title order={1}>{resources.title}</Title>
                 <Divider className={styles.divider} />
-
-                <ResourceTypeSearch
-                    onSearch={handleSearch}
-                    onClear={handleClearFilters}
-                />
 
                 <ResourceTypeActions
                     selectedResourceType={selectedResourceType}

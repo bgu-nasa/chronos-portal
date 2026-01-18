@@ -15,13 +15,10 @@ import type {
 interface ResourceTypeStore {
     // State
     resourceTypes: ResourceTypeResponse[];
-    currentDepartmentId: string | null;
     isLoading: boolean;
     error: string | null;
 
     // Actions
-    setCurrentDepartment: (departmentId: string) => void;
-    getDepartmentId: () => string;
     fetchResourceTypes: () => Promise<void>;
     createResourceType: (request: CreateResourceTypeRequest) => Promise<ResourceTypeResponse | null>;
     updateResourceType: (resourceTypeId: string, request: UpdateResourceTypeRequest) => Promise<boolean>;
@@ -35,33 +32,21 @@ interface ResourceTypeStore {
 export const useResourceTypeStore = create<ResourceTypeStore>((set, get) => ({
     // Initial state
     resourceTypes: [],
-    currentDepartmentId: null,
     isLoading: false,
     error: null,
 
-    // Set current department
-    setCurrentDepartment: (departmentId: string) => {
-        set({ currentDepartmentId: departmentId });
-    },
-
-    // Helper to get department ID
-    getDepartmentId: (): string => {
-        const { currentDepartmentId } = get();
-        if (!currentDepartmentId) {
-            throw new Error("No department context set. Call setCurrentDepartment first.");
-        }
-        return currentDepartmentId;
-    },
-
-    // Fetch all resource types
+    // Fetch all resource types for current organization
     fetchResourceTypes: async () => {
         $app.logger.info("[ResourceTypeStore] fetchResourceTypes called");
         set({ isLoading: true, error: null });
         try {
-            const departmentId = get().getDepartmentId();
-            $app.logger.info("[ResourceTypeStore] Department ID", { departmentId });
+            const org = $app.organization.getOrganization();
+            if (!org) {
+                throw new Error("No organization context found");
+            }
+            $app.logger.info("[ResourceTypeStore] Organization ID", { organizationId: org.id });
             
-            const data = await resourceTypeDataRepository.getAllResourceTypes(departmentId);
+            const data = await resourceTypeDataRepository.getAllResourceTypes(org.id);
             $app.logger.info("[ResourceTypeStore] Fetched resource types", { count: data.length });
             set({ resourceTypes: data, isLoading: false });
         } catch (err) {
@@ -80,11 +65,14 @@ export const useResourceTypeStore = create<ResourceTypeStore>((set, get) => ({
         
         set({ isLoading: true, error: null });
         try {
-            const departmentId = get().getDepartmentId();
-            $app.logger.info("[ResourceTypeStore] Department ID", { departmentId });
+            const org = $app.organization.getOrganization();
+            if (!org) {
+                throw new Error("No organization context found");
+            }
+            $app.logger.info("[ResourceTypeStore] Organization ID", { organizationId: org.id });
             
             const newResourceType = await resourceTypeDataRepository.createResourceType(
-                departmentId,
+                org.id,
                 request
             );
             
@@ -116,11 +104,14 @@ export const useResourceTypeStore = create<ResourceTypeStore>((set, get) => ({
         
         set({ isLoading: true, error: null });
         try {
-            const departmentId = get().getDepartmentId();
-            $app.logger.info("[ResourceTypeStore] Department ID", { departmentId });
+            const org = $app.organization.getOrganization();
+            if (!org) {
+                throw new Error("No organization context found");
+            }
+            $app.logger.info("[ResourceTypeStore] Organization ID", { organizationId: org.id });
             
             await resourceTypeDataRepository.updateResourceType(
-                departmentId,
+                org.id,
                 resourceTypeId,
                 request
             );
@@ -150,10 +141,13 @@ export const useResourceTypeStore = create<ResourceTypeStore>((set, get) => ({
         
         set({ isLoading: true, error: null });
         try {
-            const departmentId = get().getDepartmentId();
-            $app.logger.info("[ResourceTypeStore] Department ID", { departmentId });
+            const org = $app.organization.getOrganization();
+            if (!org) {
+                throw new Error("No organization context found");
+            }
+            $app.logger.info("[ResourceTypeStore] Organization ID", { organizationId: org.id });
             
-            await resourceTypeDataRepository.deleteResourceType(departmentId, resourceTypeId);
+            await resourceTypeDataRepository.deleteResourceType(org.id, resourceTypeId);
             
             $app.logger.info("[ResourceTypeStore] ResourceType deleted successfully", { resourceTypeId });
             set({ isLoading: false });

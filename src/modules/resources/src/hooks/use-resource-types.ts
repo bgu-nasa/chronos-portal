@@ -10,22 +10,14 @@ import { useResourceTypeStore } from "@/modules/resources/src/state";
  */
 export function useResourceTypes() {
     const resourceTypes = useResourceTypeStore((state) => state.resourceTypes);
-    const currentDepartmentId = useResourceTypeStore(
-        (state) => state.currentDepartmentId
-    );
     const isLoading = useResourceTypeStore((state) => state.isLoading);
     const error = useResourceTypeStore((state) => state.error);
-    const setCurrentDepartment = useResourceTypeStore(
-        (state) => state.setCurrentDepartment
-    );
     const fetchResourceTypes = useResourceTypeStore((state) => state.fetchResourceTypes);
 
     return {
         resourceTypes,
-        currentDepartmentId,
         isLoading,
         error,
-        setCurrentDepartment,
         fetchResourceTypes,
     };
 }

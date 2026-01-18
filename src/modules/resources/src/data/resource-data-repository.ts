@@ -38,20 +38,22 @@ export class ResourceDataRepository {
 
     /**
      * Build the base URL for resource endpoints
-     * @param departmentId - The department ID (required in route)
      */
-    private getBaseUrl(departmentId: string): string {
-        return `/api/department/${departmentId}/resources/resource`;
+    private getBaseUrl(): string {
+        return `/api/resources/resource`;
     }
 
     /**
      * Fetch all resources for the current organization
-     * @param departmentId - The department ID
+     * @param organizationId - The organization ID
      * @returns Array of resources
      */
-    async getAllResources(departmentId: string): Promise<ResourceResponse[]> {
-        const url = this.getBaseUrl(departmentId);
-        const headers = this.getHeaders();
+    async getAllResources(organizationId: string): Promise<ResourceResponse[]> {
+        const url = this.getBaseUrl();
+        const headers = {
+            ...this.getHeaders(),
+            "x-org-id": organizationId,
+        };
         
         $app.logger.info("[ResourceDataRepository] Fetching all resources", { url, headers });
         
@@ -67,16 +69,19 @@ export class ResourceDataRepository {
 
     /**
      * Fetch a single resource by ID
-     * @param departmentId - The department ID
+     * @param organizationId - The organization ID
      * @param resourceId - The ID of the resource to fetch
      * @returns Resource details
      */
     async getResourceById(
-        departmentId: string,
+        organizationId: string,
         resourceId: string
     ): Promise<ResourceResponse> {
-        const url = `${this.getBaseUrl(departmentId)}/${resourceId}`;
-        const headers = this.getHeaders();
+        const url = `${this.getBaseUrl()}/${resourceId}`;
+        const headers = {
+            ...this.getHeaders(),
+            "x-org-id": organizationId,
+        };
         
         $app.logger.info("[ResourceDataRepository] Fetching resource by ID", { url, resourceId });
         
@@ -92,16 +97,19 @@ export class ResourceDataRepository {
 
     /**
      * Create a new resource
-     * @param departmentId - The department ID
+     * @param organizationId - The organization ID
      * @param request - Resource creation request
      * @returns Created resource details
      */
     async createResource(
-        departmentId: string,
+        organizationId: string,
         request: CreateResourceRequest
     ): Promise<ResourceResponse> {
-        const url = this.getBaseUrl(departmentId);
-        const headers = this.getHeaders();
+        const url = this.getBaseUrl();
+        const headers = {
+            ...this.getHeaders(),
+            "x-org-id": organizationId,
+        };
         
         $app.logger.info("[ResourceDataRepository] Creating resource", { url, request });
         
@@ -121,18 +129,21 @@ export class ResourceDataRepository {
 
     /**
      * Update an existing resource
-     * @param departmentId - The department ID
+     * @param organizationId - The organization ID
      * @param resourceId - The ID of the resource to update
      * @param request - Resource update request
      * @returns void (HTTP 204 No Content)
      */
     async updateResource(
-        departmentId: string,
+        organizationId: string,
         resourceId: string,
         request: UpdateResourceRequest
     ): Promise<void> {
-        const url = `${this.getBaseUrl(departmentId)}/${resourceId}`;
-        const headers = this.getHeaders();
+        const url = `${this.getBaseUrl()}/${resourceId}`;
+        const headers = {
+            ...this.getHeaders(),
+            "x-org-id": organizationId,
+        };
         
         $app.logger.info("[ResourceDataRepository] Updating resource", { url, resourceId, request });
         
@@ -147,16 +158,19 @@ export class ResourceDataRepository {
 
     /**
      * Delete a resource
-     * @param departmentId - The department ID
+     * @param organizationId - The organization ID
      * @param resourceId - The ID of the resource to delete
      * @returns void (HTTP 204 No Content)
      */
     async deleteResource(
-        departmentId: string,
+        organizationId: string,
         resourceId: string
     ): Promise<void> {
-        const url = `${this.getBaseUrl(departmentId)}/${resourceId}`;
-        const headers = this.getHeaders();
+        const url = `${this.getBaseUrl()}/${resourceId}`;
+        const headers = {
+            ...this.getHeaders(),
+            "x-org-id": organizationId,
+        };
         
         $app.logger.info("[ResourceDataRepository] Deleting resource", { url, resourceId });
         
