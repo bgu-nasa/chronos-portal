@@ -1,4 +1,15 @@
 .calendarPageContainer {
   height: calc(100vh - 70px);
   padding: var(--mantine-spacing-md);
+  overflow: hidden;
+}
+
+.sidebar {
+  width: 300px;
+  flex-shrink: 0;
+}
+
+.content {
+  flex-grow: 1;
+  overflow: auto;
 }

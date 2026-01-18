@@ -1,11 +1,21 @@
-import type { ReactNode } from "react";
-import { Box } from "@mantine/core";
+import { useState } from "react";
+import { Box, Flex, Paper } from "@mantine/core";
 import styles from "./calendar-page.module.css";
+import { SchedulingPeriodSelect } from "./components/scheduling-period-select";
+import { WeekView, EventDetailsModal } from "@/common/components/calendar";
 
-interface CalendarPageProps {
-  readonly children: ReactNode;
-}
+export function CalendarPage() {
+  const [selectedPeriodId, setSelectedPeriodId] = useState<string | null>(null);
 
-export function CalendarPage({ children }: CalendarPageProps) {
-  return <Box className={styles.calendarPageContainer}>{children}</Box>;
+  return (
+    <Flex className={styles.calendarPageContainer} gap="md">
+      <Paper withBorder p="md" className={styles.sidebar}>
+        <SchedulingPeriodSelect value={selectedPeriodId} onChange={setSelectedPeriodId} />
+      </Paper>
+      <Box className={styles.content}>
+        <WeekView events={[]} />
+        <EventDetailsModal />
+      </Box>
+    </Flex>
+  );
 }

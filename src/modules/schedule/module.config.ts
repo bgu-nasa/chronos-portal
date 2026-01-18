@@ -1,6 +1,5 @@
 import type { ModuleConfig } from "@/infra";
 import React from "react";
-import { EventDetailsModal, WeekView } from "@/common/components/calendar";
 import { CalendarIcon, ScheduleIcon, SchedulingPeriodsIcon } from "@/common/icons";
 import { CalendarPage, SchedulingPeriodsPage } from "./src";
 
@@ -19,26 +18,13 @@ export const moduleConfig: ModuleConfig = {
             name: "calendar",
             path: "/calendar",
             authorize: true,
-            element: React.createElement(
-                CalendarPage,
-                null,
-                React.createElement(WeekView, { events: [] }),
-            ),
+            element: React.createElement(CalendarPage),
         },
         {
             name: "calendar-event",
             path: "/calendar/event/:id",
             authorize: true,
-            element: React.createElement(
-                CalendarPage,
-                null,
-                React.createElement(
-                    React.Fragment,
-                    null,
-                    React.createElement(WeekView, { events: [] }),
-                    React.createElement(EventDetailsModal),
-                ),
-            ),
+            element: React.createElement(CalendarPage),
         },
     ],
     navigationItems: [
