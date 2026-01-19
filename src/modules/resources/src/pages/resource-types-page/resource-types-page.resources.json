@@ -4,7 +4,6 @@
     "editButton": "Edit",
     "deleteButton": "Delete",
     "typeColumn": "Type",
-    "organizationColumn": "Organization",
     "emptyStateMessage": "No resource types yet. Get started by creating your first resource type!",
     "deleteConfirmTitle": "Delete Resource Type",
     "deleteConfirmMessage": "Are you sure you want to delete the resource type \"{type}\"?",

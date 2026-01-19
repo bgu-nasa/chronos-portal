@@ -284,7 +284,6 @@ export function ResourcesPage() {
             location: resource.location,
             identifier: resource.identifier,
             capacity: resource.capacity,
-            organizationName: "Organization",
             resourceTypeName: resourceType?.type || "Unknown",
         };
     });
@@ -292,7 +291,6 @@ export function ResourcesPage() {
     const resourceTypeData: ResourceTypeData[] = resourceTypes.map((resourceType) => ({
         id: resourceType.id,
         type: resourceType.type,
-        organizationName: "Organization",
     }));
 
     return (

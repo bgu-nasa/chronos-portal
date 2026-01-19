@@ -4,6 +4,5 @@ export type ResourceData = {
     location: string;
     identifier: string;
     capacity: number | null;
-    organizationName: string;
     resourceTypeName: string;
 };

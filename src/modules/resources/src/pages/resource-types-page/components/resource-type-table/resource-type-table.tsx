@@ -51,7 +51,6 @@ export function ResourceTypeTable({
         >
             <Column selectionMode="single" headerStyle={{ width: "3rem" }} />
             <Column field="type" header={resources.typeColumn} sortable />
-            <Column field="organizationName" header={resources.organizationColumn} sortable />
         </DataTable>
     );
 }

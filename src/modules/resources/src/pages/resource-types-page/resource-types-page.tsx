@@ -134,7 +134,6 @@ export function ResourceTypesPage() {
     const resourceTypeData: ResourceTypeData[] = resourceTypes.map((resourceType) => ({
         id: resourceType.id,
         type: resourceType.type,
-        organizationName: "Organization",
     }));
 
     return (
