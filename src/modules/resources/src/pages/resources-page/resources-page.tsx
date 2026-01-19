@@ -12,16 +12,25 @@ import {
     useCreateResourceType,
     useUpdateResourceType,
     useDeleteResourceType,
+    useNotification,
 } from "@/modules/resources/src/hooks";
 import { ResourceTypeActions, ResourceTypeTable, ResourceTypeCreator, ResourceTypeEditor, type ResourceTypeData } from "../resource-types-page/components";
+import { NotificationProvider } from "../../components";
 import resourcesJson from "./resources-page.resources.json";
 import resourceTypesJson from "../resource-types-page/resource-types-page.resources.json";
 import styles from "./resources-page.module.css";
 import { $app } from "@/infra/service";
-import { showSuccessNotification, showErrorNotification, showWarningNotification } from "../../utils/notification-functions";
-import { ResourceNotifications } from "../../utils/notifications";
 
 export function ResourcesPage() {
+    return (
+        <NotificationProvider>
+            <ResourcesPageContent />
+        </NotificationProvider>
+    );
+}
+
+function ResourcesPageContent() {
+    const { showInfo, showError, showWarning } = useNotification();
     const [activeTab, setActiveTab] = useState<string | null>("resources");
     
     // Resources state
@@ -94,16 +103,14 @@ export function ResourcesPage() {
 
             if (result) {
                 setResourceCreateModalOpened(false);
-                showSuccessNotification({ message: "Resource created successfully" });
+                showInfo("Resource created successfully");
             } else {
                 $app.logger.error("[ResourcesPage] Create resource returned null");
-                showErrorNotification({ message: "Failed to create resource. Check console for details." });
+                showError("Failed to create resource. Check console for details.");
             }
         } catch (error) {
             $app.logger.error("[ResourcesPage] Error creating resource:", error);
-            showErrorNotification({ 
-                message: `Error creating resource: ${error instanceof Error ? error.message : "Unknown error"}` 
-            });
+            showError(`Error creating resource: ${error instanceof Error ? error.message : "Unknown error"}`);
         }
     };
 
@@ -124,7 +131,7 @@ export function ResourcesPage() {
 
         if (!selectedResource) {
             $app.logger.error("[ResourcesPage] Missing selectedResource");
-            showWarningNotification({ message: "Missing resource context for edit." });
+            showWarning("Missing resource context for edit.");
             return;
         }
 
@@ -144,16 +151,14 @@ export function ResourcesPage() {
             if (success) {
                 setResourceEditModalOpened(false);
                 setSelectedResource(null);
-                showSuccessNotification({ message: "Resource updated successfully" });
+                showInfo("Resource updated successfully");
             } else {
                 $app.logger.error("[ResourcesPage] Update resource returned false");
-                showErrorNotification({ message: "Failed to update resource. Check console for details." });
+                showError("Failed to update resource. Check console for details.");
             }
         } catch (error) {
             $app.logger.error("[ResourcesPage] Error updating resource:", error);
-            showErrorNotification({ 
-                message: `Error updating resource: ${error instanceof Error ? error.message : "Unknown error"}` 
-            });
+            showError(`Error updating resource: ${error instanceof Error ? error.message : "Unknown error"}`);
         }
     };
 
@@ -201,16 +206,14 @@ export function ResourcesPage() {
 
             if (result) {
                 setResourceTypeCreateModalOpened(false);
-                showSuccessNotification({ message: "Resource type created successfully" });
+                showInfo("Resource type created successfully");
             } else {
                 $app.logger.error("[ResourcesPage] Create resource type returned null");
-                showErrorNotification({ message: "Failed to create resource type. Check console for details." });
+                showError("Failed to create resource type. Check console for details.");
             }
         } catch (error) {
             $app.logger.error("[ResourcesPage] Error creating resource type:", error);
-            showErrorNotification({ 
-                message: `Error creating resource type: ${error instanceof Error ? error.message : "Unknown error"}` 
-            });
+            showError(`Error creating resource type: ${error instanceof Error ? error.message : "Unknown error"}`);
         }
     };
 
@@ -226,7 +229,7 @@ export function ResourcesPage() {
 
         if (!selectedResourceType) {
             $app.logger.error("[ResourcesPage] Missing selectedResourceType");
-            showWarningNotification({ message: "Missing resource type context for edit." });
+            showWarning("Missing resource type context for edit.");
             return;
         }
 
@@ -243,16 +246,14 @@ export function ResourcesPage() {
             if (success) {
                 setResourceTypeEditModalOpened(false);
                 setSelectedResourceType(null);
-                showSuccessNotification({ message: "Resource type updated successfully" });
+                showInfo("Resource type updated successfully");
             } else {
                 $app.logger.error("[ResourcesPage] Update resource type returned false");
-                showErrorNotification({ message: "Failed to update resource type. Check console for details." });
+                showError("Failed to update resource type. Check console for details.");
             }
         } catch (error) {
             $app.logger.error("[ResourcesPage] Error updating resource type:", error);
-            showErrorNotification({ 
-                message: `Error updating resource type: ${error instanceof Error ? error.message : "Unknown error"}` 
-            });
+            showError(`Error updating resource type: ${error instanceof Error ? error.message : "Unknown error"}`);
         }
     };
 
@@ -295,7 +296,6 @@ export function ResourcesPage() {
 
     return (
         <Container size="xl" py="xl">
-            <ResourceNotifications />
             <div className={styles.container}>
                 <Title order={1}>Resources Management</Title>
                 <Divider className={styles.divider} />
