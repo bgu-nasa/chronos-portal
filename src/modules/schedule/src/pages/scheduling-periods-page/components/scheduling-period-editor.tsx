@@ -167,7 +167,7 @@ export function SchedulingPeriodEditor() {
 
                 <Stack gap="xs" mb="md">
                     <Text size="sm" fw={500}>
-                        {resources.editorFromDateLabel} <span style={{ color: "var(--mantine-color-red-6)" }}>*</span>
+                        {resources.editorFromDateLabel} <span style={{ color: "var(--mantine-color-error)" }}>*</span>
                     </Text>
                     <Calendar
                         value={fromDate}
@@ -188,7 +188,7 @@ export function SchedulingPeriodEditor() {
 
                 <Stack gap="xs" mb="md">
                     <Text size="sm" fw={500}>
-                        {resources.editorToDateLabel} <span style={{ color: "var(--mantine-color-red-6)" }}>*</span>
+                        {resources.editorToDateLabel} <span style={{ color: "var(--mantine-color-error)" }}>*</span>
                     </Text>
                     <Calendar
                         value={toDate}
@@ -208,9 +208,8 @@ export function SchedulingPeriodEditor() {
                     )}
                 </Stack>
 
-                {/* Display API errors */}
                 {apiError && (
-                    <Text size="sm" c="red" mb="md" style={{ padding: '0.5rem', backgroundColor: 'var(--mantine-color-red-light)', borderRadius: 'var(--mantine-radius-sm)' }}>
+                    <Text size="sm" c="red" mb="md" style={{ padding: '0.5rem', backgroundColor: 'var(--mantine-color-error-light)', borderRadius: 'var(--mantine-radius-sm)' }}>
                         {apiError}
                     </Text>
                 )}
