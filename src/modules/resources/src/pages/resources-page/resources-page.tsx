@@ -1,12 +1,8 @@
 import { useState, useEffect } from "react";
 import { Container, Divider, Title, Tabs } from "@mantine/core";
 import { ConfirmationDialog, useConfirmation } from "@/common";
-import { ResourceActions } from "./components/resource-actions";
-import { ResourceTable } from "./components/resource-table/resource-table";
-import { ResourceCreator } from "./components/resource-creator";
-import { ResourceEditor } from "./components/resource-editor";
-import type { ResourceData } from "./components/resource-table/types";
-import type { UpdateResourceRequest } from "@/modules/resources/src/data";
+import { ResourceActions, ResourceTable, ResourceCreator, ResourceEditor, type ResourceData } from "./components";
+import type { UpdateResourceRequest, UpdateResourceTypeRequest } from "@/modules/resources/src/data";
 import {
     useResources,
     useCreateResource,
@@ -17,21 +13,12 @@ import {
     useUpdateResourceType,
     useDeleteResourceType,
 } from "@/modules/resources/src/hooks";
-import { ResourceTypeActions } from "../resource-types-page/components/resource-type-actions";
-import { ResourceTypeTable } from "../resource-types-page/components/resource-type-table/resource-type-table";
-import { ResourceTypeCreator } from "../resource-types-page/components/resource-type-creator";
-import { ResourceTypeEditor } from "../resource-types-page/components/resource-type-editor";
-import type { ResourceTypeData } from "../resource-types-page/components/resource-type-table/types";
-import type { UpdateResourceTypeRequest } from "@/modules/resources/src/data";
+import { ResourceTypeActions, ResourceTypeTable, ResourceTypeCreator, ResourceTypeEditor, type ResourceTypeData } from "../resource-types-page/components";
 import resourcesJson from "./resources-page.resources.json";
 import resourceTypesJson from "../resource-types-page/resource-types-page.resources.json";
 import styles from "./resources-page.module.css";
 import { $app } from "@/infra/service";
-import { 
-    showSuccessNotification, 
-    showErrorNotification, 
-    showWarningNotification
-} from "../../utils/notification-functions";
+import { showSuccessNotification, showErrorNotification, showWarningNotification } from "../../utils/notification-functions";
 import { ResourceNotifications } from "../../utils/notifications";
 
 export function ResourcesPage() {

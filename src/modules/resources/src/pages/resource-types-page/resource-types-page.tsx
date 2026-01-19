@@ -1,26 +1,13 @@
 import { useState, useEffect } from "react";
 import { Container, Divider, Title } from "@mantine/core";
 import { ConfirmationDialog, useConfirmation } from "@/common";
-import { ResourceTypeActions } from "./components/resource-type-actions";
-import { ResourceTypeTable } from "./components/resource-type-table/resource-type-table";
-import { ResourceTypeCreator } from "./components/resource-type-creator";
-import { ResourceTypeEditor } from "./components/resource-type-editor";
-import type { ResourceTypeData } from "./components/resource-type-table/types";
+import { ResourceTypeActions, ResourceTypeTable, ResourceTypeCreator, ResourceTypeEditor, type ResourceTypeData } from "./components";
 import type { UpdateResourceTypeRequest } from "@/modules/resources/src/data";
-import {
-    useResourceTypes,
-    useCreateResourceType,
-    useUpdateResourceType,
-    useDeleteResourceType,
-} from "@/modules/resources/src/hooks";
+import { useResourceTypes, useCreateResourceType, useUpdateResourceType, useDeleteResourceType } from "@/modules/resources/src/hooks";
 import resources from "./resource-types-page.resources.json";
 import styles from "./resource-types-page.module.css";
 import { $app } from "@/infra/service";
-import { 
-    showSuccessNotification, 
-    showErrorNotification, 
-    showWarningNotification
-} from "../../utils/notification-functions";
+import { showSuccessNotification, showErrorNotification, showWarningNotification } from "../../utils/notification-functions";
 import { ResourceNotifications } from "../../utils/notifications";
 
 export function ResourceTypesPage() {
