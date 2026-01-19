@@ -1,4 +1,0 @@
-.calendarPageContainer {
-  height: calc(100vh - 70px);
-  padding: var(--mantine-spacing-md);
-}

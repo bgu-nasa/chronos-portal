@@ -6,8 +6,3 @@ export interface CalendarEvent {
     color?: string;
     description?: string;
 }
-
-export interface DayViewProps {
-    date: Date;
-    events: CalendarEvent[];
-}

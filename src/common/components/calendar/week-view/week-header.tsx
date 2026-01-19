@@ -1,8 +1,8 @@
 /** @author noamarg */
 import React from 'react';
 import { Box, Text } from '@mantine/core';
-import styles from './WeekHeader.module.css';
-import resources from './WeekHeader.resources.json';
+import styles from './week-header.module.css';
+import resources from './week-header.resources.json';
 
 interface WeekHeaderProps {
   weekDates: Date[];

@@ -2,8 +2,8 @@
 import React from 'react';
 import { Box, Text } from '@mantine/core';
 
-import styles from './TimeColumn.module.css';
-import resources from './TimeColumn.resources.json';
+import styles from './time-column.module.css';
+import resources from './time-column.resources.json';
 
 interface TimeColumnProps {
   hourHeight?: number;

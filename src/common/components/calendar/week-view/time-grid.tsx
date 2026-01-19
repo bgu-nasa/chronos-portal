@@ -1,11 +1,11 @@
 /** @author noamarg */
 import React from 'react';
 import { Box, ScrollArea } from '@mantine/core';
-import { TimeColumn } from './TimeColumn';
-import { DayColumn } from './DayColumn';
-import type { CalendarEvent } from '@/modules/calendar/src/types';
+import { TimeColumn } from './time-column';
+import { DayColumn } from './day-column';
+import type { CalendarEvent } from "@/common/types";
 
-import styles from './TimeGrid.module.css';
+import styles from './time-grid.module.css';
 
 interface TimeGridProps {
   weekDates: Date[];
