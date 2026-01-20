@@ -19,7 +19,7 @@ export function UserSelect({ value, onChange, disabled = false }: UserSelectProp
             void fetchUsers().catch((error) => {
                 // Silently handle errors - organization might not be ready yet
                 // The error will be logged by the repository
-                console.debug("Failed to fetch users:", error);
+                $app.logger.debug("Failed to fetch users:", error);
             });
         }
     }, [fetchUsers]);

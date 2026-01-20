@@ -63,18 +63,49 @@ export function OrganizationPoliciesPanel({ openConfirmation }: Readonly<Omit<Or
             title: resources.deleteMessages.deleteOrganizationPolicy,
             message: resources.deleteMessages.confirmDeleteOrganizationPolicy,
             onConfirm: async () => {
-                await deleteOrganizationPolicy(item.id);
+                try {
+                    await deleteOrganizationPolicy(item.id);
+
+                    // Show success notification
+                    $app.notifications.showSuccess(
+                        "Deleted",
+                        "The organization policy has been deleted successfully"
+                    );
+                } catch (error) {
+                    $app.logger.error("[OrganizationPoliciesPanel] Error deleting policy:", error);
+                    $app.notifications.showError(
+                        "Failed to Delete",
+                        error instanceof Error ? error.message : "An unexpected error occurred"
+                    );
+                }
             },
         });
     };
 
     const handleSubmit = async (values: any) => {
-        if (editingItem) {
-            await updateOrganizationPolicy(editingItem.id, values);
-        } else {
-            await createOrganizationPolicy(values);
+        try {
+            if (editingItem) {
+                await updateOrganizationPolicy(editingItem.id, values);
+            } else {
+                await createOrganizationPolicy(values);
+            }
+
+            // Show success notification
+            $app.notifications.showSuccess(
+                editingItem ? "Policy Updated" : "Policy Created",
+                editingItem
+                    ? "The organization policy has been updated successfully"
+                    : "The organization policy has been created successfully"
+            );
+
+            setModalOpened(false);
+        } catch (error) {
+            $app.logger.error("[OrganizationPoliciesPanel] Error saving policy:", error);
+            $app.notifications.showError(
+                "Failed to Save Policy",
+                error instanceof Error ? error.message : "An unexpected error occurred"
+            );
         }
-        setModalOpened(false);
     };
 
     if (isLoading && enrichedData.length === 0 && !modalOpened) {

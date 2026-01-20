@@ -169,34 +169,42 @@ export function UserConstraintEditor({
             return;
         }
 
-        // Serialize form data based on constraint type
-        let serializedValue = "";
+        try {
+            // Serialize form data based on constraint type
+            let serializedValue = "";
 
-        if (constraintKey === "forbidden_timerange") {
-            // Remove id field before serializing
-            const entriesWithoutIds = timeRangeEntries.map(({ id, ...entry }) => entry);
-            serializedValue = serializeForbiddenTimeRange(entriesWithoutIds);
-        } else if (constraintKey === "preferred_weekdays") {
-            serializedValue = serializePreferredWeekdays(selectedWeekdays);
+            if (constraintKey === "forbidden_timerange") {
+                // Remove id field before serializing
+                const entriesWithoutIds = timeRangeEntries.map(({ id, ...entry }) => entry);
+                serializedValue = serializeForbiddenTimeRange(entriesWithoutIds);
+            } else if (constraintKey === "preferred_weekdays") {
+                serializedValue = serializePreferredWeekdays(selectedWeekdays);
+            }
+
+            await onSubmit({
+                ...formValues,
+                value: serializedValue,
+                isPreference: initialData?.isPreference ?? isPreference,
+            });
+
+            // Reset form
+            setFormValues({
+                userId: !isAdmin && currentUserId ? currentUserId : "",
+                schedulingPeriodId: "",
+                key: constraintKey,
+                isPreference: isPreference,
+            });
+            setFormErrors({});
+            setTimeRangeEntries([]);
+            setSelectedWeekdays([]);
+            onClose();
+        } catch (error) {
+            $app.logger.error("[UserConstraintEditor] Error submitting constraint:", error);
+            $app.notifications.showError(
+                "Failed to Save Constraint",
+                error instanceof Error ? error.message : "An unexpected error occurred"
+            );
         }
-
-        await onSubmit({
-            ...formValues,
-            value: serializedValue,
-            isPreference: initialData?.isPreference ?? isPreference,
-        });
-
-        // Reset form
-        setFormValues({
-            userId: !isAdmin && currentUserId ? currentUserId : "",
-            schedulingPeriodId: "",
-            key: constraintKey,
-            isPreference: isPreference,
-        });
-        setFormErrors({});
-        setTimeRangeEntries([]);
-        setSelectedWeekdays([]);
-        onClose();
     };
 
     const addTimeRangeEntry = () => {

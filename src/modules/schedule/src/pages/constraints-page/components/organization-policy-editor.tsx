@@ -73,16 +73,24 @@ export function OrganizationPolicyEditor({
             return;
         }
 
-        await onSubmit(formValues);
+        try {
+            await onSubmit(formValues);
 
-        // Reset form
-        setFormValues({
-            schedulingPeriodId: "",
-            key: "",
-            value: "",
-        });
-        setFormErrors({});
-        onClose();
+            // Reset form
+            setFormValues({
+                schedulingPeriodId: "",
+                key: "",
+                value: "",
+            });
+            setFormErrors({});
+            onClose();
+        } catch (error) {
+            $app.logger.error("[OrganizationPolicyEditor] Error submitting policy:", error);
+            $app.notifications.showError(
+                "Failed to Save Policy",
+                error instanceof Error ? error.message : "An unexpected error occurred"
+            );
+        }
     };
 
     const periodOptions = schedulingPeriods.map((period) => ({

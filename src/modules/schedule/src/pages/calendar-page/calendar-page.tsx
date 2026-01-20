@@ -131,37 +131,51 @@ export function CalendarPage() {
       return;
     }
 
-    // Get weekday name from the date (in user's local timezone)
-    const weekdayName = timeRangeSelection.date.toLocaleDateString('en-US', { weekday: 'long' });
+    try {
+      // Get weekday name from the date (in user's local timezone)
+      const weekdayName = timeRangeSelection.date.toLocaleDateString('en-US', { weekday: 'long' });
 
-    // Create the constraint entry (times are in user's local timezone)
-    const entry: ForbiddenTimeRangeEntry = {
-      weekday: weekdayName,
-      startTime: timeRangeSelection.startTime, // Local time
-      endTime: timeRangeSelection.endTime, // Local time
-    };
+      // Create the constraint entry (times are in user's local timezone)
+      const entry: ForbiddenTimeRangeEntry = {
+        weekday: weekdayName,
+        startTime: timeRangeSelection.startTime, // Local time
+        endTime: timeRangeSelection.endTime, // Local time
+      };
 
-    // Serialize to backend format (converts local time to UTC automatically)
-    const value = serializeForbiddenTimeRange([entry]);
+      // Serialize to backend format (converts local time to UTC automatically)
+      const value = serializeForbiddenTimeRange([entry]);
 
-    // Create the constraint
-    await createUserConstraint({
-      userId: currentUserId,
-      schedulingPeriodId: selectedPeriodId,
-      key: "forbidden_timerange",
-      value: value,
-    });
+      // Create the constraint
+      await createUserConstraint({
+        userId: currentUserId,
+        schedulingPeriodId: selectedPeriodId,
+        key: "forbidden_timerange",
+        value: value,
+      });
 
-    // Refresh constraints to show the new one
-    if (isAdmin && selectedUserId) {
-      await fetchUserConstraintsByUser(selectedUserId);
-    } else if (!isAdmin && currentUserId) {
-      await fetchUserConstraintsByUser(currentUserId);
+      // Refresh constraints to show the new one
+      if (isAdmin && selectedUserId) {
+        await fetchUserConstraintsByUser(selectedUserId);
+      } else if (!isAdmin && currentUserId) {
+        await fetchUserConstraintsByUser(currentUserId);
+      }
+
+      // Show success notification
+      $app.notifications.showSuccess(
+        "Constraint Created",
+        "Unavailable time range has been set successfully"
+      );
+
+      // Close modal and reset selection
+      setModalOpened(false);
+      setTimeRangeSelection(null);
+    } catch (error) {
+      $app.logger.error("[CalendarPage] Error creating constraint:", error);
+      $app.notifications.showError(
+        "Failed to Create Constraint",
+        error instanceof Error ? error.message : "An unexpected error occurred"
+      );
     }
-
-    // Close modal and reset selection
-    setModalOpened(false);
-    setTimeRangeSelection(null);
   };
 
   return (

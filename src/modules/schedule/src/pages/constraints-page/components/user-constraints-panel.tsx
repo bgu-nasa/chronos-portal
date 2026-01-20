@@ -89,65 +89,98 @@ export function UserConstraintsPanel({ isAdmin, openConfirmation }: UserConstrai
         setModalOpened(true);
     };
 
-    const handleDelete = (item: any) => {
-        const isPreferenceType = item.type === resources.constraintTypes.preference;
-        openConfirmation({
-            title: isPreferenceType ? resources.deleteMessages.deletePreference : resources.deleteMessages.deleteConstraint,
-            message: isPreferenceType ? resources.deleteMessages.confirmDeletePreference : resources.deleteMessages.confirmDeleteConstraint,
-            onConfirm: async () => {
-                if (isPreferenceType) {
-                    await deleteUserPreference(item.id);
-                } else {
-                    await deleteUserConstraint(item.id);
-                }
-
-                // Refetch data to update the table immediately
-                if (isAdmin) {
-                    if (isPreferenceType) {
-                        await fetchUserPreferences();
-                    } else {
-                        await fetchUserConstraints();
-                    }
-                } else if (currentUserId) {
-                    if (isPreferenceType) {
-                        await fetchUserPreferencesByUser(currentUserId);
-                    } else {
-                        await fetchUserConstraintsByUser(currentUserId);
-                    }
-                }
-            },
-        });
-    };
-
-    const handleSubmit = async (values: any) => {
-        if (editingItem) {
-            if (isPreference) {
-                await updateUserPreference(editingItem.userId, editingItem.schedulingPeriodId, editingItem.key, { value: values.value });
-            } else {
-                await updateUserConstraint(editingItem.id, values);
-            }
-        } else if (isPreference) {
-            await createUserPreference(values);
-        } else {
-            await createUserConstraint(values);
-        }
-
-        // Refetch data to update the table immediately
+    const refetchData = async (isPreferenceType: boolean) => {
         if (isAdmin) {
-            if (isPreference) {
+            if (isPreferenceType) {
                 await fetchUserPreferences();
             } else {
                 await fetchUserConstraints();
             }
         } else if (currentUserId) {
-            if (isPreference) {
+            if (isPreferenceType) {
                 await fetchUserPreferencesByUser(currentUserId);
             } else {
                 await fetchUserConstraintsByUser(currentUserId);
             }
         }
+    };
 
-        setModalOpened(false);
+    const handleDelete = (item: any) => {
+        const isPreferenceType = item.type === resources.constraintTypes.preference;
+        const title = isPreferenceType ? resources.deleteMessages.deletePreference : resources.deleteMessages.deleteConstraint;
+        const message = isPreferenceType ? resources.deleteMessages.confirmDeletePreference : resources.deleteMessages.confirmDeleteConstraint;
+
+        openConfirmation({
+            title,
+            message,
+            onConfirm: async () => {
+                try {
+                    if (isPreferenceType) {
+                        await deleteUserPreference(item.id);
+                    } else {
+                        await deleteUserConstraint(item.id);
+                    }
+
+                    await refetchData(isPreferenceType);
+
+                    const itemType = isPreferenceType ? "preference" : "constraint";
+                    $app.notifications.showSuccess(
+                        "Deleted",
+                        `The ${itemType} has been deleted successfully`
+                    );
+                } catch (error) {
+                    $app.logger.error("[UserConstraintsPanel] Error deleting constraint/preference:", error);
+                    $app.notifications.showError(
+                        "Failed to Delete",
+                        error instanceof Error ? error.message : "An unexpected error occurred"
+                    );
+                }
+            },
+        });
+    };
+
+    const performUpdate = async (values: any) => {
+        if (isPreference) {
+            await updateUserPreference(editingItem.userId, editingItem.schedulingPeriodId, editingItem.key, { value: values.value });
+        } else {
+            await updateUserConstraint(editingItem.id, values);
+        }
+    };
+
+    const performCreate = async (values: any) => {
+        if (isPreference) {
+            await createUserPreference(values);
+        } else {
+            await createUserConstraint(values);
+        }
+    };
+
+    const handleSubmit = async (values: any) => {
+        try {
+            if (editingItem) {
+                await performUpdate(values);
+            } else {
+                await performCreate(values);
+            }
+
+            await refetchData(isPreference);
+
+            const isUpdate = !!editingItem;
+            const itemType = isPreference ? "preference" : "constraint";
+            const action = isUpdate ? "updated" : "created";
+            const title = isUpdate ? "Updated" : "Created";
+            const message = `The ${itemType} has been ${action} successfully`;
+
+            $app.notifications.showSuccess(title, message);
+
+            setModalOpened(false);
+        } catch (error) {
+            $app.logger.error("[UserConstraintsPanel] Error saving constraint/preference:", error);
+            $app.notifications.showError(
+                "Failed to Save",
+                error instanceof Error ? error.message : "An unexpected error occurred"
+            );
+        }
     };
 
     if (isLoading && enrichedData.length === 0 && !modalOpened) {

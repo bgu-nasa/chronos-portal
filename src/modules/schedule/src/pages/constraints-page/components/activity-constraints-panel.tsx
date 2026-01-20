@@ -67,18 +67,49 @@ export function ActivityConstraintsPanel({ openConfirmation }: Readonly<Omit<Act
             title: resources.deleteMessages.deleteActivityConstraint,
             message: resources.deleteMessages.confirmDeleteActivityConstraint,
             onConfirm: async () => {
-                await deleteActivityConstraint(item.id);
+                try {
+                    await deleteActivityConstraint(item.id);
+
+                    // Show success notification
+                    $app.notifications.showSuccess(
+                        "Deleted",
+                        "The activity constraint has been deleted successfully"
+                    );
+                } catch (error) {
+                    $app.logger.error("[ActivityConstraintsPanel] Error deleting constraint:", error);
+                    $app.notifications.showError(
+                        "Failed to Delete",
+                        error instanceof Error ? error.message : "An unexpected error occurred"
+                    );
+                }
             },
         });
     };
 
     const handleSubmit = async (values: any) => {
-        if (editingItem) {
-            await updateActivityConstraint(editingItem.id, values);
-        } else {
-            await createActivityConstraint(values);
+        try {
+            if (editingItem) {
+                await updateActivityConstraint(editingItem.id, values);
+            } else {
+                await createActivityConstraint(values);
+            }
+
+            // Show success notification
+            $app.notifications.showSuccess(
+                editingItem ? "Constraint Updated" : "Constraint Created",
+                editingItem
+                    ? "The activity constraint has been updated successfully"
+                    : "The activity constraint has been created successfully"
+            );
+
+            setModalOpened(false);
+        } catch (error) {
+            $app.logger.error("[ActivityConstraintsPanel] Error saving constraint:", error);
+            $app.notifications.showError(
+                "Failed to Save Constraint",
+                error instanceof Error ? error.message : "An unexpected error occurred"
+            );
         }
-        setModalOpened(false);
     };
 
     if (isLoading && enrichedData.length === 0 && !modalOpened) {

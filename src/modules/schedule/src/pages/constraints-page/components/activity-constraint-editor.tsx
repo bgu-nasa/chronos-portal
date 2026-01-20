@@ -150,32 +150,40 @@ export function ActivityConstraintEditor({
             return;
         }
 
-        // Serialize form data based on constraint type
-        let serializedValue = "";
+        try {
+            // Serialize form data based on constraint type
+            let serializedValue = "";
 
-        if (formValues.key === "required_capacity") {
-            serializedValue = serializeRequiredCapacity(capacityData);
-        } else if (formValues.key === "location_preference") {
-            serializedValue = serializeCommaSeparated(locationValues);
-        } else if (formValues.key === "compatible_resource_types") {
-            serializedValue = serializeCommaSeparated(resourceTypeValues);
+            if (formValues.key === "required_capacity") {
+                serializedValue = serializeRequiredCapacity(capacityData);
+            } else if (formValues.key === "location_preference") {
+                serializedValue = serializeCommaSeparated(locationValues);
+            } else if (formValues.key === "compatible_resource_types") {
+                serializedValue = serializeCommaSeparated(resourceTypeValues);
+            }
+
+            await onSubmit({
+                ...formValues,
+                value: serializedValue,
+            });
+
+            // Reset form
+            setFormValues({
+                activityId: "",
+                key: "",
+            });
+            setFormErrors({});
+            setCapacityData({});
+            setLocationValues([]);
+            setResourceTypeValues([]);
+            onClose();
+        } catch (error) {
+            $app.logger.error("[ActivityConstraintEditor] Error submitting constraint:", error);
+            $app.notifications.showError(
+                "Failed to Save Constraint",
+                error instanceof Error ? error.message : "An unexpected error occurred"
+            );
         }
-
-        await onSubmit({
-            ...formValues,
-            value: serializedValue,
-        });
-
-        // Reset form
-        setFormValues({
-            activityId: "",
-            key: "",
-        });
-        setFormErrors({});
-        setCapacityData({});
-        setLocationValues([]);
-        setResourceTypeValues([]);
-        onClose();
     };
 
     // Handle form submission with validation
