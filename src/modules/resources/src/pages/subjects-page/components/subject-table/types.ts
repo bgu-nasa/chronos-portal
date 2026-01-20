@@ -4,6 +4,5 @@ export type SubjectData = {
     name: string;
     departmentId: string;
     departmentName: string;
-    organizationName: string;
     schedulingPeriodId: string;
 };

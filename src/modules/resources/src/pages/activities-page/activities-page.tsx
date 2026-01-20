@@ -223,14 +223,7 @@ export function ActivitiesPage() {
     return (
         <Container size="xl" py="xl">
             <div className={styles.container}>
-                <div className={styles.header}>
-                    <div>
-                        <Title order={1}>{resources.title}</Title>
-                    </div>
-                    <Button variant="outline" onClick={handleBackClick}>
-                        {resources.backToSubjects}
-                    </Button>
-                </div>
+                <Title order={1}>{resources.title}</Title>
                 <Divider className={styles.divider} />
 
                 <Group justify="space-between" mb="md">
@@ -240,8 +233,8 @@ export function ActivitiesPage() {
                         onEditClick={handleEditClick}
                         onDeleteClick={handleDeleteClick}
                     />
-                    <Button variant="default" onClick={handleBackClick}>
-                        Back to Subjects
+                    <Button variant="outline" onClick={handleBackClick}>
+                        {resources.backToSubjects}
                     </Button>
                 </Group>
 

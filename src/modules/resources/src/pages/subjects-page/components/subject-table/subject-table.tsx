@@ -50,7 +50,6 @@ export function SubjectTable({
             }}
         >
             <Column selectionMode="single" headerStyle={{ width: "3rem" }} />
-            <Column field="organizationName" header={resources.organizationColumn} sortable />
             <Column field="departmentName" header={resources.departmentColumn} sortable />
             <Column field="code" header={resources.codeColumn} sortable />
             <Column field="name" header={resources.nameColumn} sortable />

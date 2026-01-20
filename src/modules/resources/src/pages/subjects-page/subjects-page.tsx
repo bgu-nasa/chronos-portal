@@ -17,6 +17,7 @@ import {
 } from "@/modules/resources/src/hooks";
 import resources from "./subjects-page.resources.json";
 import styles from "./subjects-page.module.css";
+import { $app } from "@/infra/service";
 
 export function SubjectsPage() {
     const navigate = useNavigate();
@@ -45,6 +46,7 @@ export function SubjectsPage() {
         
         if (!filters.departmentId) {
             $app.logger.warn("[SubjectsPage] Department ID is required for search");
+            $app.notifications.showWarning("Department Required", "Please select a department to search for courses");
             return;
         }
 
@@ -54,17 +56,12 @@ export function SubjectsPage() {
     };
 
     const handleClearFilters = () => {
-        // Refetch without filters
-        if (currentDepartmentId) {
-            fetchSubjects();
-        }
+        // Reset all state - clear department context and selected subject
+        setCurrentDepartmentId(null);
+        setSelectedSubject(null);
     };
 
     const handleCreateClick = () => {
-        if (!currentDepartmentId) {
-            $app.notifications.showWarning("Warning", "Please search for a department first");
-            return;
-        }
         setCreateModalOpened(true);
     };
 
@@ -183,16 +180,18 @@ export function SubjectsPage() {
     };
 
     // Convert SubjectResponse to SubjectData with display names
-    // TODO: Fetch actual organization and department names from backend
-    const subjectData: SubjectData[] = subjects.map((subject) => ({
-        id: subject.id,
-        code: subject.code,
-        name: subject.name,
-        organizationName: "Organization", // TODO: Fetch from backend
-        departmentName: "Department", // TODO: Fetch from backend
-        departmentId: subject.departmentId,
-        schedulingPeriodId: subject.schedulingPeriodId,
-    }));
+    // Only show subjects if department context is set
+    // TODO: Fetch actual department names from backend
+    const subjectData: SubjectData[] = currentDepartmentId
+        ? subjects.map((subject) => ({
+            id: subject.id,
+            code: subject.code,
+            name: subject.name,
+            departmentName: "Department", // TODO: Fetch from backend
+            departmentId: subject.departmentId,
+            schedulingPeriodId: subject.schedulingPeriodId,
+        }))
+        : [];
 
     return (
         <Container size="xl" py="xl">
@@ -211,6 +210,7 @@ export function SubjectsPage() {
                     onEditClick={handleEditClick}
                     onDeleteClick={handleDeleteClick}
                     onViewActivitiesClick={handleViewActivitiesClick}
+                    hasDepartmentContext={!!currentDepartmentId}
                 />
 
                 <SubjectTable
