@@ -11,6 +11,7 @@ import type {
     RoleAssignmentRequest,
     RoleAssignmentResponse,
 } from "@/modules/management/src/data/role.types";
+import type { ApiError } from "@/infra/service/ajax/types";
 
 interface RoleStore {
     // State - using UserRoleAssignmentSummary as primary data type
@@ -43,18 +44,24 @@ export const useRoleStore = create<RoleStore>((set, get) => ({
             const data = await roleDataRepository.getRoleAssignmentsSummary();
             set({ roleAssignments: data, isLoading: false });
         } catch (err) {
+            const apiError = err as ApiError;
             const errorMessage =
-                err instanceof Error
-                    ? err.message
-                    : "Failed to fetch role assignments";
+                apiError.message || "Failed to fetch role assignments";
             set({ error: errorMessage, isLoading: false });
             $app.logger.error("Error fetching role assignments:", err);
+            $app.notifications.showError(
+                "Failed to fetch role assignments",
+                apiError.details ? String(apiError.details) : undefined,
+            );
         }
     },
 
     // Create a role assignment and refetch
     createRoleAssignment: async (request: RoleAssignmentRequest) => {
         set({ isLoading: true, error: null });
+        const loadingNotification = $app.notifications.showLoading(
+            "Creating role assignment...",
+        );
         try {
             const newAssignment =
                 await roleDataRepository.createRoleAssignment(request);
@@ -63,14 +70,22 @@ export const useRoleStore = create<RoleStore>((set, get) => ({
             // Refetch to update the list
             await get().fetchRoleAssignments();
 
+            $app.notifications.remove(loadingNotification);
+            $app.notifications.showSuccess(
+                "Role assignment created successfully",
+            );
             return newAssignment;
         } catch (err) {
+            const apiError = err as ApiError;
             const errorMessage =
-                err instanceof Error
-                    ? err.message
-                    : "Failed to create role assignment";
+                apiError.message || "Failed to create role assignment";
             set({ error: errorMessage, isLoading: false });
             $app.logger.error("Error creating role assignment:", err);
+            $app.notifications.remove(loadingNotification);
+            $app.notifications.showError(
+                "Failed to create role assignment",
+                apiError.details ? String(apiError.details) : undefined,
+            );
             return null;
         }
     },
@@ -78,6 +93,9 @@ export const useRoleStore = create<RoleStore>((set, get) => ({
     // Remove a role assignment and refetch
     removeRoleAssignment: async (roleAssignmentId: string) => {
         set({ isLoading: true, error: null });
+        const loadingNotification = $app.notifications.showLoading(
+            "Removing role assignment...",
+        );
         try {
             await roleDataRepository.removeRoleAssignment(roleAssignmentId);
             set({ isLoading: false });
@@ -85,14 +103,22 @@ export const useRoleStore = create<RoleStore>((set, get) => ({
             // Refetch to update the list
             await get().fetchRoleAssignments();
 
+            $app.notifications.remove(loadingNotification);
+            $app.notifications.showSuccess(
+                "Role assignment removed successfully",
+            );
             return true;
         } catch (err) {
+            const apiError = err as ApiError;
             const errorMessage =
-                err instanceof Error
-                    ? err.message
-                    : "Failed to remove role assignment";
+                apiError.message || "Failed to remove role assignment";
             set({ error: errorMessage, isLoading: false });
             $app.logger.error("Error removing role assignment:", err);
+            $app.notifications.remove(loadingNotification);
+            $app.notifications.showError(
+                "Failed to remove role assignment",
+                apiError.details ? String(apiError.details) : undefined,
+            );
             return false;
         }
     },
