@@ -10,3 +10,7 @@ export * from "./scheduling-period-repository";
 // Department
 export * from "./department.types";
 export * from "./department-repository";
+
+// User
+export * from "./user.types";
+export * from "./user-repository";
