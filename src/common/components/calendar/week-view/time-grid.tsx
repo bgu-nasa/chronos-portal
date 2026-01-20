@@ -1,26 +1,36 @@
 /** @author noamarg */
 import React from 'react';
 import { Box, ScrollArea } from '@mantine/core';
-import { TimeColumn } from './time-column';
-import { DayColumn } from './day-column';
+
 import type { CalendarEvent } from "@/common/types";
 
+import { TimeColumn, DayColumn } from './';
 import styles from './time-grid.module.css';
+
+interface ConstraintVisualization {
+  weekday: string;
+  startTime: string;
+  endTime: string;
+}
 
 interface TimeGridProps {
   weekDates: Date[];
   events: CalendarEvent[];
+  constraints?: ConstraintVisualization[];
   hourHeight?: number;
   dayStartHour?: number;
   hoursPerDay?: number;
+  onTimeRangeSelect?: (selection: { date: Date; startTime: string; endTime: string }) => void;
 }
 
 export const TimeGrid: React.FC<TimeGridProps> = ({
   weekDates,
   events,
+  constraints = [],
   hourHeight,
   dayStartHour = 0,
-  hoursPerDay = 24
+  hoursPerDay = 24,
+  onTimeRangeSelect
 }) => {
   return (
     <ScrollArea className={styles.scrollArea} type="auto">
@@ -36,9 +46,11 @@ export const TimeGrid: React.FC<TimeGridProps> = ({
             key={date.toISOString()}
             date={date}
             events={events}
+            constraints={constraints}
             hourHeight={hourHeight}
             dayStartHour={dayStartHour}
             hoursPerDay={hoursPerDay}
+            onTimeRangeSelect={onTimeRangeSelect}
           />
         ))}
       </Box>

@@ -1,6 +1,6 @@
 import { useMemo } from "react";
 import { Paper, Text, Group, Stack, Badge } from "@mantine/core";
-import { Weekday, WeekdayOrder } from "@/modules/schedule/src/data/slot.types";
+import { WeekdayOrder } from "@/modules/schedule/src/data/slot.types";
 import type { SlotResponse } from "@/modules/schedule/src/data/slot.types";
 import resources from "@/modules/schedule/src/pages/slots-page/slots-page.resources.json";
 

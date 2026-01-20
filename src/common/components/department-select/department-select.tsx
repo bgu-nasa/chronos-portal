@@ -21,6 +21,8 @@ interface DepartmentSelectProps {
     error?: string;
     clearable?: boolean;
     includeDeleted?: boolean; // Whether to show deleted departments
+    style?: React.CSSProperties;
+    className?: string;
 }
 
 interface DepartmentSelectItemProps
@@ -56,6 +58,8 @@ export function DepartmentSelect({
     error,
     clearable = true,
     includeDeleted = false,
+    style,
+    className,
 }: DepartmentSelectProps) {
     const [departments, setDepartments] = useState<Department[]>([]);
 
@@ -91,6 +95,8 @@ export function DepartmentSelect({
             required={required}
             error={error}
             clearable={clearable}
+            style={style}
+            className={className}
             searchable
             nothingFoundMessage="No departments found"
             renderOption={(item) => (
