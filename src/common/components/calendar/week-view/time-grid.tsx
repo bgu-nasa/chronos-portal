@@ -7,9 +7,16 @@ import type { CalendarEvent } from "@/common/types";
 import { TimeColumn, DayColumn } from './';
 import styles from './time-grid.module.css';
 
+interface ConstraintVisualization {
+  weekday: string;
+  startTime: string;
+  endTime: string;
+}
+
 interface TimeGridProps {
   weekDates: Date[];
   events: CalendarEvent[];
+  constraints?: ConstraintVisualization[];
   hourHeight?: number;
   dayStartHour?: number;
   hoursPerDay?: number;
@@ -19,6 +26,7 @@ interface TimeGridProps {
 export const TimeGrid: React.FC<TimeGridProps> = ({
   weekDates,
   events,
+  constraints = [],
   hourHeight,
   dayStartHour = 0,
   hoursPerDay = 24,
@@ -38,6 +46,7 @@ export const TimeGrid: React.FC<TimeGridProps> = ({
             key={date.toISOString()}
             date={date}
             events={events}
+            constraints={constraints}
             hourHeight={hourHeight}
             dayStartHour={dayStartHour}
             hoursPerDay={hoursPerDay}

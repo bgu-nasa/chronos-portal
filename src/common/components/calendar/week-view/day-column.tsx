@@ -6,6 +6,7 @@ import { useInterval } from '@mantine/hooks';
 import type { CalendarEvent } from "@/common/types";
 
 import { EventItem } from './event-item';
+import { ConstraintItem } from './constraint-item';
 import styles from './day-column.module.css';
 import resources from './day-column.resources.json';
 
@@ -14,9 +15,16 @@ interface TimeRangeSelection {
   endTime: number; // minutes from dayStartHour
 }
 
+interface ConstraintVisualization {
+  weekday: string;
+  startTime: string;
+  endTime: string;
+}
+
 interface DayColumnProps {
   date: Date;
   events: CalendarEvent[];
+  constraints?: ConstraintVisualization[];
   hourHeight?: number;
   dayStartHour?: number;
   hoursPerDay?: number;
@@ -26,6 +34,7 @@ interface DayColumnProps {
 export const DayColumn: React.FC<DayColumnProps> = ({
   date,
   events,
+  constraints = [],
   hourHeight = 60,
   dayStartHour = 8,
   hoursPerDay = 24,
@@ -219,6 +228,14 @@ export const DayColumn: React.FC<DayColumnProps> = ({
   const selectionTop = selection ? getYFromTime(Math.min(selection.startTime, selection.endTime)) : null;
   const selectionHeight = selection ? Math.abs(selection.endTime - selection.startTime) / 60 * hourHeight : null;
 
+  // Get weekday name for this column
+  const weekdayName = date.toLocaleDateString('en-US', { weekday: 'long' });
+
+  // Filter constraints for this weekday
+  const dailyConstraints = useMemo(() => {
+    return constraints.filter(c => c.weekday === weekdayName);
+  }, [constraints, weekdayName]);
+
   return (
     <Box
       ref={columnRef}
@@ -249,6 +266,16 @@ export const DayColumn: React.FC<DayColumnProps> = ({
           }}
         />
       )}
+
+      {dailyConstraints.map((constraint, index) => (
+        <ConstraintItem
+          key={`constraint-${index}-${constraint.startTime}-${constraint.endTime}`}
+          startTime={constraint.startTime}
+          endTime={constraint.endTime}
+          hourHeight={hourHeight}
+          dayStartHour={dayStartHour}
+        />
+      ))}
 
       {positionedEvents.map((event) => (
         <EventItem

@@ -1,12 +1,13 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { Box, Flex, Paper } from "@mantine/core";
 
 import { $app } from "@/infra/service";
 import { WeekView } from "@/common/components/calendar";
-import { useUserConstraints } from "@/modules/schedule/src/hooks";
-import { serializeForbiddenTimeRange, type ForbiddenTimeRangeEntry } from "@/modules/schedule/src/pages/constraints-page/utils";
+import { useUsers } from "@/modules/auth/src/hooks";
+import { useUserConstraints, useSchedulingPeriods } from "@/modules/schedule/src/hooks";
+import { serializeForbiddenTimeRange, parseForbiddenTimeRange, type ForbiddenTimeRangeEntry } from "@/modules/schedule/src/pages/constraints-page/utils";
 
-import { SchedulingPeriodSelect, TimeRangeSelectionModal } from "./components";
+import { SchedulingPeriodSelect, TimeRangeSelectionModal, UserSelect } from "./components";
 import styles from "./calendar-page.module.css";
 
 interface TimeRangeSelection {
@@ -17,19 +18,105 @@ interface TimeRangeSelection {
 
 export function CalendarPage() {
   const [selectedPeriodId, setSelectedPeriodId] = useState<string | null>(null);
+  const [selectedUserId, setSelectedUserId] = useState<string | null>(null);
   const [timeRangeSelection, setTimeRangeSelection] = useState<TimeRangeSelection | null>(null);
   const [modalOpened, setModalOpened] = useState(false);
   const [currentUserId, setCurrentUserId] = useState<string>("");
+  const [isAdmin, setIsAdmin] = useState(false);
 
-  const { createUserConstraint, isLoading } = useUserConstraints();
+  const { createUserConstraint, fetchUserConstraintsByUser, userConstraints, isLoading } = useUserConstraints();
+  const { schedulingPeriods, fetchSchedulingPeriods } = useSchedulingPeriods();
+  const { fetchUsers } = useUsers();
 
+  // Initialize user and admin status
   useEffect(() => {
     const org = $app.organization.getOrganization();
     const userId = org?.userRoles?.[0]?.userId;
+    const userIsAdmin = $app.organization.isAdministrator();
+    
     if (userId) {
       setCurrentUserId(userId);
+      // For non-admin users, set and lock the user selection
+      if (!userIsAdmin) {
+        setSelectedUserId(userId);
+      }
     }
-  }, []);
+    setIsAdmin(userIsAdmin);
+
+    // Fetch all users if admin
+    if (userIsAdmin) {
+      fetchUsers();
+    }
+  }, [fetchUsers]);
+
+  // Fetch scheduling periods and set default
+  useEffect(() => {
+    fetchSchedulingPeriods();
+  }, [fetchSchedulingPeriods]);
+
+  // Set default scheduling period to the most current active one
+  useEffect(() => {
+    if (schedulingPeriods.length > 0 && !selectedPeriodId) {
+      const now = new Date();
+      now.setHours(0, 0, 0, 0);
+
+      // Filter out ended periods (toDate < today)
+      const activePeriods = schedulingPeriods.filter((period) => {
+        const toDate = new Date(period.toDate);
+        toDate.setHours(0, 0, 0, 0);
+        return toDate >= now;
+      });
+
+      if (activePeriods.length > 0) {
+        // Sort by fromDate ascending and pick the one with the earliest start time
+        const sortedPeriods = [...activePeriods].sort((a, b) => {
+          const dateA = new Date(a.fromDate).getTime();
+          const dateB = new Date(b.fromDate).getTime();
+          return dateA - dateB;
+        });
+
+        setSelectedPeriodId(sortedPeriods[0].id);
+      }
+    }
+  }, [schedulingPeriods, selectedPeriodId]);
+
+  // Fetch constraints based on user role and selection
+  useEffect(() => {
+    if (isAdmin && selectedUserId) {
+      fetchUserConstraintsByUser(selectedUserId);
+    } else if (!isAdmin && currentUserId) {
+      fetchUserConstraintsByUser(currentUserId);
+    }
+  }, [isAdmin, selectedUserId, currentUserId, fetchUserConstraintsByUser]);
+
+  // Convert constraints to visualizations
+  const constraintVisualizations = useMemo(() => {
+    if (isAdmin && !selectedUserId) {
+      return [];
+    }
+
+    const userIdToShow = isAdmin ? selectedUserId : currentUserId;
+    if (!userIdToShow || !selectedPeriodId) {
+      return [];
+    }
+
+    // Filter constraints for the selected user and period
+    const relevantConstraints = userConstraints.filter(
+      (c) => c.userId === userIdToShow &&
+        c.schedulingPeriodId === selectedPeriodId &&
+        c.key === "forbidden_timerange"
+    );
+
+    // Parse and flatten all constraint entries
+    const visualizations: Array<{ weekday: string; startTime: string; endTime: string }> = [];
+
+    for (const constraint of relevantConstraints) {
+      const entries = parseForbiddenTimeRange(constraint.value);
+      visualizations.push(...entries);
+    }
+
+    return visualizations;
+  }, [userConstraints, isAdmin, selectedUserId, currentUserId, selectedPeriodId]);
 
   const handleTimeRangeSelect = (selection: { date: Date; startTime: string; endTime: string }) => {
     // Only allow selection if a scheduling period is selected
@@ -66,6 +153,13 @@ export function CalendarPage() {
       value: value,
     });
 
+    // Refresh constraints to show the new one
+    if (isAdmin && selectedUserId) {
+      await fetchUserConstraintsByUser(selectedUserId);
+    } else if (!isAdmin && currentUserId) {
+      await fetchUserConstraintsByUser(currentUserId);
+    }
+
     // Close modal and reset selection
     setModalOpened(false);
     setTimeRangeSelection(null);
@@ -75,10 +169,20 @@ export function CalendarPage() {
     <Flex className={styles.calendarPageContainer} gap="md">
       <Paper withBorder p="md" className={styles.sidebar}>
         <SchedulingPeriodSelect value={selectedPeriodId} onChange={setSelectedPeriodId} />
+        {isAdmin ? (
+          <Box mt="md">
+            <UserSelect value={selectedUserId} onChange={setSelectedUserId} />
+          </Box>
+        ) : (
+          <Box mt="md">
+            <UserSelect value={selectedUserId} onChange={() => { }} disabled />
+          </Box>
+        )}
       </Paper>
       <Box className={styles.content}>
         <WeekView
           events={[]}
+          constraints={constraintVisualizations}
           onTimeRangeSelect={handleTimeRangeSelect}
         />
       </Box>
