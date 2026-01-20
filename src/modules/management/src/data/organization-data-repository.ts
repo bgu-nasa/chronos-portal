@@ -3,8 +3,6 @@
  * Handles organization API calls
  */
 
-import type { OrganizationInfoResponse } from "@/modules/management/src/data/organization.types";
-
 /**
  * Organization repository class
  * Provides methods for organization operations
@@ -29,18 +27,6 @@ export class OrganizationDataRepository {
         return {
             "x-org-id": this.getOrganizationId(),
         };
-    }
-
-    /**
-     * Get organization information
-     * @returns Organization information including user details
-     */
-    async getOrganizationInfo(): Promise<OrganizationInfoResponse> {
-        const response = await $app.ajax.get<OrganizationInfoResponse>(
-            "/api/management/organization/info",
-            { headers: this.getHeaders() },
-        );
-        return response;
     }
 
     /**

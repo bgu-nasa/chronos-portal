@@ -15,3 +15,5 @@ export type {
     RoleAssignmentRequest,
     RoleType,
 } from "@/modules/management/src/data/role.types";
+
+export { organizationDataRepository } from "@/modules/management/src/data/organization-data-repository";
