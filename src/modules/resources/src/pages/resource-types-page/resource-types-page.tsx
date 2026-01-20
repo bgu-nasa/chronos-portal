@@ -6,9 +6,6 @@ import type { UpdateResourceTypeRequest } from "@/modules/resources/src/data";
 import { useResourceTypes, useCreateResourceType, useUpdateResourceType, useDeleteResourceType } from "@/modules/resources/src/hooks";
 import resources from "./resource-types-page.resources.json";
 import styles from "./resource-types-page.module.css";
-import { $app } from "@/infra/service";
-import { showSuccessNotification, showErrorNotification, showWarningNotification } from "../../utils/notification-functions";
-import { ResourceNotifications } from "../../utils/notifications";
 
 export function ResourceTypesPage() {
     const [selectedResourceType, setSelectedResourceType] = useState<ResourceTypeData | null>(null);
@@ -57,16 +54,14 @@ export function ResourceTypesPage() {
 
             if (result) {
                 setCreateModalOpened(false);
-                showSuccessNotification({ message: "Resource type created successfully" });
+                $app.notifications.showSuccess("Success", "Resource type created successfully");
             } else {
                 $app.logger.error("[ResourceTypesPage] Create resource type returned null");
-                showErrorNotification({ message: "Failed to create resource type. Check console for details." });
+                $app.notifications.showError("Error", "Failed to create resource type. Check console for details.");
             }
         } catch (error) {
             $app.logger.error("[ResourceTypesPage] Error creating resource type:", error);
-            showErrorNotification({ 
-                message: `Error creating resource type: ${error instanceof Error ? error.message : "Unknown error"}` 
-            });
+            $app.notifications.showError("Error", `Error creating resource type: ${error instanceof Error ? error.message : "Unknown error"}`);
         }
     };
 
@@ -82,7 +77,7 @@ export function ResourceTypesPage() {
 
         if (!selectedResourceType) {
             $app.logger.error("[ResourceTypesPage] Missing selectedResourceType");
-            showWarningNotification({ message: "Missing resource type context for edit." });
+            $app.notifications.showWarning("Warning", "Missing resource type context for edit.");
             return;
         }
 
@@ -99,16 +94,14 @@ export function ResourceTypesPage() {
             if (success) {
                 setEditModalOpened(false);
                 setSelectedResourceType(null);
-                showSuccessNotification({ message: "Resource type updated successfully" });
+                $app.notifications.showSuccess("Success", "Resource type updated successfully");
             } else {
                 $app.logger.error("[ResourceTypesPage] Update resource type returned false");
-                showErrorNotification({ message: "Failed to update resource type. Check console for details." });
+                $app.notifications.showError("Error", "Failed to update resource type. Check console for details.");
             }
         } catch (error) {
             $app.logger.error("[ResourceTypesPage] Error updating resource type:", error);
-            showErrorNotification({ 
-                message: `Error updating resource type: ${error instanceof Error ? error.message : "Unknown error"}` 
-            });
+            $app.notifications.showError("Error", `Error updating resource type: ${error instanceof Error ? error.message : "Unknown error"}`);
         }
     };
 
@@ -138,7 +131,6 @@ export function ResourceTypesPage() {
 
     return (
         <Container size="xl" py="xl">
-            <ResourceNotifications />
             <div className={styles.container}>
                 <Title order={1}>{resources.title}</Title>
                 <Divider className={styles.divider} />
