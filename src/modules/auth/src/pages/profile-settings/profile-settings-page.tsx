@@ -7,7 +7,6 @@ import {
     Stack,
     Paper,
     Text,
-    Group,
 } from "@mantine/core";
 import { ProfileUpdateForm } from "./components/profile-update-form";
 import { UpdatePasswordModal } from "./components/update-password-modal";

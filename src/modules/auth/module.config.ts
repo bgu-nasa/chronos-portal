@@ -6,7 +6,7 @@ import {
     UsersPage,
     ProfileSettingsPage,
 } from "./src/pages";
-import { UsersIcon, SettingsIcon } from "@/common/icons";
+import { UsersIcon } from "@/common/icons";
 
 export const moduleConfig: ModuleConfig = {
     name: "Auth",
