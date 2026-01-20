@@ -3,22 +3,32 @@
  * Handles both create and edit modes for assignments
  */
 
-import { useEffect, useState } from "react";
-import { Modal, TextInput, Button, Group, Text, Stack } from "@mantine/core";
+import { useEffect, useState, useMemo } from "react";
+import { Modal, Select, TextInput, Button, Group, Text, Stack } from "@mantine/core";
 import { useAssignmentEditorStore } from "@/modules/schedule/src/stores/assignment-editor.store";
 import {
     useCreateAssignment,
     useUpdateAssignment,
 } from "@/modules/schedule/src/hooks/use-assignments";
+import { useResources } from "@/modules/schedule/src/hooks/use-resources";
 
 export function AssignmentEditor() {
     const { isOpen, mode, assignment, slotId, close } = useAssignmentEditorStore();
     const { createAssignment, isLoading: isCreating, error: createError, clearError: clearCreateError } = useCreateAssignment();
     const { updateAssignment, isLoading: isUpdating, error: updateError, clearError: clearUpdateError } = useUpdateAssignment();
+    const { resources, isLoading: isLoadingResources } = useResources();
 
-    const [resourceId, setResourceId] = useState("");
+    const [resourceId, setResourceId] = useState<string | null>(null);
     const [activityId, setActivityId] = useState("");
     const [errors, setErrors] = useState<Record<string, string>>({});
+
+    // Transform resources to Select options - show Location / Identifier, value is ID
+    const resourceOptions = useMemo(() => {
+        return resources.map((resource) => ({
+            value: resource.id,
+            label: `${resource.location} / ${resource.identifier}`,
+        }));
+    }, [resources]);
 
     // Reset form when modal opens/closes or assignment changes
     useEffect(() => {
@@ -31,7 +41,7 @@ export function AssignmentEditor() {
                 setResourceId(assignment.resourceId);
                 setActivityId(assignment.activityId);
             } else {
-                setResourceId("");
+                setResourceId(null);
                 setActivityId("");
             }
         }
@@ -39,8 +49,8 @@ export function AssignmentEditor() {
 
     const validate = () => {
         const newErrors: Record<string, string> = {};
-        if (!resourceId.trim()) {
-            newErrors.resourceId = "Resource ID is required";
+        if (!resourceId) {
+            newErrors.resourceId = "Resource is required";
         }
         if (!activityId.trim()) {
             newErrors.activityId = "Activity ID is required";
@@ -56,16 +66,16 @@ export function AssignmentEditor() {
 
         let success = false;
 
-        if (mode === "create" && slotId) {
+        if (mode === "create" && slotId && resourceId) {
             const result = await createAssignment({
                 slotId,
-                resourceId: resourceId.trim(),
+                resourceId,
                 activityId: activityId.trim(),
             });
             success = result !== null;
-        } else if (mode === "edit" && assignment) {
+        } else if (mode === "edit" && assignment && resourceId) {
             success = await updateAssignment(assignment.id, {
-                resourceId: resourceId.trim(),
+                resourceId,
                 activityId: activityId.trim(),
             });
         }
@@ -77,7 +87,7 @@ export function AssignmentEditor() {
 
     const handleClose = () => {
         close();
-        setResourceId("");
+        setResourceId(null);
         setActivityId("");
         setErrors({});
         clearCreateError();
@@ -93,12 +103,19 @@ export function AssignmentEditor() {
         <Modal opened={isOpen} onClose={handleClose} title={title} centered size="md">
             <form onSubmit={handleSubmit}>
                 <Stack gap="md">
-                    <TextInput
-                        label="Resource ID"
-                        placeholder="Enter resource ID"
+                    <Select
+                        label="Resource (Location)"
+                        placeholder={
+                            isLoadingResources
+                                ? "Loading resources..."
+                                : resourceOptions.length === 0
+                                    ? "There are no resources yet"
+                                    : "Select a resource"
+                        }
+                        data={resourceOptions}
                         value={resourceId}
-                        onChange={(e) => {
-                            setResourceId(e.currentTarget.value);
+                        onChange={(value) => {
+                            setResourceId(value);
                             setErrors((prev) => {
                                 const { resourceId: _, ...rest } = prev;
                                 return rest;
@@ -106,7 +123,9 @@ export function AssignmentEditor() {
                         }}
                         error={errors.resourceId}
                         required
-                        disabled={isLoading}
+                        disabled={isLoading || isLoadingResources || resourceOptions.length === 0}
+                        searchable
+                        clearable
                         data-autofocus
                     />
 

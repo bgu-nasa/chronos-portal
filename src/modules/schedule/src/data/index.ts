@@ -4,3 +4,5 @@ export * from "./slot.types";
 export * from "./slot-data-repository";
 export * from "./assignment.types";
 export * from "./assignment-data-repository";
+export * from "./resource.types";
+export * from "./resource-data-repository";
