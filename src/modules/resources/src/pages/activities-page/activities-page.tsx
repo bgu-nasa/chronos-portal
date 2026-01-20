@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Container, Divider, Title, Button, Alert, Text, Group } from "@mantine/core";
+import { Container, Divider, Title, Button, Text, Group } from "@mantine/core";
 import { useNavigate, useSearchParams } from "react-router";
 import { ConfirmationDialog, useConfirmation } from "@/common";
 import { ActivityActions } from "./components/activity-actions";

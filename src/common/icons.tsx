@@ -13,6 +13,7 @@ import {
     HiOutlineCalendar,
     HiOutlineCog,
     HiOutlineLogout,
+    HiOutlineAdjustments,
 } from "react-icons/hi";
 
 // Alert icons
@@ -34,6 +35,7 @@ export const AccessControlIcon = HiOutlineLockOpen;
 export const ScheduleIcon = HiOutlineCalendar;
 export const SchedulingPeriodsIcon = HiOutlineCalendar;
 export const CalendarIcon = HiOutlineCalendar;
+export const ConstraintsIcon = HiOutlineAdjustments;
 
 // User Menu Icons
 export const SettingsIcon = HiOutlineCog;

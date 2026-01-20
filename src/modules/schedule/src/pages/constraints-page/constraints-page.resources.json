@@ -1,0 +1,17 @@
+{
+    "title": "Constraints",
+    "userConstraintsTab": "User Constraints / Preferences",
+    "activityConstraintsTab": "Activity Constraints",
+    "organizationConstraintsTab": "Organization Constraints",
+    "createConstraintButton": "Create Constraint",
+    "createPreferenceButton": "Create Preference",
+    "createButton": "Create",
+    "editButton": "Edit",
+    "deleteButton": "Delete",
+    "deleteConfirmTitle": "Delete Constraint",
+    "deleteConfirmMessage": "Are you sure you want to delete this constraint? This action cannot be undone.",
+    "deleteConfirmButton": "Delete",
+    "deleteCancelButton": "Cancel",
+    "noConstraintsMessage": "No constraints found",
+    "loadingMessage": "Loading constraints..."
+}
