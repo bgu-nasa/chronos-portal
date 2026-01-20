@@ -42,3 +42,19 @@
   border-radius: 50%;
   background-color: var(--mantine-color-red-6);
 }
+
+.selecting {
+  cursor: crosshair;
+}
+
+.timeSelection {
+  position: absolute;
+  left: 0;
+  right: 0;
+  background-color: var(--mantine-color-blue-3);
+  opacity: 0.4;
+  border: 2px solid var(--mantine-color-blue-6);
+  border-radius: 4px;
+  z-index: 5;
+  pointer-events: none;
+}

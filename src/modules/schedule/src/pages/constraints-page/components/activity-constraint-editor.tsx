@@ -8,9 +8,10 @@ import { useForm } from "@mantine/form";
 import { useActivities, useSubjects } from "@/modules/resources/src/hooks";
 
 import resources from "../constraints-page.resources.json";
-import { parseRequiredCapacity, parseCommaSeparated } from "../utils/constraint-value-parser";
-import { serializeRequiredCapacity, serializeCommaSeparated } from "../utils/constraint-value-serializer";
-import type { RequiredCapacityFormData } from "../utils/constraint-value-parser";
+import {
+    parseRequiredCapacity, parseCommaSeparated, serializeRequiredCapacity,
+    serializeCommaSeparated, type RequiredCapacityFormData
+} from "../utils";
 
 interface ActivityConstraintEditorProps {
     readonly opened: boolean;

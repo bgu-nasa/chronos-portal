@@ -1,12 +1,18 @@
 /** @author noamarg */
-import React, { useMemo, useState, useEffect } from 'react';
+import React, { useMemo, useState, useEffect, useRef, useCallback } from 'react';
 import { Box } from '@mantine/core';
 import { useInterval } from '@mantine/hooks';
-import type { CalendarEvent } from "@/common/types";
-import { EventItem } from './event-item';
 
+import type { CalendarEvent } from "@/common/types";
+
+import { EventItem } from './event-item';
 import styles from './day-column.module.css';
 import resources from './day-column.resources.json';
+
+interface TimeRangeSelection {
+  startTime: number; // minutes from dayStartHour
+  endTime: number; // minutes from dayStartHour
+}
 
 interface DayColumnProps {
   date: Date;
@@ -14,6 +20,7 @@ interface DayColumnProps {
   hourHeight?: number;
   dayStartHour?: number;
   hoursPerDay?: number;
+  onTimeRangeSelect?: (selection: { date: Date; startTime: string; endTime: string }) => void;
 }
 
 export const DayColumn: React.FC<DayColumnProps> = ({
@@ -21,9 +28,15 @@ export const DayColumn: React.FC<DayColumnProps> = ({
   events,
   hourHeight = 60,
   dayStartHour = 8,
-  hoursPerDay = 24
+  hoursPerDay = 24,
+  onTimeRangeSelect
 }) => {
   const [now, setNow] = useState(new Date());
+  const [isSelecting, setIsSelecting] = useState(false);
+  const [selection, setSelection] = useState<TimeRangeSelection | null>(null);
+  const originalStartTimeRef = useRef<number | null>(null);
+  const currentEndTimeRef = useRef<number | null>(null);
+  const columnRef = useRef<HTMLDivElement>(null);
 
   const interval = useInterval(() => setNow(new Date()), resources.intervals.nowUpdate);
 
@@ -33,6 +46,119 @@ export const DayColumn: React.FC<DayColumnProps> = ({
   }, [interval]);
 
   const isToday = date.toDateString() === now.toDateString();
+
+  // Snap time to nearest 30-minute interval
+  const snapToHalfHour = useCallback((minutes: number): number => {
+    return Math.round(minutes / 30) * 30;
+  }, []);
+
+  // Convert Y position to time in minutes from dayStartHour
+  const getTimeFromY = useCallback((y: number): number => {
+    const minutes = (y / hourHeight) * 60;
+    return Math.max(0, Math.min(hoursPerDay * 60, snapToHalfHour(minutes)));
+  }, [hourHeight, hoursPerDay, snapToHalfHour]);
+
+  // Convert time in minutes to Y position
+  const getYFromTime = useCallback((minutes: number): number => {
+    return (minutes / 60) * hourHeight;
+  }, [hourHeight]);
+
+  const handleMouseDown = useCallback((e: React.MouseEvent<HTMLDivElement>) => {
+    if (!columnRef.current || !onTimeRangeSelect) return;
+
+    const rect = columnRef.current.getBoundingClientRect();
+    const y = e.clientY - rect.top;
+    const startTime = getTimeFromY(y);
+
+    setIsSelecting(true);
+    originalStartTimeRef.current = startTime;
+    currentEndTimeRef.current = startTime;
+    setSelection({ startTime, endTime: startTime });
+  }, [onTimeRangeSelect, getTimeFromY]);
+
+  const handleMouseMove = useCallback((e: React.MouseEvent<HTMLDivElement>) => {
+    if (!isSelecting || !columnRef.current || originalStartTimeRef.current === null) return;
+
+    const rect = columnRef.current.getBoundingClientRect();
+    const y = e.clientY - rect.top;
+    const endTime = getTimeFromY(y);
+    currentEndTimeRef.current = endTime;
+
+    setSelection({
+      startTime: Math.min(originalStartTimeRef.current, endTime),
+      endTime: Math.max(originalStartTimeRef.current, endTime)
+    });
+  }, [isSelecting, getTimeFromY]);
+
+  const handleMouseUp = useCallback(() => {
+    if (!isSelecting || !onTimeRangeSelect || originalStartTimeRef.current === null || currentEndTimeRef.current === null) {
+      setIsSelecting(false);
+      setSelection(null);
+      originalStartTimeRef.current = null;
+      currentEndTimeRef.current = null;
+      return;
+    }
+
+    const startTime = originalStartTimeRef.current;
+    const endTime = currentEndTimeRef.current;
+    const duration = Math.abs(endTime - startTime);
+
+    // Only trigger if there's a meaningful selection (at least 30 minutes)
+    if (duration >= 30) {
+      const actualStartTime = Math.min(startTime, endTime);
+      const actualEndTime = Math.max(startTime, endTime);
+
+      const startHours = Math.floor(actualStartTime / 60) + dayStartHour;
+      const startMinutes = actualStartTime % 60;
+      const endHours = Math.floor(actualEndTime / 60) + dayStartHour;
+      const endMinutes = actualEndTime % 60;
+
+      const startTimeStr = `${String(startHours).padStart(2, '0')}:${String(startMinutes).padStart(2, '0')}`;
+      const endTimeStr = `${String(endHours).padStart(2, '0')}:${String(endMinutes).padStart(2, '0')}`;
+
+      onTimeRangeSelect({
+        date,
+        startTime: startTimeStr,
+        endTime: endTimeStr
+      });
+    }
+
+    setIsSelecting(false);
+    setSelection(null);
+    originalStartTimeRef.current = null;
+    currentEndTimeRef.current = null;
+  }, [isSelecting, onTimeRangeSelect, date, dayStartHour]);
+
+  // Handle mouse events on document for drag outside column
+  useEffect(() => {
+    if (!isSelecting) return;
+
+    const handleMouseMoveGlobal = (e: MouseEvent) => {
+      if (!columnRef.current || originalStartTimeRef.current === null) return;
+
+      const rect = columnRef.current.getBoundingClientRect();
+      const y = e.clientY - rect.top;
+      const endTime = getTimeFromY(y);
+      currentEndTimeRef.current = endTime;
+
+      setSelection({
+        startTime: Math.min(originalStartTimeRef.current, endTime),
+        endTime: Math.max(originalStartTimeRef.current, endTime)
+      });
+    };
+
+    const handleMouseUpGlobal = () => {
+      handleMouseUp();
+    };
+
+    document.addEventListener('mousemove', handleMouseMoveGlobal);
+    document.addEventListener('mouseup', handleMouseUpGlobal);
+
+    return () => {
+      document.removeEventListener('mousemove', handleMouseMoveGlobal);
+      document.removeEventListener('mouseup', handleMouseUpGlobal);
+    };
+  }, [isSelecting, getTimeFromY, handleMouseUp]);
 
   // Generate grid lines
   const gridLines = useMemo(() => {
@@ -90,8 +216,17 @@ export const DayColumn: React.FC<DayColumnProps> = ({
     );
   }, [dailyEvents]);
 
+  const selectionTop = selection ? getYFromTime(Math.min(selection.startTime, selection.endTime)) : null;
+  const selectionHeight = selection ? Math.abs(selection.endTime - selection.startTime) / 60 * hourHeight : null;
+
   return (
-    <Box className={`${styles.dayColumn} ${isToday ? styles.todayColumn : styles.notTodayColumn}`}>
+    <Box
+      ref={columnRef}
+      className={`${styles.dayColumn} ${isToday ? styles.todayColumn : styles.notTodayColumn} ${isSelecting ? styles.selecting : ''}`}
+      onMouseDown={handleMouseDown}
+      onMouseMove={handleMouseMove}
+      onMouseUp={handleMouseUp}
+    >
       {gridLines}
 
       {isToday && currentTimeTop !== null && (
@@ -103,6 +238,16 @@ export const DayColumn: React.FC<DayColumnProps> = ({
         >
           <Box className={styles.nowDot} />
         </Box>
+      )}
+
+      {selection && selectionTop !== null && selectionHeight !== null && (
+        <Box
+          className={styles.timeSelection}
+          style={{
+            top: `${selectionTop}px`,
+            height: `${Math.max(selectionHeight, 2)}px`
+          }}
+        />
       )}
 
       {positionedEvents.map((event) => (

@@ -13,9 +13,10 @@ import { useUsers } from "@/modules/auth/src/hooks";
 import { useSchedulingPeriods } from "@/modules/schedule/src/hooks";
 
 import resources from "../constraints-page.resources.json";
-import { parseForbiddenTimeRange, parsePreferredWeekdays } from "../utils/constraint-value-parser";
-import { serializeForbiddenTimeRange, serializePreferredWeekdays } from "../utils/constraint-value-serializer";
-import type { ForbiddenTimeRangeEntry } from "../utils/constraint-value-parser";
+import {
+    parseForbiddenTimeRange, parsePreferredWeekdays, serializeForbiddenTimeRange,
+    serializePreferredWeekdays, type ForbiddenTimeRangeEntry
+} from "../utils";
 
 interface UserConstraintEditorProps {
     readonly opened: boolean;
