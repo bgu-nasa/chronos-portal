@@ -2,6 +2,7 @@ import { useEffect } from "react";
 import { Modal, TextInput, Button, Group, Select, Textarea } from "@mantine/core";
 import { useForm } from "@mantine/form";
 import { useSchedulingPeriods } from "@/modules/schedule/src/hooks";
+import resources from "../constraints-page.resources.json";
 
 interface OrganizationPolicyEditorProps {
     readonly opened: boolean;
@@ -35,9 +36,9 @@ export function OrganizationPolicyEditor({
             value: initialData?.value || "",
         },
         validate: {
-            schedulingPeriodId: (value: string) => (value ? null : "Scheduling period is required"),
-            key: (value: string) => (value ? null : "Key is required"),
-            value: (value: string) => (value ? null : "Value is required"),
+            schedulingPeriodId: (value: string) => (value ? null : resources.validationMessages.schedulingPeriodRequired),
+            key: (value: string) => (value ? null : resources.validationMessages.keyRequired),
+            value: (value: string) => (value ? null : resources.validationMessages.valueRequired),
         },
     });
 
@@ -67,13 +68,13 @@ export function OrganizationPolicyEditor({
         <Modal
             opened={opened}
             onClose={onClose}
-            title={initialData ? "Edit Organization Policy" : "Create Organization Policy"}
-            size="md"
+            title={initialData ? resources.modalTitles.editOrganizationPolicy : resources.modalTitles.createOrganizationPolicy}
+            size={resources.modalSize}
         >
             <form onSubmit={form.onSubmit(handleSubmit)}>
                 <Select
-                    label="Scheduling Period"
-                    placeholder="Select scheduling period"
+                    label={resources.labels.schedulingPeriod}
+                    placeholder={resources.placeholders.selectSchedulingPeriod}
                     data={periodOptions}
                     searchable
                     required
@@ -82,28 +83,28 @@ export function OrganizationPolicyEditor({
                 />
 
                 <TextInput
-                    label="Key"
-                    placeholder="e.g., max_daily_hours, min_break_time"
+                    label={resources.labels.key}
+                    placeholder={resources.placeholders.keyExamples.organization}
                     required
                     mb="md"
                     {...form.getInputProps("key")}
                 />
 
                 <Textarea
-                    label="Value"
-                    placeholder="e.g., 8, 30"
+                    label={resources.labels.value}
+                    placeholder={resources.placeholders.valueExamples.organization}
                     required
                     mb="md"
-                    minRows={3}
+                    minRows={resources.other.textareaMinRows}
                     {...form.getInputProps("value")}
                 />
 
                 <Group justify="flex-end" mt="xl">
                     <Button variant="subtle" onClick={onClose} disabled={loading}>
-                        Cancel
+                        {resources.cancelButton}
                     </Button>
                     <Button type="submit" loading={loading}>
-                        {initialData ? "Update" : "Create"}
+                        {initialData ? resources.updateButton : resources.createButton}
                     </Button>
                 </Group>
             </form>

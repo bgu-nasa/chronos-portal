@@ -1,11 +1,12 @@
 import { useEffect, useState, useMemo } from "react";
 import { Table, Button, Group, Text, ActionIcon, Loader } from "@mantine/core";
 import { HiOutlinePencil, HiOutlineTrash } from "react-icons/hi";
-import { 
-    useOrganizationPolicies, 
-    useSchedulingPeriods 
+import {
+    useOrganizationPolicies,
+    useSchedulingPeriods
 } from "@/modules/schedule/src/hooks";
 import { OrganizationPolicyEditor } from "./organization-policy-editor";
+import resources from "../constraints-page.resources.json";
 
 interface OrganizationPoliciesPanelProps {
     readonly isAdmin: boolean;
@@ -36,7 +37,7 @@ export function OrganizationPoliciesPanel({ openConfirmation }: Readonly<Omit<Or
     const enrichedData = useMemo(() => {
         return organizationPolicies.map(item => {
             const period = schedulingPeriods.find((p: any) => p.id === item.schedulingPeriodId);
-            
+
             return {
                 ...item,
                 periodName: period ? period.name : item.schedulingPeriodId
@@ -56,8 +57,8 @@ export function OrganizationPoliciesPanel({ openConfirmation }: Readonly<Omit<Or
 
     const handleDelete = (item: any) => {
         openConfirmation({
-            title: "Delete Organization Policy",
-            message: "Are you sure you want to delete this organization policy?",
+            title: resources.deleteMessages.deleteOrganizationPolicy,
+            message: resources.deleteMessages.confirmDeleteOrganizationPolicy,
             onConfirm: async () => {
                 await deleteOrganizationPolicy(item.id);
             },
@@ -73,7 +74,7 @@ export function OrganizationPoliciesPanel({ openConfirmation }: Readonly<Omit<Or
             }
             setModalOpened(false);
         } catch (error) {
-            console.error("Error saving organization policy:", error);
+            console.error(resources.errorMessages.saveOrganizationPolicy, error);
         }
     };
 
@@ -89,23 +90,23 @@ export function OrganizationPoliciesPanel({ openConfirmation }: Readonly<Omit<Or
         <div>
             <Group mb="md" justify="space-between">
                 <Button variant="filled" onClick={handleCreate}>
-                    Create Organization Policy
+                    {resources.modalTitles.createOrganizationPolicy}
                 </Button>
                 {isLoading && <Loader size="xs" />}
             </Group>
 
             {enrichedData.length === 0 ? (
                 <Text c="dimmed" ta="center" py="xl">
-                    No organization policies found.
+                    {resources.emptyStateMessages.noOrganizationPolicies}
                 </Text>
             ) : (
                 <Table striped highlightOnHover>
                     <Table.Thead>
                         <Table.Tr>
-                            <Table.Th>Period</Table.Th>
-                            <Table.Th>Key</Table.Th>
-                            <Table.Th>Value</Table.Th>
-                            <Table.Th>Actions</Table.Th>
+                            <Table.Th>{resources.labels.period}</Table.Th>
+                            <Table.Th>{resources.labels.key}</Table.Th>
+                            <Table.Th>{resources.labels.value}</Table.Th>
+                            <Table.Th>{resources.labels.actions}</Table.Th>
                         </Table.Tr>
                     </Table.Thead>
                     <Table.Tbody>
@@ -116,10 +117,10 @@ export function OrganizationPoliciesPanel({ openConfirmation }: Readonly<Omit<Or
                                 <Table.Td>{item.value}</Table.Td>
                                 <Table.Td>
                                     <Group gap="xs">
-                                        <ActionIcon variant="subtle" color="blue" onClick={() => handleEdit(item)}>
+                                        <ActionIcon variant="subtle" onClick={() => handleEdit(item)}>
                                             <HiOutlinePencil />
                                         </ActionIcon>
-                                        <ActionIcon variant="subtle" color="red" onClick={() => handleDelete(item)}>
+                                        <ActionIcon variant="subtle" onClick={() => handleDelete(item)}>
                                             <HiOutlineTrash />
                                         </ActionIcon>
                                     </Group>

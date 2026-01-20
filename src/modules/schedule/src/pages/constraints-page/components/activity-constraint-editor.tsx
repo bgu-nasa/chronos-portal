@@ -3,6 +3,7 @@ import { useForm } from "@mantine/form";
 import { useEffect } from "react";
 import { useActivities } from "@/modules/resources/src/hooks";
 import { useSubjects } from "@/modules/resources/src/hooks/use-subjects";
+import resources from "../constraints-page.resources.json";
 
 interface ActivityConstraintEditorProps {
     readonly opened: boolean;
@@ -37,9 +38,9 @@ export function ActivityConstraintEditor({
             value: initialData?.value || "",
         },
         validate: {
-            activityId: (value: string) => (value ? null : "Activity is required"),
-            key: (value: string) => (value ? null : "Key is required"),
-            value: (value: string) => (value ? null : "Value is required"),
+            activityId: (value: string) => (value ? null : resources.validationMessages.activityRequired),
+            key: (value: string) => (value ? null : resources.validationMessages.keyRequired),
+            value: (value: string) => (value ? null : resources.validationMessages.valueRequired),
         },
     });
 
@@ -76,13 +77,13 @@ export function ActivityConstraintEditor({
         <Modal
             opened={opened}
             onClose={onClose}
-            title={initialData ? "Edit Activity Constraint" : "Create Activity Constraint"}
-            size="md"
+            title={initialData ? resources.modalTitles.editActivityConstraint : resources.modalTitles.createActivityConstraint}
+            size={resources.modalSize}
         >
             <form onSubmit={form.onSubmit(handleSubmit)}>
                 <Select
-                    label="Activity"
-                    placeholder="Select activity"
+                    label={resources.labels.activity}
+                    placeholder={resources.placeholders.selectActivity}
                     data={activityOptions}
                     searchable
                     required
@@ -91,28 +92,28 @@ export function ActivityConstraintEditor({
                 />
 
                 <TextInput
-                    label="Key"
-                    placeholder="e.g., required_room_type, max_students"
+                    label={resources.labels.key}
+                    placeholder={resources.placeholders.keyExamples.activity}
                     required
                     mb="md"
                     {...form.getInputProps("key")}
                 />
 
                 <Textarea
-                    label="Value"
-                    placeholder="e.g., lab, 30"
+                    label={resources.labels.value}
+                    placeholder={resources.placeholders.valueExamples.activity}
                     required
                     mb="md"
-                    minRows={3}
+                    minRows={resources.other.textareaMinRows}
                     {...form.getInputProps("value")}
                 />
 
                 <Group justify="flex-end" mt="xl">
                     <Button variant="subtle" onClick={onClose} disabled={loading}>
-                        Cancel
+                        {resources.cancelButton}
                     </Button>
                     <Button type="submit" loading={loading}>
-                        {initialData ? "Update" : "Create"}
+                        {initialData ? resources.updateButton : resources.createButton}
                     </Button>
                 </Group>
             </form>

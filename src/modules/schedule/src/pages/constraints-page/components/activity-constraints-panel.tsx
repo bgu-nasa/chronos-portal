@@ -1,12 +1,13 @@
 import { useEffect, useState, useMemo } from "react";
 import { Table, Button, Group, Text, ActionIcon, Loader } from "@mantine/core";
 import { HiOutlinePencil, HiOutlineTrash } from "react-icons/hi";
-import { 
-    useActivityConstraints 
+import {
+    useActivityConstraints
 } from "@/modules/schedule/src/hooks";
 import { useActivities } from "@/modules/resources/src/hooks";
 import { useSubjects } from "@/modules/resources/src/hooks/use-subjects";
 import { ActivityConstraintEditor } from "./activity-constraint-editor";
+import resources from "../constraints-page.resources.json";
 
 interface ActivityConstraintsPanelProps {
     readonly isAdmin: boolean;
@@ -40,11 +41,11 @@ export function ActivityConstraintsPanel({ openConfirmation }: Readonly<Omit<Act
         return activityConstraints.map(item => {
             const activity = activities.find((a: any) => a.id === item.activityId);
             const subject = activity ? subjects.find((s: any) => s.id === activity.subjectId) : null;
-            
+
             return {
                 ...item,
                 activityName: activity ? activity.activityType : item.activityId,
-                subjectName: subject ? subject.name : 'Unknown Subject'
+                subjectName: subject ? subject.name : resources.other.unknownSubject
             };
         });
     }, [activityConstraints, activities, subjects]);
@@ -61,8 +62,8 @@ export function ActivityConstraintsPanel({ openConfirmation }: Readonly<Omit<Act
 
     const handleDelete = (item: any) => {
         openConfirmation({
-            title: "Delete Activity Constraint",
-            message: "Are you sure you want to delete this activity constraint?",
+            title: resources.deleteMessages.deleteActivityConstraint,
+            message: resources.deleteMessages.confirmDeleteActivityConstraint,
             onConfirm: async () => {
                 await deleteActivityConstraint(item.id);
             },
@@ -78,7 +79,7 @@ export function ActivityConstraintsPanel({ openConfirmation }: Readonly<Omit<Act
             }
             setModalOpened(false);
         } catch (error) {
-            console.error("Error saving activity constraint:", error);
+            console.error(resources.errorMessages.saveActivityConstraint, error);
         }
     };
 
@@ -94,24 +95,24 @@ export function ActivityConstraintsPanel({ openConfirmation }: Readonly<Omit<Act
         <div>
             <Group mb="md" justify="space-between">
                 <Button variant="filled" onClick={handleCreate}>
-                    Create Activity Constraint
+                    {resources.modalTitles.createActivityConstraint}
                 </Button>
                 {isLoading && <Loader size="xs" />}
             </Group>
 
             {enrichedData.length === 0 ? (
                 <Text c="dimmed" ta="center" py="xl">
-                    No activity constraints found.
+                    {resources.emptyStateMessages.noActivityConstraints}
                 </Text>
             ) : (
                 <Table striped highlightOnHover>
                     <Table.Thead>
                         <Table.Tr>
-                            <Table.Th>Subject</Table.Th>
-                            <Table.Th>Activity</Table.Th>
-                            <Table.Th>Key</Table.Th>
-                            <Table.Th>Value</Table.Th>
-                            <Table.Th>Actions</Table.Th>
+                            <Table.Th>{resources.labels.subject}</Table.Th>
+                            <Table.Th>{resources.labels.activity}</Table.Th>
+                            <Table.Th>{resources.labels.key}</Table.Th>
+                            <Table.Th>{resources.labels.value}</Table.Th>
+                            <Table.Th>{resources.labels.actions}</Table.Th>
                         </Table.Tr>
                     </Table.Thead>
                     <Table.Tbody>
@@ -123,10 +124,10 @@ export function ActivityConstraintsPanel({ openConfirmation }: Readonly<Omit<Act
                                 <Table.Td>{item.value}</Table.Td>
                                 <Table.Td>
                                     <Group gap="xs">
-                                        <ActionIcon variant="subtle" color="blue" onClick={() => handleEdit(item)}>
+                                        <ActionIcon variant="subtle" onClick={() => handleEdit(item)}>
                                             <HiOutlinePencil />
                                         </ActionIcon>
-                                        <ActionIcon variant="subtle" color="red" onClick={() => handleDelete(item)}>
+                                        <ActionIcon variant="subtle" onClick={() => handleDelete(item)}>
                                             <HiOutlineTrash />
                                         </ActionIcon>
                                     </Group>

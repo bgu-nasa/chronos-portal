@@ -1,14 +1,15 @@
 import { useEffect, useState, useMemo } from "react";
 import { Table, Button, Group, Text, Badge, ActionIcon, Loader } from "@mantine/core";
 import { HiOutlinePencil, HiOutlineTrash } from "react-icons/hi";
-import { 
-    useUserConstraints, 
-    useUserPreferences, 
-    useSchedulingPeriods 
+import {
+    useUserConstraints,
+    useUserPreferences,
+    useSchedulingPeriods
 } from "@/modules/schedule/src/hooks";
 import { useUsers } from "@/modules/auth/src/hooks";
 import { UserConstraintEditor } from "./user-constraint-editor";
 import { $app } from "@/infra/service";
+import resources from "../constraints-page.resources.json";
 
 interface UserConstraintsPanelProps {
     readonly isAdmin: boolean;
@@ -56,14 +57,14 @@ export function UserConstraintsPanel({ isAdmin, openConfirmation }: UserConstrai
     // Combined and enriched data
     const enrichedData = useMemo(() => {
         const combine = [
-            ...userConstraints.map((c: any) => ({ ...c, type: 'constraint' })),
-            ...userPreferences.map((p: any) => ({ ...p, type: 'preference' }))
+            ...userConstraints.map((c: any) => ({ ...c, type: resources.constraintTypes.constraint })),
+            ...userPreferences.map((p: any) => ({ ...p, type: resources.constraintTypes.preference }))
         ];
 
         return combine.map(item => {
             const user = users.find((u: any) => u.id === item.userId);
             const period = schedulingPeriods.find((p: any) => p.id === item.schedulingPeriodId);
-            
+
             return {
                 ...item,
                 userName: user ? `${user.firstName} ${user.lastName}` : item.userId,
@@ -80,30 +81,31 @@ export function UserConstraintsPanel({ isAdmin, openConfirmation }: UserConstrai
 
     const handleEdit = (item: any) => {
         setEditingItem(item);
-        setIsPreference(item.type === 'preference');
+        setIsPreference(item.type === resources.constraintTypes.preference);
         setModalOpened(true);
     };
 
     const handleDelete = (item: any) => {
+        const isPreferenceType = item.type === resources.constraintTypes.preference;
         openConfirmation({
-            title: `Delete ${item.type === 'preference' ? 'Preference' : 'Constraint'}`,
-            message: `Are you sure you want to delete this ${item.type}?`,
+            title: isPreferenceType ? resources.deleteMessages.deletePreference : resources.deleteMessages.deleteConstraint,
+            message: isPreferenceType ? resources.deleteMessages.confirmDeletePreference : resources.deleteMessages.confirmDeleteConstraint,
             onConfirm: async () => {
-                if (item.type === 'preference') {
+                if (isPreferenceType) {
                     await deleteUserPreference(item.id);
                 } else {
                     await deleteUserConstraint(item.id);
                 }
-                
+
                 // Refetch data to update the table immediately
                 if (isAdmin) {
-                    if (item.type === 'preference') {
+                    if (isPreferenceType) {
                         await fetchUserPreferences();
                     } else {
                         await fetchUserConstraints();
                     }
                 } else if (currentUserId) {
-                    if (item.type === 'preference') {
+                    if (isPreferenceType) {
                         await fetchUserPreferencesByUser(currentUserId);
                     } else {
                         await fetchUserConstraintsByUser(currentUserId);
@@ -126,7 +128,7 @@ export function UserConstraintsPanel({ isAdmin, openConfirmation }: UserConstrai
             } else {
                 await createUserConstraint(values);
             }
-            
+
             // Refetch data to update the table immediately
             if (isAdmin) {
                 if (isPreference) {
@@ -141,10 +143,10 @@ export function UserConstraintsPanel({ isAdmin, openConfirmation }: UserConstrai
                     await fetchUserConstraintsByUser(currentUserId);
                 }
             }
-            
+
             setModalOpened(false);
         } catch (error) {
-            console.error("Error saving user constraint:", error);
+            console.error(resources.errorMessages.saveUserConstraint, error);
         }
     };
 
@@ -161,10 +163,10 @@ export function UserConstraintsPanel({ isAdmin, openConfirmation }: UserConstrai
             <Group mb="md" justify="space-between">
                 <Group>
                     <Button variant="filled" onClick={() => handleCreate(false)}>
-                        Create Constraint
+                        {resources.createConstraintButton}
                     </Button>
                     <Button variant="outline" onClick={() => handleCreate(true)}>
-                        Create Preference
+                        {resources.createPreferenceButton}
                     </Button>
                 </Group>
                 {isLoading && <Loader size="xs" />}
@@ -172,18 +174,18 @@ export function UserConstraintsPanel({ isAdmin, openConfirmation }: UserConstrai
 
             {enrichedData.length === 0 ? (
                 <Text c="dimmed" ta="center" py="xl">
-                    No constraints or preferences found.
+                    {resources.emptyStateMessages.noConstraintsOrPreferences}
                 </Text>
             ) : (
                 <Table striped highlightOnHover>
                     <Table.Thead>
                         <Table.Tr>
-                            {isAdmin && <Table.Th>Lecturer</Table.Th>}
-                            <Table.Th>Period</Table.Th>
-                            <Table.Th>Type</Table.Th>
-                            <Table.Th>Key</Table.Th>
-                            <Table.Th>Value</Table.Th>
-                            <Table.Th>Actions</Table.Th>
+                            {isAdmin && <Table.Th>{resources.labels.lecturer}</Table.Th>}
+                            <Table.Th>{resources.labels.period}</Table.Th>
+                            <Table.Th>{resources.labels.type}</Table.Th>
+                            <Table.Th>{resources.labels.key}</Table.Th>
+                            <Table.Th>{resources.labels.value}</Table.Th>
+                            <Table.Th>{resources.labels.actions}</Table.Th>
                         </Table.Tr>
                     </Table.Thead>
                     <Table.Tbody>
@@ -192,18 +194,18 @@ export function UserConstraintsPanel({ isAdmin, openConfirmation }: UserConstrai
                                 {isAdmin && <Table.Td>{item.userName}</Table.Td>}
                                 <Table.Td>{item.periodName}</Table.Td>
                                 <Table.Td>
-                                    <Badge color={item.type === 'constraint' ? 'red' : 'blue'} variant="light">
-                                        {item.type === 'constraint' ? 'Hard' : 'Soft'}
+                                    <Badge variant="light">
+                                        {item.type === resources.constraintTypes.constraint ? resources.badgeLabels.constraint : resources.badgeLabels.preference}
                                     </Badge>
                                 </Table.Td>
                                 <Table.Td>{item.key}</Table.Td>
                                 <Table.Td>{item.value}</Table.Td>
                                 <Table.Td>
                                     <Group gap="xs">
-                                        <ActionIcon variant="subtle" color="blue" onClick={() => handleEdit(item)}>
+                                        <ActionIcon variant="subtle" onClick={() => handleEdit(item)}>
                                             <HiOutlinePencil />
                                         </ActionIcon>
-                                        <ActionIcon variant="subtle" color="red" onClick={() => handleDelete(item)}>
+                                        <ActionIcon variant="subtle" onClick={() => handleDelete(item)}>
                                             <HiOutlineTrash />
                                         </ActionIcon>
                                     </Group>

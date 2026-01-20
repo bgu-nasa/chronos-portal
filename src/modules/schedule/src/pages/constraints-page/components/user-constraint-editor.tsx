@@ -3,6 +3,7 @@ import { Modal, TextInput, Button, Group, Select, Textarea } from "@mantine/core
 import { useForm } from "@mantine/form";
 import { useUsers } from "@/modules/auth/src/hooks";
 import { useSchedulingPeriods } from "@/modules/schedule/src/hooks";
+import resources from "../constraints-page.resources.json";
 
 interface UserConstraintEditorProps {
     readonly opened: boolean;
@@ -49,10 +50,10 @@ export function UserConstraintEditor({
             isPreference: initialData?.isPreference ?? isPreference,
         },
         validate: {
-            userId: (value: string) => (value ? null : "User is required"),
-            schedulingPeriodId: (value: string) => (value ? null : "Scheduling period is required"),
-            key: (value: string) => (value ? null : "Key is required"),
-            value: (value: string) => (value ? null : "Value is required"),
+            userId: (value: string) => (value ? null : resources.validationMessages.userRequired),
+            schedulingPeriodId: (value: string) => (value ? null : resources.validationMessages.schedulingPeriodRequired),
+            key: (value: string) => (value ? null : resources.validationMessages.keyRequired),
+            value: (value: string) => (value ? null : resources.validationMessages.valueRequired),
         },
     });
 
@@ -104,20 +105,29 @@ export function UserConstraintEditor({
         label: period.name,
     }));
 
+    let modalTitle: string;
+    if (initialData) {
+        modalTitle = isPreference
+            ? resources.modalTitles.editUserPreference
+            : resources.modalTitles.editUserConstraint;
+    } else {
+        modalTitle = isPreference
+            ? resources.modalTitles.createUserPreference
+            : resources.modalTitles.createUserConstraint;
+    }
+
     return (
         <Modal
             opened={opened}
             onClose={onClose}
-            title={initialData 
-                ? `Edit User ${isPreference ? 'Preference' : 'Constraint'}` 
-                : `Create User ${isPreference ? 'Preference' : 'Constraint'}`}
-            size="md"
+            title={modalTitle}
+            size={resources.modalSize}
         >
             <form onSubmit={form.onSubmit(handleSubmit)}>
                 {isAdmin ? (
                     <Select
-                        label="User"
-                        placeholder="Select user"
+                        label={resources.labels.user}
+                        placeholder={resources.placeholders.selectUser}
                         data={userOptions}
                         searchable
                         required
@@ -126,11 +136,11 @@ export function UserConstraintEditor({
                     />
                 ) : (
                     <TextInput
-                        label="User"
+                        label={resources.labels.user}
                         value={
                             users.some((u) => u.id === currentUserId)
                                 ? `${users.find((u) => u.id === currentUserId)?.firstName} ${users.find((u) => u.id === currentUserId)?.lastName}`
-                                : "Current User"
+                                : resources.other.currentUser
                         }
                         disabled
                         mb="md"
@@ -138,8 +148,8 @@ export function UserConstraintEditor({
                 )}
 
                 <Select
-                    label="Scheduling Period"
-                    placeholder="Select scheduling period"
+                    label={resources.labels.schedulingPeriod}
+                    placeholder={resources.placeholders.selectSchedulingPeriod}
                     data={periodOptions}
                     searchable
                     required
@@ -148,28 +158,28 @@ export function UserConstraintEditor({
                 />
 
                 <TextInput
-                    label="Key"
-                    placeholder="e.g., preferred_time, max_hours_per_day"
+                    label={resources.labels.key}
+                    placeholder={resources.placeholders.keyExamples.user}
                     required
                     mb="md"
                     {...form.getInputProps("key")}
                 />
 
                 <Textarea
-                    label="Value"
-                    placeholder="e.g., 09:00-12:00, 8"
+                    label={resources.labels.value}
+                    placeholder={resources.placeholders.valueExamples.user}
                     required
                     mb="md"
-                    minRows={3}
+                    minRows={resources.other.textareaMinRows}
                     {...form.getInputProps("value")}
                 />
 
                 <Group justify="flex-end" mt="xl">
                     <Button variant="subtle" onClick={onClose} disabled={loading}>
-                        Cancel
+                        {resources.cancelButton}
                     </Button>
                     <Button type="submit" loading={loading}>
-                        {initialData ? "Update" : "Create"}
+                        {initialData ? resources.updateButton : resources.createButton}
                     </Button>
                 </Group>
             </form>
