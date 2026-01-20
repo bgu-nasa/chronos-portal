@@ -1,9 +1,8 @@
 import { useEffect, useMemo, useState } from "react";
 import {
-    Modal, Button, Group,
+    Modal, Button, Group, Text,
     Select, MultiSelect, NumberInput
 } from "@mantine/core";
-import { useForm } from "@mantine/form";
 
 import { useActivities, useSubjects } from "@/modules/resources/src/hooks";
 
@@ -53,26 +52,24 @@ export function ActivityConstraintEditor({
     const [locationValues, setLocationValues] = useState<string[]>([]);
     const [resourceTypeValues, setResourceTypeValues] = useState<string[]>([]);
 
-    const form = useForm({
-        initialValues: {
-            activityId: initialData?.activityId || "",
-            key: initialData?.key || "",
-        },
-        validate: {
-            activityId: (value: string) => (value ? null : resources.validationMessages.activityRequired),
-            key: (value: string) => (value ? null : resources.validationMessages.keyRequired),
-        },
+    // Form state
+    const [formValues, setFormValues] = useState({
+        activityId: initialData?.activityId || "",
+        key: initialData?.key || "",
     });
+
+    const [formErrors, setFormErrors] = useState<Record<string, string>>({});
 
     useEffect(() => {
         if (opened) {
             fetchActivities();
             fetchSubjects();
             if (initialData) {
-                form.setValues({
+                setFormValues({
                     activityId: initialData.activityId,
                     key: initialData.key,
                 });
+                setFormErrors({});
 
                 // Parse the value based on constraint type
                 if (initialData.key === "required_capacity") {
@@ -86,7 +83,11 @@ export function ActivityConstraintEditor({
                     setResourceTypeValues(parsed);
                 }
             } else {
-                form.reset();
+                setFormValues({
+                    activityId: "",
+                    key: "",
+                });
+                setFormErrors({});
                 setCapacityData({});
                 setLocationValues([]);
                 setResourceTypeValues([]);
@@ -95,7 +96,10 @@ export function ActivityConstraintEditor({
     }, [opened, initialData]);
 
     const handleKeyChange = (value: string | null) => {
-        form.setFieldValue("key", value || "");
+        setFormValues({ ...formValues, key: value || "" });
+        if (formErrors.key) {
+            setFormErrors({ ...formErrors, key: "" });
+        }
         // Clear form data when key changes (only when creating new, not editing)
         if (!initialData && value) {
             setCapacityData({});
@@ -106,18 +110,18 @@ export function ActivityConstraintEditor({
 
     // Validation for form submission
     const validateForm = (): string | null => {
-        if (form.values.key === "required_capacity") {
+        if (formValues.key === "required_capacity") {
             if (capacityData.min === undefined && capacityData.max === undefined) {
                 return resources.validationMessages.minOrMaxRequired;
             }
             if (capacityData.min !== undefined && capacityData.max !== undefined && capacityData.min > capacityData.max) {
                 return resources.validationMessages.minGreaterThanMax;
             }
-        } else if (form.values.key === "location_preference") {
+        } else if (formValues.key === "location_preference") {
             if (locationValues.length === 0) {
                 return resources.validationMessages.atLeastOneLocation;
             }
-        } else if (form.values.key === "compatible_resource_types") {
+        } else if (formValues.key === "compatible_resource_types") {
             if (resourceTypeValues.length === 0) {
                 return resources.validationMessages.atLeastOneResourceType;
             }
@@ -125,30 +129,49 @@ export function ActivityConstraintEditor({
         return null;
     };
 
-    const handleSubmit = async (values: typeof form.values) => {
-        // Validate before submitting
+    const handleSubmit = async () => {
+        // Validate form fields
+        const errors: Record<string, string> = {};
+        if (!formValues.activityId) {
+            errors.activityId = resources.validationMessages.activityRequired;
+        }
+        if (!formValues.key) {
+            errors.key = resources.validationMessages.keyRequired;
+        }
+
+        // Validate constraint-specific fields
         const validationError = validateForm();
         if (validationError) {
-            form.setFieldError("value", validationError);
+            errors.value = validationError;
+        }
+
+        if (Object.keys(errors).length > 0) {
+            setFormErrors(errors);
             return;
         }
 
         // Serialize form data based on constraint type
         let serializedValue = "";
 
-        if (values.key === "required_capacity") {
+        if (formValues.key === "required_capacity") {
             serializedValue = serializeRequiredCapacity(capacityData);
-        } else if (values.key === "location_preference") {
+        } else if (formValues.key === "location_preference") {
             serializedValue = serializeCommaSeparated(locationValues);
-        } else if (values.key === "compatible_resource_types") {
+        } else if (formValues.key === "compatible_resource_types") {
             serializedValue = serializeCommaSeparated(resourceTypeValues);
         }
 
         await onSubmit({
-            ...values,
+            ...formValues,
             value: serializedValue,
         });
-        form.reset();
+
+        // Reset form
+        setFormValues({
+            activityId: "",
+            key: "",
+        });
+        setFormErrors({});
         setCapacityData({});
         setLocationValues([]);
         setResourceTypeValues([]);
@@ -158,12 +181,7 @@ export function ActivityConstraintEditor({
     // Handle form submission with validation
     const handleFormSubmit = (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
-        const validationError = validateForm();
-        if (validationError) {
-            form.setFieldError("value", validationError);
-        } else {
-            form.onSubmit(handleSubmit)(e);
-        }
+        handleSubmit();
     };
 
     // Group activities by subject for better UX
@@ -192,7 +210,14 @@ export function ActivityConstraintEditor({
                     searchable
                     required
                     mb="md"
-                    {...form.getInputProps("activityId")}
+                    value={formValues.activityId}
+                    onChange={(value) => {
+                        setFormValues({ ...formValues, activityId: value || "" });
+                        if (formErrors.activityId) {
+                            setFormErrors({ ...formErrors, activityId: "" });
+                        }
+                    }}
+                    error={formErrors.activityId}
                 />
 
                 <Select
@@ -201,54 +226,83 @@ export function ActivityConstraintEditor({
                     data={constraintTypeOptions}
                     required
                     mb="md"
-                    value={form.values.key}
+                    value={formValues.key}
                     onChange={handleKeyChange}
-                    error={form.errors.key}
+                    error={formErrors.key}
                 />
 
-                {form.values.key === "required_capacity" && (
-                    <Group grow mb="md">
-                        <NumberInput
-                            label={resources.labels.minCapacity}
-                            placeholder={resources.placeholders.enterMinCapacity}
-                            value={capacityData.min}
-                            onChange={(value) => setCapacityData({ ...capacityData, min: typeof value === "number" ? value : undefined })}
-                            min={0}
-                            allowDecimal={false}
-                        />
-                        <NumberInput
-                            label={resources.labels.maxCapacity}
-                            placeholder={resources.placeholders.enterMaxCapacity}
-                            value={capacityData.max}
-                            onChange={(value) => setCapacityData({ ...capacityData, max: typeof value === "number" ? value : undefined })}
-                            min={0}
-                            allowDecimal={false}
-                        />
-                    </Group>
+                {formValues.key === "required_capacity" && (
+                    <>
+                        {formErrors.value && (
+                            <Text size="sm" c="red" mb="xs">
+                                {formErrors.value}
+                            </Text>
+                        )}
+                        <Group grow mb="md">
+                            <NumberInput
+                                label={resources.labels.minCapacity}
+                                placeholder={resources.placeholders.enterMinCapacity}
+                                value={capacityData.min}
+                                onChange={(value) => {
+                                    setCapacityData({ ...capacityData, min: typeof value === "number" ? value : undefined });
+                                    if (formErrors.value) {
+                                        setFormErrors({ ...formErrors, value: "" });
+                                    }
+                                }}
+                                min={0}
+                                allowDecimal={false}
+                            />
+                            <NumberInput
+                                label={resources.labels.maxCapacity}
+                                placeholder={resources.placeholders.enterMaxCapacity}
+                                value={capacityData.max}
+                                onChange={(value) => {
+                                    setCapacityData({ ...capacityData, max: typeof value === "number" ? value : undefined });
+                                    if (formErrors.value) {
+                                        setFormErrors({ ...formErrors, value: "" });
+                                    }
+                                }}
+                                min={0}
+                                allowDecimal={false}
+                            />
+                        </Group>
+                    </>
                 )}
 
-                {form.values.key === "location_preference" && (
+                {formValues.key === "location_preference" && (
                     <MultiSelect
                         label={resources.labels.locations}
                         placeholder={resources.placeholders.enterLocations}
                         value={locationValues}
-                        onChange={setLocationValues}
+                        onChange={(value) => {
+                            setLocationValues(value);
+                            if (formErrors.value) {
+                                setFormErrors({ ...formErrors, value: "" });
+                            }
+                        }}
                         data={locationValues.map(v => ({ value: v, label: v }))}
                         searchable
                         required
+                        error={formErrors.value}
                         mb="md"
                     />
                 )}
 
-                {form.values.key === "compatible_resource_types" && (
+                {formValues.key === "compatible_resource_types" && (
                     <MultiSelect
                         label={resources.labels.resourceTypes}
                         placeholder={resources.placeholders.enterResourceTypes}
                         value={resourceTypeValues}
-                        onChange={setResourceTypeValues}
+                        onChange={(value) => {
+                            setResourceTypeValues(value);
+                            if (formErrors.value) {
+                                setFormErrors({ ...formErrors, value: "" });
+                            }
+                        }}
                         data={resourceTypeValues.map(v => ({ value: v, label: v }))}
                         searchable
                         required
+                        error={formErrors.value}
                         mb="md"
                     />
                 )}

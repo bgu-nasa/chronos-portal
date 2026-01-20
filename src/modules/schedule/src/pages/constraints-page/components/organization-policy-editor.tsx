@@ -1,6 +1,5 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { Modal, TextInput, Button, Group, Select, Textarea } from "@mantine/core";
-import { useForm } from "@mantine/form";
 
 import { useSchedulingPeriods } from "@/modules/schedule/src/hooks";
 
@@ -31,33 +30,58 @@ export function OrganizationPolicyEditor({
 }: OrganizationPolicyEditorProps) {
     const { schedulingPeriods, fetchSchedulingPeriods } = useSchedulingPeriods();
 
-    const form = useForm({
-        initialValues: {
-            schedulingPeriodId: initialData?.schedulingPeriodId || "",
-            key: initialData?.key || "",
-            value: initialData?.value || "",
-        },
-        validate: {
-            schedulingPeriodId: (value: string) => (value ? null : resources.validationMessages.schedulingPeriodRequired),
-            key: (value: string) => (value ? null : resources.validationMessages.keyRequired),
-            value: (value: string) => (value ? null : resources.validationMessages.valueRequired),
-        },
+    // Form state
+    const [formValues, setFormValues] = useState({
+        schedulingPeriodId: initialData?.schedulingPeriodId || "",
+        key: initialData?.key || "",
+        value: initialData?.value || "",
     });
+
+    const [formErrors, setFormErrors] = useState<Record<string, string>>({});
 
     useEffect(() => {
         if (opened) {
             fetchSchedulingPeriods();
             if (initialData) {
-                form.setValues(initialData);
+                setFormValues(initialData);
             } else {
-                form.reset();
+                setFormValues({
+                    schedulingPeriodId: "",
+                    key: "",
+                    value: "",
+                });
             }
+            setFormErrors({});
         }
     }, [opened, initialData]);
 
-    const handleSubmit = async (values: typeof form.values) => {
-        await onSubmit(values);
-        form.reset();
+    const handleSubmit = async () => {
+        // Validate form fields
+        const errors: Record<string, string> = {};
+        if (!formValues.schedulingPeriodId) {
+            errors.schedulingPeriodId = resources.validationMessages.schedulingPeriodRequired;
+        }
+        if (!formValues.key) {
+            errors.key = resources.validationMessages.keyRequired;
+        }
+        if (!formValues.value) {
+            errors.value = resources.validationMessages.valueRequired;
+        }
+
+        if (Object.keys(errors).length > 0) {
+            setFormErrors(errors);
+            return;
+        }
+
+        await onSubmit(formValues);
+
+        // Reset form
+        setFormValues({
+            schedulingPeriodId: "",
+            key: "",
+            value: "",
+        });
+        setFormErrors({});
         onClose();
     };
 
@@ -73,7 +97,7 @@ export function OrganizationPolicyEditor({
             title={initialData ? resources.modalTitles.editOrganizationPolicy : resources.modalTitles.createOrganizationPolicy}
             size={resources.modalSize}
         >
-            <form onSubmit={form.onSubmit(handleSubmit)}>
+            <form onSubmit={(e) => { e.preventDefault(); handleSubmit(); }}>
                 <Select
                     label={resources.labels.schedulingPeriod}
                     placeholder={resources.placeholders.selectSchedulingPeriod}
@@ -81,7 +105,14 @@ export function OrganizationPolicyEditor({
                     searchable
                     required
                     mb="md"
-                    {...form.getInputProps("schedulingPeriodId")}
+                    value={formValues.schedulingPeriodId}
+                    onChange={(value) => {
+                        setFormValues({ ...formValues, schedulingPeriodId: value || "" });
+                        if (formErrors.schedulingPeriodId) {
+                            setFormErrors({ ...formErrors, schedulingPeriodId: "" });
+                        }
+                    }}
+                    error={formErrors.schedulingPeriodId}
                 />
 
                 <TextInput
@@ -89,7 +120,14 @@ export function OrganizationPolicyEditor({
                     placeholder={resources.placeholders.keyExamples.organization}
                     required
                     mb="md"
-                    {...form.getInputProps("key")}
+                    value={formValues.key}
+                    onChange={(e) => {
+                        setFormValues({ ...formValues, key: e.currentTarget.value });
+                        if (formErrors.key) {
+                            setFormErrors({ ...formErrors, key: "" });
+                        }
+                    }}
+                    error={formErrors.key}
                 />
 
                 <Textarea
@@ -98,7 +136,14 @@ export function OrganizationPolicyEditor({
                     required
                     mb="md"
                     minRows={resources.other.textareaMinRows}
-                    {...form.getInputProps("value")}
+                    value={formValues.value}
+                    onChange={(e) => {
+                        setFormValues({ ...formValues, value: e.currentTarget.value });
+                        if (formErrors.value) {
+                            setFormErrors({ ...formErrors, value: "" });
+                        }
+                    }}
+                    error={formErrors.value}
                 />
 
                 <Group justify="flex-end" mt="xl">

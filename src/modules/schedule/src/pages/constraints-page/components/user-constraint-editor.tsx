@@ -2,12 +2,11 @@ import { useEffect, useMemo, useState } from "react";
 import { HiOutlineTrash } from "react-icons/hi";
 
 import {
-    Modal, TextInput, Button,
+    Modal, TextInput, Button, Text,
     Group, Select, MultiSelect,
     ActionIcon, Stack
 } from "@mantine/core";
 import { TimeInput } from "@mantine/dates";
-import { useForm } from "@mantine/form";
 
 import { useUsers } from "@/modules/auth/src/hooks";
 import { useSchedulingPeriods } from "@/modules/schedule/src/hooks";
@@ -72,22 +71,19 @@ export function UserConstraintEditor({
 
     // Form state for forbidden_timerange: array of time range entries with unique IDs
     const [timeRangeEntries, setTimeRangeEntries] = useState<Array<ForbiddenTimeRangeEntry & { id: string }>>([]);
-    
+
     // Form state for preferred_weekdays: array of selected weekdays
     const [selectedWeekdays, setSelectedWeekdays] = useState<string[]>([]);
 
-    const form = useForm({
-        initialValues: {
-            userId: initialData?.userId || currentUserId || "",
-            schedulingPeriodId: initialData?.schedulingPeriodId || "",
-            key: constraintKey,
-            isPreference: initialData?.isPreference ?? isPreference,
-        },
-        validate: {
-            userId: (value: string) => (value ? null : resources.validationMessages.userRequired),
-            schedulingPeriodId: (value: string) => (value ? null : resources.validationMessages.schedulingPeriodRequired),
-        },
+    // Form state
+    const [formValues, setFormValues] = useState({
+        userId: initialData?.userId || currentUserId || "",
+        schedulingPeriodId: initialData?.schedulingPeriodId || "",
+        key: constraintKey,
+        isPreference: initialData?.isPreference ?? isPreference,
     });
+
+    const [formErrors, setFormErrors] = useState<Record<string, string>>({});
 
     useEffect(() => {
         if (opened) {
@@ -102,18 +98,19 @@ export function UserConstraintEditor({
     // Initialize form data when editing
     const initializeEditData = () => {
         if (!initialData) return;
-        
-        form.setValues({
+
+        setFormValues({
             userId: initialData.userId,
             schedulingPeriodId: initialData.schedulingPeriodId,
             key: initialData.key,
             isPreference: initialData.isPreference,
         });
-        
+        setFormErrors({});
+
         // Parse the value based on constraint type
         if (initialData.key === "forbidden_timerange") {
             const entries = parseForbiddenTimeRange(initialData.value);
-            const entriesWithIds = entries.length > 0 
+            const entriesWithIds = entries.length > 0
                 ? entries.map(e => ({ ...e, id: generateEntryId() }))
                 : [{ weekday: "", startTime: "", endTime: "", id: generateEntryId() }];
             setTimeRangeEntries(entriesWithIds);
@@ -125,13 +122,14 @@ export function UserConstraintEditor({
 
     // Initialize form data when creating new
     const initializeNewData = () => {
-        form.setValues({
+        setFormValues({
             userId: !isAdmin && currentUserId ? currentUserId : "",
             schedulingPeriodId: "",
             key: constraintKey,
             isPreference: isPreference,
         });
-        
+        setFormErrors({});
+
         // Initialize empty form data based on constraint type
         if (constraintKey === "forbidden_timerange") {
             setTimeRangeEntries([{ weekday: "", startTime: "", endTime: "", id: generateEntryId() }]);
@@ -150,17 +148,30 @@ export function UserConstraintEditor({
         }
     }, [opened, initialData, isAdmin, currentUserId, isPreference, constraintKey]);
 
-    const handleSubmit = async (values: typeof form.values) => {
-        // Validate before submitting
+    const handleSubmit = async () => {
+        // Validate form fields
+        const errors: Record<string, string> = {};
+        if (!formValues.userId) {
+            errors.userId = resources.validationMessages.userRequired;
+        }
+        if (!formValues.schedulingPeriodId) {
+            errors.schedulingPeriodId = resources.validationMessages.schedulingPeriodRequired;
+        }
+
+        // Validate constraint-specific fields
         const validationError = validateForm();
         if (validationError) {
-            form.setFieldError("value", validationError);
+            errors.value = validationError;
+        }
+
+        if (Object.keys(errors).length > 0) {
+            setFormErrors(errors);
             return;
         }
 
         // Serialize form data based on constraint type
         let serializedValue = "";
-        
+
         if (constraintKey === "forbidden_timerange") {
             // Remove id field before serializing
             const entriesWithoutIds = timeRangeEntries.map(({ id, ...entry }) => entry);
@@ -168,13 +179,21 @@ export function UserConstraintEditor({
         } else if (constraintKey === "preferred_weekdays") {
             serializedValue = serializePreferredWeekdays(selectedWeekdays);
         }
-        
+
         await onSubmit({
-            ...values,
+            ...formValues,
             value: serializedValue,
             isPreference: initialData?.isPreference ?? isPreference,
         });
-        form.reset();
+
+        // Reset form
+        setFormValues({
+            userId: !isAdmin && currentUserId ? currentUserId : "",
+            schedulingPeriodId: "",
+            key: constraintKey,
+            isPreference: isPreference,
+        });
+        setFormErrors({});
         setTimeRangeEntries([]);
         setSelectedWeekdays([]);
         onClose();
@@ -189,7 +208,7 @@ export function UserConstraintEditor({
     };
 
     const updateTimeRangeEntry = (id: string, field: keyof ForbiddenTimeRangeEntry, value: string) => {
-        setTimeRangeEntries(timeRangeEntries.map(entry => 
+        setTimeRangeEntries(timeRangeEntries.map(entry =>
             entry.id === id ? { ...entry, [field]: value } : entry
         ));
     };
@@ -201,14 +220,14 @@ export function UserConstraintEditor({
             if (validEntries.length === 0) {
                 return resources.validationMessages.atLeastOneTimeRange;
             }
-            
+
             // Validate each entry
             for (const entry of validEntries) {
                 const [startHours, startMinutes] = entry.startTime.split(':').map(Number);
                 const [endHours, endMinutes] = entry.endTime.split(':').map(Number);
                 const startTotal = startHours * 60 + startMinutes;
                 const endTotal = endHours * 60 + endMinutes;
-                
+
                 if (startTotal >= endTotal) {
                     return resources.validationMessages.startTimeBeforeEndTime;
                 }
@@ -224,12 +243,7 @@ export function UserConstraintEditor({
     // Handle form submission with validation
     const handleFormSubmit = (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
-        const validationError = validateForm();
-        if (validationError) {
-            form.setFieldError("value", validationError);
-        } else {
-            form.onSubmit(handleSubmit)(e);
-        }
+        handleSubmit();
     };
 
     const userOptions = users.map((user) => ({
@@ -269,7 +283,14 @@ export function UserConstraintEditor({
                         searchable
                         required
                         mb="md"
-                        {...form.getInputProps("userId")}
+                        value={formValues.userId}
+                        onChange={(value) => {
+                            setFormValues({ ...formValues, userId: value || "" });
+                            if (formErrors.userId) {
+                                setFormErrors({ ...formErrors, userId: "" });
+                            }
+                        }}
+                        error={formErrors.userId}
                     />
                 ) : (
                     <TextInput
@@ -292,7 +313,14 @@ export function UserConstraintEditor({
                     searchable
                     required
                     mb="md"
-                    {...form.getInputProps("schedulingPeriodId")}
+                    value={formValues.schedulingPeriodId}
+                    onChange={(value) => {
+                        setFormValues({ ...formValues, schedulingPeriodId: value || "" });
+                        if (formErrors.schedulingPeriodId) {
+                            setFormErrors({ ...formErrors, schedulingPeriodId: "" });
+                        }
+                    }}
+                    error={formErrors.schedulingPeriodId}
                 />
 
                 <TextInput
@@ -304,6 +332,11 @@ export function UserConstraintEditor({
 
                 {constraintKey === "forbidden_timerange" && (
                     <Stack gap="md" mb="md">
+                        {formErrors.value && (
+                            <Text size="sm" c="red" mb="xs">
+                                {formErrors.value}
+                            </Text>
+                        )}
                         {timeRangeEntries.map((entry, index) => (
                             <Group key={entry.id} align="flex-start" gap="xs">
                                 <Select
@@ -359,7 +392,13 @@ export function UserConstraintEditor({
                         placeholder={resources.placeholders.selectWeekday}
                         data={resources.other.weekdays}
                         value={selectedWeekdays}
-                        onChange={setSelectedWeekdays}
+                        onChange={(value) => {
+                            setSelectedWeekdays(value);
+                            if (formErrors.value) {
+                                setFormErrors({ ...formErrors, value: "" });
+                            }
+                        }}
+                        error={formErrors.value}
                         required
                         mb="md"
                     />
@@ -369,8 +408,8 @@ export function UserConstraintEditor({
                     <Button variant="subtle" onClick={onClose} disabled={loading}>
                         {resources.cancelButton}
                     </Button>
-                    <Button 
-                        type="submit" 
+                    <Button
+                        type="submit"
                         loading={loading}
                     >
                         {initialData ? resources.updateButton : resources.createButton}

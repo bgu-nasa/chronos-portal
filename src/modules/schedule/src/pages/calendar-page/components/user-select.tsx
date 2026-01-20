@@ -13,7 +13,15 @@ export function UserSelect({ value, onChange, disabled = false }: UserSelectProp
     const { users, isLoading, fetchUsers } = useUsers();
 
     useEffect(() => {
-        void fetchUsers();
+        // Only fetch users if organization context is available
+        const org = $app.organization.getOrganization();
+        if (org) {
+            void fetchUsers().catch((error) => {
+                // Silently handle errors - organization might not be ready yet
+                // The error will be logged by the repository
+                console.debug("Failed to fetch users:", error);
+            });
+        }
     }, [fetchUsers]);
 
     const data = users.map((user) => ({
