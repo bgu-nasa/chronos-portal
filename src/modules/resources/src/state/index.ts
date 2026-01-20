@@ -5,3 +5,5 @@
 
 export * from "./subject.store";
 export * from "./activity.store";
+export * from "./resource.store";
+export * from "./resource-type.store";

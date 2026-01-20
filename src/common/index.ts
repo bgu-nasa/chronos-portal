@@ -22,4 +22,11 @@ export type {
 } from "./hooks/use-confirmation";
 
 // Icons
-export { ChevronLeftIcon, ChevronRightIcon, MenuIcon } from "./icons";
+export { 
+    ChevronLeftIcon, 
+    ChevronRightIcon, 
+    MenuIcon,
+    ResourcesIcon,
+    CoursesIcon,
+    ResourceManagementIcon,
+} from "./icons";
