@@ -4,6 +4,7 @@ import { ConfirmationDialog, useConfirmation } from "@/common";
 import { SchedulingPeriodActions } from "@/modules/schedule/src/pages/scheduling-periods-page/components/scheduling-period-actions";
 import { SchedulingPeriodTable } from "@/modules/schedule/src/pages/scheduling-periods-page/components/scheduling-period-table";
 import { SchedulingPeriodEditor } from "@/modules/schedule/src/pages/scheduling-periods-page/components/scheduling-period-editor";
+import { AssignmentPanel } from "@/modules/schedule/src/pages/scheduling-periods-page/components/assignment-panel";
 import { SlotTable } from "@/modules/schedule/src/pages/slots-page/components/slot-table";
 import { SlotActions } from "@/modules/schedule/src/pages/slots-page/components/slot-actions";
 import { SlotEditor } from "@/modules/schedule/src/pages/slots-page/components/slot-editor";
@@ -27,6 +28,7 @@ export function SchedulingPeriodsPage() {
     const [selectedPeriod, setSelectedPeriod] = useState<SchedulingPeriodDataWithExpired | null>(null);
     const [showSlots, setShowSlots] = useState(false);
     const [selectedSlot, setSelectedSlot] = useState<SlotResponse | null>(null);
+    const [showAssignments, setShowAssignments] = useState(false);
 
     const { schedulingPeriods, fetchSchedulingPeriods } = useSchedulingPeriods();
     const { deleteSchedulingPeriod } = useDeleteSchedulingPeriod();
@@ -140,6 +142,13 @@ export function SchedulingPeriodsPage() {
         });
     };
 
+    // Assignment actions
+    const handleViewAssignmentsClick = () => {
+        if (selectedSlot) {
+            setShowAssignments(true);
+        }
+    };
+
     return (
         <Container size="xl" py="xl">
             <div className={styles.container}>
@@ -199,6 +208,7 @@ export function SchedulingPeriodsPage() {
                                         onCreateClick={handleCreateSlotClick}
                                         onEditClick={handleEditSlotClick}
                                         onDeleteClick={handleDeleteSlotClick}
+                                        onViewAssignmentsClick={handleViewAssignmentsClick}
                                     />
                                 )}
 
@@ -217,6 +227,12 @@ export function SchedulingPeriodsPage() {
                 </Grid>
 
                 <SchedulingPeriodEditor />
+
+                <AssignmentPanel
+                    isOpen={showAssignments}
+                    slot={selectedSlot}
+                    onClose={() => setShowAssignments(false)}
+                />
 
                 <ConfirmationDialog
                     opened={confirmationState.isOpen}

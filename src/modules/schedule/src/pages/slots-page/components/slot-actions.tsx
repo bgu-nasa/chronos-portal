@@ -1,5 +1,4 @@
 import { Button, Group } from "@mantine/core";
-import { HiOutlinePlus, HiOutlinePencil, HiOutlineTrash } from "react-icons/hi";
 import type { SlotResponse } from "@/modules/schedule/src/data/slot.types";
 import resources from "@/modules/schedule/src/pages/slots-page/slots-page.resources.json";
 
@@ -8,6 +7,7 @@ interface SlotActionsProps {
     onCreateClick: () => void;
     onEditClick: () => void;
     onDeleteClick: () => void;
+    onViewAssignmentsClick?: () => void;
 }
 
 export function SlotActions({
@@ -15,18 +15,15 @@ export function SlotActions({
     onCreateClick,
     onEditClick,
     onDeleteClick,
+    onViewAssignmentsClick,
 }: SlotActionsProps) {
     return (
         <Group mb="md">
-            <Button
-                leftSection={<HiOutlinePlus size={16} />}
-                onClick={onCreateClick}
-            >
+            <Button onClick={onCreateClick}>
                 {resources.createButton}
             </Button>
             <Button
                 variant="light"
-                leftSection={<HiOutlinePencil size={16} />}
                 disabled={!selectedSlot}
                 onClick={onEditClick}
             >
@@ -34,12 +31,20 @@ export function SlotActions({
             </Button>
             <Button
                 variant="light"
-                leftSection={<HiOutlineTrash size={16} />}
                 disabled={!selectedSlot}
                 onClick={onDeleteClick}
             >
                 {resources.deleteButton}
             </Button>
+            {onViewAssignmentsClick && (
+                <Button
+                    variant="outline"
+                    disabled={!selectedSlot}
+                    onClick={onViewAssignmentsClick}
+                >
+                    View Assignments
+                </Button>
+            )}
         </Group>
     );
 }

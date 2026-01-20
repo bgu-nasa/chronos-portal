@@ -182,7 +182,7 @@ export function SchedulingPeriodEditor() {
                         touchUI
                     />
                     {error && error === resources.editorFromDateRequired && (
-                        <Text size="xs" c="red">{error}</Text>
+                        <Text size="xs" c="var(--mantine-color-error)">{error}</Text>
                     )}
                 </Stack>
 
@@ -204,12 +204,12 @@ export function SchedulingPeriodEditor() {
                         touchUI
                     />
                     {error && error === resources.editorToDateRequired && (
-                        <Text size="xs" c="red">{error}</Text>
+                        <Text size="xs" c="var(--mantine-color-error)">{error}</Text>
                     )}
                 </Stack>
 
                 {apiError && (
-                    <Text size="sm" c="red" mb="md" style={{ padding: '0.5rem', backgroundColor: 'var(--mantine-color-error-light)', borderRadius: 'var(--mantine-radius-sm)' }}>
+                    <Text size="sm" c="var(--mantine-color-error)" mb="md">
                         {apiError}
                     </Text>
                 )}
