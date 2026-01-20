@@ -8,7 +8,7 @@ import { tokenService } from "./token.service";
 import type { ApiError } from "./types";
 
 // Base URL can be configured via environment variable
-const BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:29058";
+const BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:5000/";
 
 // Refresh endpoint
 const REFRESH_ENDPOINT = "/api/auth/refresh";
@@ -61,13 +61,13 @@ function createHttpClient(): AxiosInstance {
                                 },
                                 _requiresAuth: true,
                                 _isRefreshRequest: true,
-                            } as CustomAxiosRequestConfig
+                            } as CustomAxiosRequestConfig,
                         );
                         return (response.data as { token: string }).token;
                     });
                 } catch (error) {
                     // Token refresh failed, request will proceed without token
-                    console.warn("Token refresh failed:", error);
+                    $app.logger.warn("Token refresh failed:", error);
                 }
             }
 
@@ -79,7 +79,7 @@ function createHttpClient(): AxiosInstance {
 
             return config;
         },
-        (error) => Promise.reject(error)
+        (error) => Promise.reject(error),
     );
 
     // Response interceptor: normalize errors
@@ -100,7 +100,7 @@ function createHttpClient(): AxiosInstance {
             }
 
             return Promise.reject(apiError);
-        }
+        },
     );
 
     return client;
