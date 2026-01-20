@@ -49,10 +49,6 @@ export const useRoleStore = create<RoleStore>((set, get) => ({
                 apiError.message || "Failed to fetch role assignments";
             set({ error: errorMessage, isLoading: false });
             $app.logger.error("Error fetching role assignments:", err);
-            $app.notifications.showError(
-                "Failed to fetch role assignments",
-                apiError.details ? String(apiError.details) : undefined,
-            );
         }
     },
 

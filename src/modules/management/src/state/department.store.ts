@@ -52,10 +52,6 @@ export const useDepartmentStore = create<DepartmentStore>((set, get) => ({
                 apiError.message || "Failed to fetch departments";
             set({ error: errorMessage, isLoading: false });
             $app.logger.error("Error fetching departments:", err);
-            $app.notifications.showError(
-                "Failed to fetch departments",
-                apiError.details ? String(apiError.details) : undefined,
-            );
         }
     },
 

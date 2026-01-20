@@ -50,10 +50,6 @@ export const useUserStore = create<UserStore>((set, get) => ({
             const errorMessage = apiError.message || "Failed to fetch users";
             set({ error: errorMessage, isLoading: false });
             $app.logger.error("Error fetching users:", err);
-            $app.notifications.showError(
-                "Failed to fetch users",
-                apiError.details ? String(apiError.details) : undefined,
-            );
         }
     },
 
