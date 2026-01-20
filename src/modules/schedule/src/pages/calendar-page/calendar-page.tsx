@@ -1,7 +1,6 @@
 import { useState, useEffect, useMemo } from "react";
 import { Box, Flex, Paper, Group } from "@mantine/core";
 
-import { $app } from "@/infra/service";
 import { WeekView } from "@/common/components/calendar";
 import { useUsers } from "@/modules/auth/src/hooks";
 import { useUserConstraints, useSchedulingPeriods } from "@/modules/schedule/src/hooks";
