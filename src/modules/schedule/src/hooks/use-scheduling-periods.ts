@@ -24,6 +24,8 @@ export function useSchedulingPeriods() {
     };
 }
 
+
+
 /**
  * Hook for creating a scheduling period
  */

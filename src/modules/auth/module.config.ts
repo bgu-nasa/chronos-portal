@@ -36,6 +36,13 @@ export const moduleConfig: ModuleConfig = {
             label: "Users",
             href: "/auth/users",
             location: "dashboard",
+            // Only admins and user managers can interact with the user mgmt, but the rest can see it
+            requiredRoles: [
+                "Administrator",
+                "UserManager",
+                "ResourceManager",
+                "Operator",
+            ],
             icon: React.createElement(UsersIcon),
         },
     ],

@@ -7,6 +7,7 @@ import {
     DashboardLayout,
     PublicLayout,
 } from "./theme";
+import { NotificationProvider } from "./service";
 
 function App() {
     const publicRoutes = ApplicationRoutesRepository.getPublicRoutes();
@@ -17,31 +18,35 @@ function App() {
     };
 
     return (
-        <Routes>
-            <Route element={<UnauthenticatedPageFilter />}>
-                <Route element={<PublicLayout />}>
-                    {publicRoutes.map((route, index) => (
-                        <Route
-                            key={getRouteKey(route, index)}
-                            path={route.path}
-                            element={route.element}
-                        />
-                    ))}
+        <>
+            <Routes>
+                <Route element={<UnauthenticatedPageFilter />}>
+                    <Route element={<PublicLayout />}>
+                        {publicRoutes.map((route, index) => (
+                            <Route
+                                key={getRouteKey(route, index)}
+                                path={route.path}
+                                element={route.element}
+                            />
+                        ))}
+                    </Route>
                 </Route>
-            </Route>
 
-            <Route element={<AuthenticatedPageFilter />}>
-                <Route element={<DashboardLayout />}>
-                    {privateRoutes.map((route, index) => (
-                        <Route
-                            key={getRouteKey(route, index)}
-                            path={route.path}
-                            element={route.element}
-                        />
-                    ))}
+                <Route element={<AuthenticatedPageFilter />}>
+                    <Route element={<DashboardLayout />}>
+                        {privateRoutes.map((route, index) => (
+                            <Route
+                                key={getRouteKey(route, index)}
+                                path={route.path}
+                                element={route.element}
+                            />
+                        ))}
+                    </Route>
                 </Route>
-            </Route>
-        </Routes>
+            </Routes>
+
+            <NotificationProvider />
+        </>
     );
 }
 

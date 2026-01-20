@@ -1,0 +1,379 @@
+import { useEffect, useState } from "react";
+import { Modal, Select, Button, Stack, Text, Group, Chip, Box, ActionIcon } from "@mantine/core";
+import { useSlotEditorStore } from "@/modules/schedule/src/stores/slot-editor.store";
+import { useCreateSlot, useUpdateSlot } from "@/modules/schedule/src/hooks/use-slots";
+import { Weekday, WeekdayOrder } from "@/modules/schedule/src/data/slot.types";
+import resources from "@/modules/schedule/src/pages/slots-page/slots-page.resources.json";
+
+interface SlotEditorProps {
+    schedulingPeriodId: string;
+}
+
+// Duration options in minutes
+const durationOptions = [
+    { value: "30", label: "30 minutes" },
+    { value: "60", label: "1 hour" },
+    { value: "90", label: "1.5 hours" },
+    { value: "120", label: "2 hours" },
+    { value: "150", label: "2.5 hours" },
+    { value: "180", label: "3 hours" },
+];
+
+// TimeSpinner component with + above and - below, stepping by 30 minutes with wrap-around
+interface TimeSpinnerProps {
+    label: string;
+    totalMinutes: number; // 0-1439 (24 hours * 60 minutes)
+    onChange: (totalMinutes: number) => void;
+    error?: string;
+}
+
+function TimeSpinner({ label, totalMinutes, onChange, error }: TimeSpinnerProps) {
+    const hours = Math.floor(totalMinutes / 60);
+    const minutes = totalMinutes % 60;
+
+    const displayTime = `${hours.toString().padStart(2, "0")}:${minutes.toString().padStart(2, "0")}`;
+
+    const handleIncrement = () => {
+        // Add 30 minutes with wrap-around (1440 = 24 hours in minutes)
+        const newValue = (totalMinutes + 30) % 1440;
+        onChange(newValue);
+    };
+
+    const handleDecrement = () => {
+        // Subtract 30 minutes with wrap-around
+        const newValue = (totalMinutes - 30 + 1440) % 1440;
+        onChange(newValue);
+    };
+
+    return (
+        <Box>
+            <Text size="sm" fw={500} mb={4}>
+                {label} <span style={{ color: "var(--mantine-color-error)" }}>*</span>
+            </Text>
+            <Stack gap={4} align="center" style={{ width: "fit-content" }}>
+                <ActionIcon
+                    variant="light"
+                    size="lg"
+                    onClick={handleIncrement}
+                    aria-label="Add 30 minutes"
+                >
+                    +
+                </ActionIcon>
+                <Box
+                    style={{
+                        padding: "8px 16px",
+                        border: "1px solid var(--mantine-color-default-border)",
+                        borderRadius: "var(--mantine-radius-sm)",
+                        fontWeight: 600,
+                        fontSize: "1.1rem",
+                        minWidth: "80px",
+                        textAlign: "center",
+                        backgroundColor: "var(--mantine-color-default)",
+                    }}
+                >
+                    {displayTime}
+                </Box>
+                <ActionIcon
+                    variant="light"
+                    size="lg"
+                    onClick={handleDecrement}
+                    aria-label="Subtract 30 minutes"
+                >
+                    −
+                </ActionIcon>
+            </Stack>
+            {error && <Text size="xs" c="red" mt={4}>{error}</Text>}
+        </Box>
+    );
+}
+
+// Day options for multi-select (Sunday first) - uses string values directly
+const dayOptions = WeekdayOrder.map((day) => ({
+    value: day,
+    label: day,
+}));
+
+export function SlotEditor({ schedulingPeriodId }: SlotEditorProps) {
+    const { isOpen, mode, slot, close } = useSlotEditorStore();
+    const { createSlot, error: createError, clearError: clearCreateError } = useCreateSlot();
+    const { updateSlot, error: updateError, clearError: clearUpdateError } = useUpdateSlot();
+
+    // Form state - Create mode (using total minutes)
+    const [selectedDays, setSelectedDays] = useState<string[]>([]);
+    const [startTime, setStartTime] = useState(8 * 60); // 08:00 in minutes
+    const [endTime, setEndTime] = useState(16 * 60); // 16:00 in minutes
+    const [duration, setDuration] = useState<string | null>("60");
+    const [errors, setErrors] = useState<Record<string, string>>({});
+    const [isSubmitting, setIsSubmitting] = useState(false);
+
+    // For edit mode - single day and times
+    const [editWeekday, setEditWeekday] = useState<string | null>(null);
+    const [editFromTime, setEditFromTime] = useState(8 * 60);
+    const [editToTime, setEditToTime] = useState(9 * 60);
+
+    // Clear related errors when values change
+    const handleStartTimeChange = (value: number) => {
+        setStartTime(value);
+        setErrors((prev) => {
+            const { startTime: _, endTime: __, duration: ___, ...rest } = prev;
+            return rest;
+        });
+    };
+
+    const handleEndTimeChange = (value: number) => {
+        setEndTime(value);
+        setErrors((prev) => {
+            const { endTime: _, duration: __, ...rest } = prev;
+            return rest;
+        });
+    };
+
+    const handleDurationChange = (value: string | null) => {
+        setDuration(value);
+        setErrors((prev) => {
+            const { duration: _, ...rest } = prev;
+            return rest;
+        });
+    };
+
+    // Reset form when modal opens
+    useEffect(() => {
+        if (isOpen) {
+            clearCreateError();
+            clearUpdateError();
+            setErrors({});
+
+            if (mode === "edit" && slot) {
+                // Edit mode: single slot
+                setEditWeekday(slot.weekday);
+                // Parse time to total minutes
+                const fromParts = slot.fromTime.split(":");
+                const toParts = slot.toTime.split(":");
+                setEditFromTime(parseInt(fromParts[0], 10) * 60 + parseInt(fromParts[1], 10));
+                setEditToTime(parseInt(toParts[0], 10) * 60 + parseInt(toParts[1], 10));
+            } else {
+                // Create mode: bulk creation
+                setSelectedDays([]);
+                setStartTime(8 * 60);
+                setEndTime(16 * 60);
+                setDuration("60");
+            }
+        }
+    }, [isOpen, mode, slot]);
+
+    const validateCreate = () => {
+        const newErrors: Record<string, string> = {};
+        if (selectedDays.length === 0) newErrors.days = "Please select at least one day";
+        if (!duration) newErrors.duration = "Duration is required";
+        if (startTime >= endTime) {
+            newErrors.endTime = "End time must be after start time";
+        }
+        // Check if time range is divisible by duration
+        if (duration && startTime < endTime) {
+            const timeRange = endTime - startTime;
+            const durationMinutes = parseInt(duration);
+            if (timeRange < durationMinutes) {
+                newErrors.duration = "Time range is too short for this duration";
+            } else if (timeRange % durationMinutes !== 0) {
+                newErrors.duration = "Time range must be evenly divisible by duration";
+            }
+        }
+        setErrors(newErrors);
+        return Object.keys(newErrors).length === 0;
+    };
+
+    const validateEdit = () => {
+        const newErrors: Record<string, string> = {};
+        if (!editWeekday) newErrors.weekday = "Day is required";
+        if (editFromTime >= editToTime) {
+            newErrors.toTime = "End time must be after start time";
+        }
+        setErrors(newErrors);
+        return Object.keys(newErrors).length === 0;
+    };
+
+    // Format total minutes to time string
+    const formatTimeStr = (totalMinutes: number, withSeconds = false) => {
+        const hours = Math.floor(totalMinutes / 60);
+        const mins = totalMinutes % 60;
+        const h = hours.toString().padStart(2, "0");
+        const m = mins.toString().padStart(2, "0");
+        return withSeconds ? `${h}:${m}:00` : `${h}:${m}`;
+    };
+
+    const handleSubmit = async (e: React.FormEvent) => {
+        e.preventDefault();
+        setIsSubmitting(true);
+
+        try {
+            if (mode === "create") {
+                if (!validateCreate()) {
+                    setIsSubmitting(false);
+                    return;
+                }
+
+                // Generate slots based on time range, duration, and days
+                const durationMinutes = parseInt(duration!);
+
+                const slotsToCreate: { day: Weekday; fromTime: string; toTime: string }[] = [];
+
+                // Generate slot times
+                let currentStart = startTime;
+                while (currentStart + durationMinutes <= endTime) {
+                    const fromTimeStr = formatTimeStr(currentStart, true);
+                    const toTimeStr = formatTimeStr(currentStart + durationMinutes, true);
+
+                    selectedDays.forEach((dayStr) => {
+                        slotsToCreate.push({
+                            day: dayStr as Weekday,
+                            fromTime: fromTimeStr,
+                            toTime: toTimeStr,
+                        });
+                    });
+
+                    currentStart += durationMinutes;
+                }
+
+                // Create all slots
+                for (const slotData of slotsToCreate) {
+                    await createSlot({
+                        schedulingPeriodId,
+                        weekday: slotData.day,
+                        fromTime: slotData.fromTime,
+                        toTime: slotData.toTime,
+                    });
+                }
+
+                close();
+            } else if (mode === "edit" && slot) {
+                if (!validateEdit()) {
+                    setIsSubmitting(false);
+                    return;
+                }
+
+                const success = await updateSlot(slot.id, {
+                    weekday: editWeekday as Weekday,
+                    fromTime: formatTimeStr(editFromTime, true),
+                    toTime: formatTimeStr(editToTime, true),
+                });
+
+                if (success) {
+                    close();
+                }
+            }
+        } finally {
+            setIsSubmitting(false);
+        }
+    };
+
+    const title = mode === "create" ? resources.editorCreateTitle : resources.editorEditTitle;
+    const apiError = createError || updateError;
+
+    // Calculate slot count for preview
+    const calculateSlotCount = () => {
+        if (!duration || selectedDays.length === 0) return 0;
+        if (startTime >= endTime) return 0;
+        return Math.floor((endTime - startTime) / parseInt(duration)) * selectedDays.length;
+    };
+
+    return (
+        <Modal opened={isOpen} onClose={close} title={title} size="md">
+            <form onSubmit={handleSubmit}>
+                <Stack gap="md">
+                    {mode === "create" ? (
+                        <>
+                            <div>
+                                <Text size="sm" fw={500} mb="xs">Days</Text>
+                                <Chip.Group multiple value={selectedDays} onChange={setSelectedDays}>
+                                    <Group gap="xs">
+                                        {dayOptions.map((day) => (
+                                            <Chip key={day.value} value={day.value} variant="filled">
+                                                {day.label.substring(0, 3)}
+                                            </Chip>
+                                        ))}
+                                    </Group>
+                                </Chip.Group>
+                                {errors.days && <Text size="xs" c="red" mt="xs">{errors.days}</Text>}
+                            </div>
+
+                            <Group grow align="flex-start">
+                                <TimeSpinner
+                                    label="Start Time"
+                                    totalMinutes={startTime}
+                                    onChange={handleStartTimeChange}
+                                    error={errors.startTime}
+                                />
+                                <TimeSpinner
+                                    label="End Time"
+                                    totalMinutes={endTime}
+                                    onChange={handleEndTimeChange}
+                                    error={errors.endTime}
+                                />
+                            </Group>
+
+                            <Select
+                                label="Slot Duration"
+                                placeholder="Select duration"
+                                data={durationOptions}
+                                value={duration}
+                                onChange={handleDurationChange}
+                                error={errors.duration}
+                                required
+                            />
+
+                            {selectedDays.length > 0 && duration && calculateSlotCount() > 0 && (
+                                <Text size="sm" c="dimmed">
+                                    This will create{" "}
+                                    <strong>{calculateSlotCount()}</strong>{" "}
+                                    slots total
+                                </Text>
+                            )}
+                        </>
+                    ) : (
+                        <>
+                            <Select
+                                label={resources.editorDayLabel}
+                                placeholder={resources.editorDayPlaceholder}
+                                data={dayOptions}
+                                value={editWeekday}
+                                onChange={setEditWeekday}
+                                error={errors.weekday}
+                                required
+                            />
+
+                            <Group grow align="flex-start">
+                                <TimeSpinner
+                                    label={resources.editorStartTimeLabel}
+                                    totalMinutes={editFromTime}
+                                    onChange={setEditFromTime}
+                                    error={errors.fromTime}
+                                />
+                                <TimeSpinner
+                                    label={resources.editorEndTimeLabel}
+                                    totalMinutes={editToTime}
+                                    onChange={setEditToTime}
+                                    error={errors.toTime}
+                                />
+                            </Group>
+                        </>
+                    )}
+
+                    {apiError && (
+                        <Text c="red" size="sm">
+                            {apiError}
+                        </Text>
+                    )}
+
+                    <Group justify="flex-end" mt="md">
+                        <Button variant="default" onClick={close}>
+                            {resources.editorCancelButton}
+                        </Button>
+                        <Button type="submit" loading={isSubmitting}>
+                            {mode === "create" ? resources.editorCreateButton : resources.editorSaveButton}
+                        </Button>
+                    </Group>
+                </Stack>
+            </form>
+        </Modal>
+    );
+}

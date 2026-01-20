@@ -20,8 +20,8 @@
 }
 
 .calendarInput :global(.p-inputtext:focus) {
-    border-color: var(--mantine-color-blue-6);
-    box-shadow: 0 0 0 2px rgba(34, 139, 230, 0.2);
+    border-color: var(--mantine-primary-color-filled);
+    box-shadow: 0 0 0 2px var(--mantine-primary-color-light);
     outline: none;
 }
 
@@ -47,7 +47,7 @@
     background-color: var(--mantine-color-body) !important;
     border: 1px solid var(--mantine-color-default-border) !important;
     border-radius: var(--mantine-radius-lg) !important;
-    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3) !important;
+    box-shadow: var(--mantine-shadow-xl) !important;
     padding: 1rem !important;
     /* TouchUI constraints */
     width: 360px !important;
@@ -137,7 +137,7 @@
    ENABLED DAYS (Darker and bolder in both modes)
    ============================================ */
 .calendarPanel :global(.p-datepicker-day:not(.p-disabled):not(.p-datepicker-other-month) span) {
-    color: #000 !important;
+    color: var(--mantine-color-text) !important;
     font-weight: 900 !important;
     border: none !important;
     background-color: transparent !important;
@@ -154,13 +154,13 @@
 /* Dark mode support for enabled days */
 @media (prefers-color-scheme: dark) {
     .calendarPanel :global(.p-datepicker-day:not(.p-disabled):not(.p-datepicker-other-month) span) {
-        color: #fff !important;
+        color: var(--mantine-color-text) !important;
     }
 }
 
 /* HOVER on Enabled Days */
 .calendarPanel :global(.p-datepicker-day:not(.p-disabled):not(.p-datepicker-other-month):hover span) {
-    background-color: var(--mantine-color-blue-light) !important;
+    background-color: var(--mantine-primary-color-light) !important;
     cursor: pointer !important;
 }
 
@@ -170,8 +170,8 @@
 .calendarPanel :global(.p-datepicker-day-selected span),
 .calendarPanel :global(.p-highlight),
 .calendarPanel :global(.p-datepicker-today.p-datepicker-day-selected span) {
-    background-color: var(--mantine-color-blue-filled) !important;
-    color: white !important;
+    background-color: var(--mantine-primary-color-filled) !important;
+    color: var(--mantine-color-white) !important;
     font-weight: 900 !important;
     border: none !important;
 }

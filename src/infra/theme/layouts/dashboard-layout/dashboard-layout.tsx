@@ -9,7 +9,7 @@ import {
     Tooltip,
     HoverCard,
 } from "@mantine/core";
-import { useEffect } from "react";
+import { useEffect, useMemo } from "react";
 import styles from "./dashboard-layout.module.css";
 import { useDashboardNavigation } from "./use-dashboard-navigation";
 import { UserCard } from "@/infra/theme/components/user-card";
@@ -26,12 +26,13 @@ import {
 import { DeletedOrganizationAlert } from "./deleted-organization-alert";
 import { useNavbarStore } from "./navbar.store";
 import resources from "./navbar-collapse.resources.json";
+import { filterNavigationByRoles } from "./filter-navigation-by-roles";
 
 function renderNavigationItems(
     items: NavigationItem[],
     navigate: (path: string) => void,
     currentPath: string,
-    collapsed: boolean
+    collapsed: boolean,
 ) {
     return items.map((item) => {
         const hasChildren = item.children && item.children.length > 0;
@@ -122,7 +123,7 @@ function renderNavigationItems(
                         item.children,
                         navigate,
                         currentPath,
-                        collapsed
+                        collapsed,
                     )}
             </NavLink>
         );
@@ -144,11 +145,19 @@ export default function DashboardLayout() {
             fetchOrganization().catch((error) => {
                 console.error(
                     "Failed to fetch organization information:",
-                    error
+                    error,
                 );
             });
         }
     }, [fetchOrganization, organization]);
+
+    // Filter navigation items based on user roles
+    const filteredNavigationItems = useMemo(() => {
+        if (!organization) {
+            return navigationItems;
+        }
+        return filterNavigationByRoles(navigationItems, organization.userRoles);
+    }, [navigationItems, organization]);
 
     return (
         <AppShell
@@ -195,10 +204,10 @@ export default function DashboardLayout() {
                     <div style={{ flex: 1 }}>
                         <Stack gap="xs">
                             {renderNavigationItems(
-                                navigationItems,
+                                filteredNavigationItems,
                                 navigate,
                                 location.pathname,
-                                collapsed
+                                collapsed,
                             )}
                         </Stack>
                     </div>
