@@ -30,7 +30,7 @@ export function useUpdatePassword() {
                     : "Failed to update password";
             setError(errorMessage);
             setIsLoading(false);
-            console.error("Error updating password:", err);
+            $app.logger.error("Error updating password:", err);
             return false;
         }
     };
