@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo } from "react";
-import { Box, Flex, Paper } from "@mantine/core";
+import { Box, Flex, Paper, Group } from "@mantine/core";
 
 import { $app } from "@/infra/service";
 import { WeekView } from "@/common/components/calendar";
@@ -33,7 +33,7 @@ export function CalendarPage() {
     const org = $app.organization.getOrganization();
     const userId = org?.userRoles?.[0]?.userId;
     const userIsAdmin = $app.organization.isAdministrator();
-    
+
     if (userId) {
       setCurrentUserId(userId);
       // For non-admin users, set and lock the user selection
@@ -166,18 +166,27 @@ export function CalendarPage() {
   };
 
   return (
-    <Flex className={styles.calendarPageContainer} gap="md">
-      <Paper withBorder p="md" className={styles.sidebar}>
-        <SchedulingPeriodSelect value={selectedPeriodId} onChange={setSelectedPeriodId} />
-        {isAdmin ? (
-          <Box mt="md">
-            <UserSelect value={selectedUserId} onChange={setSelectedUserId} />
+    <Flex className={styles.calendarPageContainer} direction="column" gap="md">
+      <Paper withBorder p="md" className={styles.topBar}>
+        <Group
+          gap="md"
+          align="flex-start"
+          className={styles.controlsGroup}
+          wrap="wrap"
+        >
+          <Box className={styles.controlItem}>
+            <SchedulingPeriodSelect value={selectedPeriodId} onChange={setSelectedPeriodId} />
           </Box>
-        ) : (
-          <Box mt="md">
-            <UserSelect value={selectedUserId} onChange={() => { }} disabled />
-          </Box>
-        )}
+          {isAdmin ? (
+            <Box className={styles.controlItem}>
+              <UserSelect value={selectedUserId} onChange={setSelectedUserId} />
+            </Box>
+          ) : (
+            <Box className={styles.controlItem}>
+              <UserSelect value={selectedUserId} onChange={() => { }} disabled />
+            </Box>
+          )}
+        </Group>
       </Paper>
       <Box className={styles.content}>
         <WeekView
