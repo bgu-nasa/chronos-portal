@@ -4,22 +4,24 @@
  */
 
 import { useEffect, useState, useMemo } from "react";
-import { Modal, Select, TextInput, Button, Group, Text, Stack } from "@mantine/core";
+import { Modal, Select, Button, Group, Text, Stack } from "@mantine/core";
 import { useAssignmentEditorStore } from "@/modules/schedule/src/stores/assignment-editor.store";
 import {
     useCreateAssignment,
     useUpdateAssignment,
 } from "@/modules/schedule/src/hooks/use-assignments";
 import { useResources } from "@/modules/schedule/src/hooks/use-resources";
+import { useActivities } from "@/modules/schedule/src/hooks/use-activities";
 
 export function AssignmentEditor() {
     const { isOpen, mode, assignment, slotId, close } = useAssignmentEditorStore();
     const { createAssignment, isLoading: isCreating, error: createError, clearError: clearCreateError } = useCreateAssignment();
     const { updateAssignment, isLoading: isUpdating, error: updateError, clearError: clearUpdateError } = useUpdateAssignment();
     const { resources, isLoading: isLoadingResources } = useResources();
+    const { activities, isLoading: isLoadingActivities } = useActivities();
 
     const [resourceId, setResourceId] = useState<string | null>(null);
-    const [activityId, setActivityId] = useState("");
+    const [activityId, setActivityId] = useState<string | null>(null);
     const [errors, setErrors] = useState<Record<string, string>>({});
 
     // Transform resources to Select options - show Location / Identifier, value is ID
@@ -29,6 +31,14 @@ export function AssignmentEditor() {
             label: `${resource.location} / ${resource.identifier}`,
         }));
     }, [resources]);
+
+    // Transform activities to Select options - show enriched display, value is ID
+    const activityOptions = useMemo(() => {
+        return activities.map((activity) => ({
+            value: activity.id,
+            label: activity.displayLabel,
+        }));
+    }, [activities]);
 
     // Reset form when modal opens/closes or assignment changes
     useEffect(() => {
@@ -42,7 +52,7 @@ export function AssignmentEditor() {
                 setActivityId(assignment.activityId);
             } else {
                 setResourceId(null);
-                setActivityId("");
+                setActivityId(null);
             }
         }
     }, [isOpen, mode, assignment]);
@@ -52,8 +62,8 @@ export function AssignmentEditor() {
         if (!resourceId) {
             newErrors.resourceId = "Resource is required";
         }
-        if (!activityId.trim()) {
-            newErrors.activityId = "Activity ID is required";
+        if (!activityId) {
+            newErrors.activityId = "Activity is required";
         }
         setErrors(newErrors);
         return Object.keys(newErrors).length === 0;
@@ -66,17 +76,17 @@ export function AssignmentEditor() {
 
         let success = false;
 
-        if (mode === "create" && slotId && resourceId) {
+        if (mode === "create" && slotId && resourceId && activityId) {
             const result = await createAssignment({
                 slotId,
                 resourceId,
-                activityId: activityId.trim(),
+                activityId,
             });
             success = result !== null;
-        } else if (mode === "edit" && assignment && resourceId) {
+        } else if (mode === "edit" && assignment && resourceId && activityId) {
             success = await updateAssignment(assignment.id, {
                 resourceId,
-                activityId: activityId.trim(),
+                activityId,
             });
         }
 
@@ -88,7 +98,7 @@ export function AssignmentEditor() {
     const handleClose = () => {
         close();
         setResourceId(null);
-        setActivityId("");
+        setActivityId(null);
         setErrors({});
         clearCreateError();
         clearUpdateError();
@@ -126,15 +136,21 @@ export function AssignmentEditor() {
                         disabled={isLoading || isLoadingResources || resourceOptions.length === 0}
                         searchable
                         clearable
-                        data-autofocus
                     />
 
-                    <TextInput
-                        label="Activity ID"
-                        placeholder="Enter activity ID"
+                    <Select
+                        label="Activity"
+                        placeholder={
+                            isLoadingActivities
+                                ? "Loading activities..."
+                                : activityOptions.length === 0
+                                    ? "There are no activities yet"
+                                    : "Select an activity"
+                        }
+                        data={activityOptions}
                         value={activityId}
-                        onChange={(e) => {
-                            setActivityId(e.currentTarget.value);
+                        onChange={(value) => {
+                            setActivityId(value);
                             setErrors((prev) => {
                                 const { activityId: _, ...rest } = prev;
                                 return rest;
@@ -142,7 +158,9 @@ export function AssignmentEditor() {
                         }}
                         error={errors.activityId}
                         required
-                        disabled={isLoading}
+                        disabled={isLoading || isLoadingActivities || activityOptions.length === 0}
+                        searchable
+                        clearable
                     />
 
                     {apiError && (

@@ -6,3 +6,5 @@ export * from "./assignment.types";
 export * from "./assignment-data-repository";
 export * from "./resource.types";
 export * from "./resource-data-repository";
+export * from "./activity.types";
+export * from "./activity-data-repository";

@@ -3,8 +3,11 @@
  * Displays assignments for a slot in a list format
  */
 
+import { useMemo } from "react";
 import { Paper, Text, Stack } from "@mantine/core";
 import type { AssignmentResponse } from "@/modules/schedule/src/data/assignment.types";
+import { useResources } from "@/modules/schedule/src/hooks/use-resources";
+import { useActivities } from "@/modules/schedule/src/hooks/use-activities";
 
 interface AssignmentTableProps {
     assignments: AssignmentResponse[];
@@ -19,6 +22,32 @@ export function AssignmentTable({
     onSelectionChange,
     isLoading = false,
 }: AssignmentTableProps) {
+    const { resources } = useResources();
+    const { activities } = useActivities();
+
+    // Create lookup maps for display names
+    const resourceDisplayMap = useMemo(() => {
+        return new Map(
+            resources.map((r) => [r.id, `${r.location} / ${r.identifier}`])
+        );
+    }, [resources]);
+
+    const activityDisplayMap = useMemo(() => {
+        return new Map(
+            activities.map((a) => [a.id, a.displayLabel])
+        );
+    }, [activities]);
+
+    // Get display name for resource ID
+    const getResourceDisplay = (resourceId: string) => {
+        return resourceDisplayMap.get(resourceId) || resourceId;
+    };
+
+    // Get display name for activity ID
+    const getActivityDisplay = (activityId: string) => {
+        return activityDisplayMap.get(activityId) || activityId;
+    };
+
     if (isLoading) {
         return (
             <Paper p="xl" withBorder>
@@ -57,10 +86,10 @@ export function AssignmentTable({
                 >
                     <Stack gap={4}>
                         <Text size="sm">
-                            <Text span fw={500}>Resource:</Text> {assignment.resourceId}
+                            <Text span fw={500}>Resource:</Text> {getResourceDisplay(assignment.resourceId)}
                         </Text>
                         <Text size="sm">
-                            <Text span fw={500}>Activity:</Text> {assignment.activityId}
+                            <Text span fw={500}>Activity:</Text> {getActivityDisplay(assignment.activityId)}
                         </Text>
                     </Stack>
                 </Paper>
