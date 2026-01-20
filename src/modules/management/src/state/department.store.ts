@@ -19,11 +19,11 @@ interface DepartmentStore {
     // Actions
     fetchDepartments: () => Promise<void>;
     createDepartment: (
-        request: DepartmentRequest
+        request: DepartmentRequest,
     ) => Promise<DepartmentResponse | null>;
     updateDepartment: (
         departmentId: string,
-        request: DepartmentRequest
+        request: DepartmentRequest,
     ) => Promise<boolean>;
     deleteDepartment: (departmentId: string) => Promise<boolean>;
     restoreDepartment: (departmentId: string) => Promise<boolean>;
@@ -51,7 +51,7 @@ export const useDepartmentStore = create<DepartmentStore>((set, get) => ({
                     ? err.message
                     : "Failed to fetch departments";
             set({ error: errorMessage, isLoading: false });
-            console.error("Error fetching departments:", err);
+            $app.logger.error("Error fetching departments:", err);
         }
     },
 
@@ -73,7 +73,7 @@ export const useDepartmentStore = create<DepartmentStore>((set, get) => ({
                     ? err.message
                     : "Failed to create department";
             set({ error: errorMessage, isLoading: false });
-            console.error("Error creating department:", err);
+            $app.logger.error("Error creating department:", err);
             return null;
         }
     },
@@ -81,13 +81,13 @@ export const useDepartmentStore = create<DepartmentStore>((set, get) => ({
     // Update a department and refetch
     updateDepartment: async (
         departmentId: string,
-        request: DepartmentRequest
+        request: DepartmentRequest,
     ) => {
         set({ isLoading: true, error: null });
         try {
             await departmentDataRepository.updateDepartment(
                 departmentId,
-                request
+                request,
             );
             set({ isLoading: false });
 
@@ -101,7 +101,7 @@ export const useDepartmentStore = create<DepartmentStore>((set, get) => ({
                     ? err.message
                     : "Failed to update department";
             set({ error: errorMessage, isLoading: false });
-            console.error("Error updating department:", err);
+            $app.logger.error("Error updating department:", err);
             return false;
         }
     },
@@ -123,7 +123,7 @@ export const useDepartmentStore = create<DepartmentStore>((set, get) => ({
                     ? err.message
                     : "Failed to delete department";
             set({ error: errorMessage, isLoading: false });
-            console.error("Error deleting department:", err);
+            $app.logger.error("Error deleting department:", err);
             return false;
         }
     },
@@ -145,7 +145,7 @@ export const useDepartmentStore = create<DepartmentStore>((set, get) => ({
                     ? err.message
                     : "Failed to restore department";
             set({ error: errorMessage, isLoading: false });
-            console.error("Error restoring department:", err);
+            $app.logger.error("Error restoring department:", err);
             return false;
         }
     },

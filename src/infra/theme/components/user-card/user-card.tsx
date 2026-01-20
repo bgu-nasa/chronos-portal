@@ -57,7 +57,10 @@ export default function UserCard() {
             <Menu.Dropdown>
                 <Menu.Label>{userFullName}</Menu.Label>
                 <Menu.Divider />
-                <Menu.Item leftSection={<SettingsIcon size={16} />}>
+                <Menu.Item
+                    leftSection={<SettingsIcon size={16} />}
+                    onClick={() => navigate("/auth/profile-settings")}
+                >
                     Settings
                 </Menu.Item>
                 <Menu.Item

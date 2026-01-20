@@ -45,3 +45,11 @@ export interface RegisterResponse {
     token: string;
     // Add other fields if backend returns them
 }
+
+/**
+ * Password update request contract
+ */
+export interface PasswordUpdateRequest {
+    oldPassword: string;
+    newPassword: string;
+}
