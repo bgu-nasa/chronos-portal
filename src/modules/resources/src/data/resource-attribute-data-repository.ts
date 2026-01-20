@@ -38,17 +38,15 @@ export class ResourceAttributeDataRepository {
 
     /**
      * Build the base URL for resource attribute endpoints
-     * TODO: Update with actual endpoint when backend is ready
      */
     private getBaseUrl(): string {
-        return `/api/resources/resource-attribute`; // Placeholder
+        return `/api/resources/attributes`;
     }
 
     /**
      * Fetch all resource attributes for the current organization
      * @param organizationId - The organization ID
      * @returns Array of resource attributes
-     * TODO: Implement when endpoint is available
      */
     async getAll(organizationId: string): Promise<ResourceAttributeResponse[]> {
         $app.logger.info(
@@ -81,7 +79,6 @@ export class ResourceAttributeDataRepository {
      * Fetch a specific resource attribute by ID
      * @param id - The resource attribute ID
      * @returns The resource attribute
-     * TODO: Implement when endpoint is available
      */
     async getById(id: string): Promise<ResourceAttributeResponse> {
         $app.logger.info(
@@ -114,7 +111,6 @@ export class ResourceAttributeDataRepository {
      * Create a new resource attribute
      * @param request - The resource attribute creation request
      * @returns The created resource attribute
-     * TODO: Implement when endpoint is available
      */
     async create(
         request: CreateResourceAttributeRequest,
@@ -151,7 +147,6 @@ export class ResourceAttributeDataRepository {
      * @param id - The resource attribute ID
      * @param request - The resource attribute update request
      * @returns The updated resource attribute
-     * TODO: Implement when endpoint is available
      */
     async update(
         id: string,
@@ -163,13 +158,16 @@ export class ResourceAttributeDataRepository {
         );
 
         try {
-            const response = await $app.ajax.put<ResourceAttributeResponse>(
+            await $app.ajax.patch(
                 `${this.getBaseUrl()}/${id}`,
                 request,
                 {
                     headers: this.getHeaders(),
                 },
             );
+            
+            // Return the updated resource attribute by fetching it
+            const response = await this.getById(id);
             $app.logger.info(
                 "[ResourceAttributeDataRepository] Updated resource attribute",
                 { id },
@@ -187,7 +185,6 @@ export class ResourceAttributeDataRepository {
     /**
      * Delete a resource attribute
      * @param id - The resource attribute ID
-     * TODO: Implement when endpoint is available
      */
     async delete(id: string): Promise<void> {
         $app.logger.info(

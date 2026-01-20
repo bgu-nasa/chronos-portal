@@ -38,30 +38,24 @@ export class ResourceAttributeAssignmentDataRepository {
 
     /**
      * Build the base URL for resource attribute assignment endpoints
-     * TODO: Update with actual endpoint when backend is ready
      */
     private getBaseUrl(): string {
-        return `/api/resources/resource-attribute-assignment`; // Placeholder
+        return `/api/resources/attribute-assignments`;
     }
 
     /**
-     * Fetch all resource attribute assignments for a specific resource
-     * @param resourceId - The resource ID
+     * Fetch all resource attribute assignments for the organization
      * @returns Array of resource attribute assignments
-     * TODO: Implement when endpoint is available
      */
-    async getByResourceId(
-        resourceId: string,
-    ): Promise<ResourceAttributeAssignmentResponse[]> {
+    async getAll(): Promise<ResourceAttributeAssignmentResponse[]> {
         $app.logger.info(
-            "[ResourceAttributeAssignmentDataRepository] Fetching assignments for resource",
-            { resourceId },
+            "[ResourceAttributeAssignmentDataRepository] Fetching all assignments",
         );
 
         try {
             const response = await $app.ajax.get<
                 ResourceAttributeAssignmentResponse[]
-            >(`${this.getBaseUrl()}?resourceId=${resourceId}`, {
+            >(this.getBaseUrl(), {
                 headers: this.getHeaders(),
             });
             $app.logger.info(
@@ -79,10 +73,41 @@ export class ResourceAttributeAssignmentDataRepository {
     }
 
     /**
+     * Fetch all resource attribute assignments for a specific resource
+     * @param resourceId - The resource ID
+     * @returns Array of resource attribute assignments filtered by resourceId
+     */
+    async getByResourceId(
+        resourceId: string,
+    ): Promise<ResourceAttributeAssignmentResponse[]> {
+        $app.logger.info(
+            "[ResourceAttributeAssignmentDataRepository] Fetching assignments for resource",
+            { resourceId },
+        );
+
+        try {
+            const allAssignments = await this.getAll();
+            const filtered = allAssignments.filter(
+                (assignment) => assignment.resourceId === resourceId,
+            );
+            $app.logger.info(
+                "[ResourceAttributeAssignmentDataRepository] Filtered assignments",
+                { count: filtered.length },
+            );
+            return filtered;
+        } catch (error) {
+            $app.logger.error(
+                "[ResourceAttributeAssignmentDataRepository] Error fetching assignments:",
+                error,
+            );
+            throw error;
+        }
+    }
+
+    /**
      * Create a new resource attribute assignment
      * @param request - The assignment creation request
      * @returns The created assignment
-     * TODO: Implement when endpoint is available
      */
     async create(
         request: CreateResourceAttributeAssignmentRequest,
@@ -121,7 +146,6 @@ export class ResourceAttributeAssignmentDataRepository {
      * @param resourceAttributeId - The resource attribute ID
      * @param request - The assignment update request
      * @returns The updated assignment
-     * TODO: Implement when endpoint is available
      */
     async update(
         resourceId: string,
@@ -134,14 +158,20 @@ export class ResourceAttributeAssignmentDataRepository {
         );
 
         try {
-            const response =
-                await $app.ajax.put<ResourceAttributeAssignmentResponse>(
-                    `${this.getBaseUrl()}/${resourceId}/${resourceAttributeId}`,
-                    request,
-                    {
-                        headers: this.getHeaders(),
-                    },
-                );
+            await $app.ajax.patch(
+                `${this.getBaseUrl()}/${resourceId}/${resourceAttributeId}`,
+                request,
+                {
+                    headers: this.getHeaders(),
+                },
+            );
+            
+            // Return the updated assignment (construct from request data)
+            const response: ResourceAttributeAssignmentResponse = {
+                resourceId: request.resourceId,
+                resourceAttributeId: request.resourceAttributeId,
+                organizationId: request.organizationId,
+            };
             $app.logger.info(
                 "[ResourceAttributeAssignmentDataRepository] Updated assignment",
                 response,
@@ -160,7 +190,6 @@ export class ResourceAttributeAssignmentDataRepository {
      * Delete a resource attribute assignment
      * @param resourceId - The resource ID
      * @param resourceAttributeId - The resource attribute ID
-     * TODO: Implement when endpoint is available
      */
     async delete(
         resourceId: string,
