@@ -2,6 +2,17 @@
 import type { JSX } from "react";
 
 /**
+ * Role types for navigation item access control
+ * @dashboard-only Used only for dashboard navigation items
+ */
+export type RoleType =
+    | "Administrator"
+    | "UserManager"
+    | "ResourceManager"
+    | "Operator"
+    | "Viewer";
+
+/**
  * Configuration for a module in the federation
  */
 export type ModuleConfig = {
@@ -82,4 +93,12 @@ export type NavigationItem = {
      * So you could define the order of the navigation items
      */
     order?: number;
+    /**
+     * Optional list of roles required to view this navigation item.
+     * Only applicable for dashboard navigation items.
+     * If specified, the user must have at least one of these roles to see this item.
+     * If not specified or empty, the item is visible to all users regardless of their roles.
+     * @dashboard-only This field is only enforced for items with location="dashboard"
+     */
+    requiredRoles?: RoleType[];
 };
