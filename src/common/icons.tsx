@@ -14,6 +14,9 @@ import {
     HiOutlineCog,
     HiOutlineLogout,
     HiOutlineAdjustments,
+    HiOutlineCollection,
+    HiOutlineBookOpen,
+    HiOutlineOfficeBuilding,
 } from "react-icons/hi";
 
 // Alert icons
@@ -36,6 +39,9 @@ export const ScheduleIcon = HiOutlineCalendar;
 export const SchedulingPeriodsIcon = HiOutlineCalendar;
 export const CalendarIcon = HiOutlineCalendar;
 export const ConstraintsIcon = HiOutlineAdjustments;
+export const ResourcesIcon = HiOutlineCollection;
+export const CoursesIcon = HiOutlineBookOpen;
+export const ResourceManagementIcon = HiOutlineOfficeBuilding;
 
 // User Menu Icons
 export const SettingsIcon = HiOutlineCog;

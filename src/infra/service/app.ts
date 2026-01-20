@@ -10,9 +10,11 @@ import {
     loggerService,
     setOrganizationIdGetter,
 } from "./logger/logger.service";
+import { notificationService } from "./notification/notification.service";
 import type { IAjaxService } from "./ajax/types";
 import type { IOrganizationService } from "./organization/organization.service";
 import type { ILogger } from "./logger/logger.types";
+import type { INotificationService } from "./notification/notification.types";
 
 /**
  * Application service container interface
@@ -44,6 +46,13 @@ interface IApp {
     logger: ILogger;
 
     /**
+     * Notification service
+     * Shows ephemeral notifications at the bottom right of the screen
+     * All notifications auto-dismiss after 15 seconds by default
+     */
+    notifications: INotificationService;
+
+    /**
      * Check if user is authenticated (has a valid token)
      * @returns true if token exists, false otherwise
      */
@@ -52,7 +61,6 @@ interface IApp {
     // Future services can be added here:
     // auth: IAuthService;
     // storage: IStorageService;
-    // notifications: INotificationService;
 }
 
 /**
@@ -89,6 +97,7 @@ export const $app: IApp = {
     token: tokenService,
     organization: organizationService,
     logger: loggerService,
+    notifications: notificationService,
     isAuthenticated: () => tokenService.hasToken(),
 };
 

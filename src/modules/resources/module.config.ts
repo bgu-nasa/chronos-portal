@@ -1,7 +1,7 @@
 import type { ModuleConfig } from "@/infra";
 import React from "react";
-import { SubjectsPage, ActivitiesPage } from "./src/pages";
-// import { SubjectsIcon } from "@/common/icons";
+import { ResourcesPage, SubjectsPage, ActivitiesPage } from "./src/pages";
+import { ResourcesIcon, CoursesIcon, ResourceManagementIcon } from "@/common/icons";
 
 export const moduleConfig: ModuleConfig = {
     name: "Resources",
@@ -20,13 +20,32 @@ export const moduleConfig: ModuleConfig = {
             path: "/activities",
             element: React.createElement(ActivitiesPage),
         },
+        {
+            authorize: true,
+            name: "resources",
+            path: "/manage",
+            element: React.createElement(ResourcesPage),
+        },
     ],
     navigationItems: [
         {
-            label: "Courses",
-            href: "/resources/subjects",
+            label: "Resources",
             location: "dashboard",
-            // icon: React.createElement(SubjectsIcon),
+            icon: React.createElement(ResourcesIcon),
+            children: [
+                {
+                    label: "Courses",
+                    href: "/resources/subjects",
+                    location: "dashboard",
+                    icon: React.createElement(CoursesIcon),
+                },
+                {
+                    label: "Resources",
+                    href: "/resources/manage",
+                    location: "dashboard",
+                    icon: React.createElement(ResourceManagementIcon),
+                },
+            ],
         },
     ],
 };

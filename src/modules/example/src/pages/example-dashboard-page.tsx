@@ -8,10 +8,19 @@ export default function ExampleDashboardPage() {
         exampleDataRepository.getExampleData().then(setData);
     }, []);
 
+    const showNotification = () => {
+        $app.notifications.showSuccess(
+            "Data Loaded",
+            "The example data has been loaded successfully.",
+        );
+    };
+
     return (
         <div>
             <h1>Example Page</h1>
             <p>{data ? data : "Loading..."}</p>
+
+            <button onClick={showNotification}>Show Notification</button>
         </div>
     );
 }

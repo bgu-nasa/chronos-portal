@@ -36,12 +36,22 @@ export const moduleConfig: ModuleConfig = {
                     label: "Departments",
                     href: "/management/departments",
                     location: "dashboard",
+                    requiredRoles: [
+                        "Administrator",
+                        "ResourceManager", // can only create
+                        "Operator", // cannot interact
+                    ],
                     icon: React.createElement(DepartmentsIcon),
                 },
                 {
                     label: "Access Control",
                     href: "/management/roles",
                     location: "dashboard",
+                    requiredRoles: [
+                        "Administrator",
+                        "ResourceManager",
+                        "Operator", // cannot interact
+                    ],
                     icon: React.createElement(AccessControlIcon),
                 },
             ],

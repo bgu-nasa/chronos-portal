@@ -1,0 +1,23 @@
+{
+    "title": "Resource Types Management",
+    "createButton": "Create",
+    "editButton": "Edit",
+    "deleteButton": "Delete",
+    "typeColumn": "Type",
+    "emptyStateMessage": "No resource types yet. Get started by creating your first resource type!",
+    "deleteConfirmTitle": "Delete Resource Type",
+    "deleteConfirmMessage": "Are you sure you want to delete the resource type \"{type}\"?",
+    "deleteConfirmButton": "Delete",
+    "deleteCancelButton": "Cancel",
+    "searchDepartmentLabel": "Department",
+    "searchDepartmentPlaceholder": "Select department",
+    "searchButton": "Search",
+    "clearFiltersButton": "Clear Filters",
+    "editorCreateTitle": "Create Resource Type",
+    "editorEditTitle": "Edit Resource Type",
+    "editorTypeLabel": "Type",
+    "editorTypePlaceholder": "e.g. Laboratory, Classroom, Auditorium",
+    "editorCancelButton": "Cancel",
+    "editorSaveButton": "Save",
+    "editorCreateButton": "Create"
+}
