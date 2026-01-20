@@ -132,17 +132,17 @@ export function CalendarPage() {
       return;
     }
 
-    // Get weekday name from the date
+    // Get weekday name from the date (in user's local timezone)
     const weekdayName = timeRangeSelection.date.toLocaleDateString('en-US', { weekday: 'long' });
 
-    // Create the constraint entry
+    // Create the constraint entry (times are in user's local timezone)
     const entry: ForbiddenTimeRangeEntry = {
       weekday: weekdayName,
-      startTime: timeRangeSelection.startTime,
-      endTime: timeRangeSelection.endTime,
+      startTime: timeRangeSelection.startTime, // Local time
+      endTime: timeRangeSelection.endTime, // Local time
     };
 
-    // Serialize to backend format
+    // Serialize to backend format (converts local time to UTC automatically)
     const value = serializeForbiddenTimeRange([entry]);
 
     // Create the constraint

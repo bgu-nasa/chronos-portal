@@ -2,6 +2,8 @@
  * Parser utilities to convert backend constraint values into form data structures
  */
 
+import { convertUtcEntriesToLocal, type TimeRangeEntry } from "./timezone-utils";
+
 export interface ForbiddenTimeRangeEntry {
     weekday: string;
     startTime: string;
@@ -15,15 +17,19 @@ export interface RequiredCapacityFormData {
 
 /**
  * Parses forbidden_timerange value into form entries
- * Input: "Monday 09:30 - 11:00, Tuesday 13:00 - 15:00"
- * Output: Array of { weekday, startTime, endTime }
+ * 
+ * IMPORTANT: Database stores times in UTC.
+ * This function converts UTC to the user's LOCAL timezone for display.
+ * 
+ * Input: "Monday 09:30 - 11:00, Tuesday 13:00 - 15:00" (in UTC from database)
+ * Output: Array of { weekday, startTime, endTime } (in user's local timezone for UI display)
  */
 export function parseForbiddenTimeRange(value: string): ForbiddenTimeRangeEntry[] {
     if (!value?.trim()) {
         return [];
     }
 
-    const entries: ForbiddenTimeRangeEntry[] = [];
+    const utcEntries: TimeRangeEntry[] = [];
     const parts = value.split(/[,\n\r]/).map(p => p.trim()).filter(Boolean);
     const pattern = /^(\w+)\s+(\d{1,2}:\d{2})\s*-\s*(\d{1,2}:\d{2})$/i;
 
@@ -31,7 +37,7 @@ export function parseForbiddenTimeRange(value: string): ForbiddenTimeRangeEntry[
         const match = pattern.exec(part);
         if (match) {
             const weekday = match[1].charAt(0).toUpperCase() + match[1].slice(1).toLowerCase();
-            entries.push({
+            utcEntries.push({
                 weekday,
                 startTime: match[2],
                 endTime: match[3],
@@ -39,7 +45,9 @@ export function parseForbiddenTimeRange(value: string): ForbiddenTimeRangeEntry[
         }
     }
 
-    return entries;
+    // Convert UTC entries to local timezone (may split across weekdays)
+    const localEntries = convertUtcEntriesToLocal(utcEntries);
+    return localEntries;
 }
 
 /**

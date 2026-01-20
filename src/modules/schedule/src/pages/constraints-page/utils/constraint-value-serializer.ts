@@ -3,15 +3,26 @@
  */
 
 import type { ForbiddenTimeRangeEntry, RequiredCapacityFormData } from "./constraint-value-parser";
+import { convertLocalEntriesToUtc, type TimeRangeEntry } from "./timezone-utils";
 
 /**
  * Serializes forbidden_timerange form entries into backend format
- * Input: [{ weekday: "Monday", startTime: "09:30", endTime: "11:00" }]
- * Output: "Monday 09:30 - 11:00"
+ * 
+ * IMPORTANT: Users input times in their LOCAL timezone.
+ * This function converts local time to UTC before saving to the database.
+ * 
+ * Input: [{ weekday: "Monday", startTime: "09:30", endTime: "11:00" }] (in user's local timezone)
+ * Output: "Monday 09:30 - 11:00" (in UTC, may be split across multiple entries if timezone conversion causes day change)
  */
 export function serializeForbiddenTimeRange(entries: ForbiddenTimeRangeEntry[]): string {
-    return entries
-        .filter(e => e.weekday && e.startTime && e.endTime)
+    // Filter valid entries
+    const validEntries = entries.filter(e => e.weekday && e.startTime && e.endTime);
+
+    // Convert local entries to UTC (may split across weekdays)
+    const utcEntries = convertLocalEntriesToUtc(validEntries as TimeRangeEntry[]);
+
+    // Serialize UTC entries to backend format
+    return utcEntries
         .map(e => `${e.weekday} ${e.startTime} - ${e.endTime}`)
         .join(", ");
 }
