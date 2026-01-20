@@ -6,6 +6,7 @@ interface ResourceActionsProps {
     onCreateClick: () => void;
     onEditClick: () => void;
     onDeleteClick: () => void;
+    onAssignAttributesClick: () => void;
 }
 
 export function ResourceActions({
@@ -13,6 +14,7 @@ export function ResourceActions({
     onCreateClick,
     onEditClick,
     onDeleteClick,
+    onAssignAttributesClick,
 }: ResourceActionsProps) {
     return (
         <Group mb="md">
@@ -30,8 +32,17 @@ export function ResourceActions({
                 onClick={onDeleteClick}
                 disabled={!selectedResource}
                 variant="outline"
+                color="red"
             >
                 {resources.deleteButton}
+            </Button>
+            <Button
+                onClick={onAssignAttributesClick}
+                disabled={!selectedResource}
+                variant="outline"
+                color="blue"
+            >
+                {resources.assignAttributesButton}
             </Button>
         </Group>
     );

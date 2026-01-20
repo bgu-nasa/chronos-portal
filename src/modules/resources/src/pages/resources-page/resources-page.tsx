@@ -1,8 +1,8 @@
 import { useState, useEffect } from "react";
 import { Container, Divider, Title, Tabs } from "@mantine/core";
 import { ConfirmationDialog, useConfirmation } from "@/common";
-import { ResourceActions, ResourceTable, ResourceCreator, ResourceEditor, type ResourceData } from "./components";
-import type { UpdateResourceRequest, UpdateResourceTypeRequest } from "@/modules/resources/src/data";
+import { ResourceActions, ResourceTable, ResourceCreator, ResourceEditor, ResourceAttributeAssignmentModal, type ResourceData } from "./components";
+import type { UpdateResourceRequest, UpdateResourceTypeRequest, CreateResourceAttributeRequest, UpdateResourceAttributeRequest } from "@/modules/resources/src/data";
 import {
     useResources,
     useCreateResource,
@@ -32,6 +32,7 @@ export function ResourcesPage() {
     const [selectedResource, setSelectedResource] = useState<ResourceData | null>(null);
     const [resourceCreateModalOpened, setResourceCreateModalOpened] = useState(false);
     const [resourceEditModalOpened, setResourceEditModalOpened] = useState(false);
+    const [resourceAttributeAssignmentModalOpened, setResourceAttributeAssignmentModalOpened] = useState(false);
 
     // Resource Types state
     const [selectedResourceType, setSelectedResourceType] = useState<ResourceTypeData | null>(null);
@@ -186,6 +187,13 @@ export function ResourcesPage() {
                 }
             },
         });
+    };
+
+    const handleResourceAssignAttributesClick = () => {
+        $app.logger.info("[ResourcesPage] handleResourceAssignAttributesClick called");
+        if (selectedResource) {
+            setResourceAttributeAssignmentModalOpened(true);
+        }
     };
 
     // Resource Types handlers
@@ -424,6 +432,7 @@ export function ResourcesPage() {
                             onCreateClick={handleResourceCreateClick}
                             onEditClick={handleResourceEditClick}
                             onDeleteClick={handleResourceDeleteClick}
+                            onAssignAttributesClick={handleResourceAssignAttributesClick}
                         />
 
                         <ResourceTable
@@ -530,6 +539,14 @@ export function ResourcesPage() {
                             }
                             : undefined
                     }
+                />
+
+                {/* Resource Attribute Assignment Modal */}
+                <ResourceAttributeAssignmentModal
+                    opened={resourceAttributeAssignmentModalOpened}
+                    onClose={() => setResourceAttributeAssignmentModalOpened(false)}
+                    resourceId={selectedResource?.id || null}
+                    resourceIdentifier={selectedResource?.identifier}
                 />
 
                 <ConfirmationDialog
