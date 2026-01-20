@@ -17,7 +17,6 @@ import {
 } from "@/modules/resources/src/hooks";
 import resources from "./subjects-page.resources.json";
 import styles from "./subjects-page.module.css";
-import { $app } from "@/infra/service";
 
 export function SubjectsPage() {
     const navigate = useNavigate();

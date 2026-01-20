@@ -6,7 +6,6 @@ import type { UpdateResourceTypeRequest } from "@/modules/resources/src/data";
 import { useResourceTypes, useCreateResourceType, useUpdateResourceType, useDeleteResourceType } from "@/modules/resources/src/hooks";
 import resources from "./resource-types-page.resources.json";
 import styles from "./resource-types-page.module.css";
-import { $app } from "@/infra/service";
 
 export function ResourceTypesPage() {
     const [selectedResourceType, setSelectedResourceType] = useState<ResourceTypeData | null>(null);

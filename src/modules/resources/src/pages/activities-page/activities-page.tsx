@@ -16,7 +16,6 @@ import {
 } from "@/modules/resources/src/hooks";
 import resources from "./activities-page.resources.json";
 import styles from "./activities-page.module.css";
-import { $app } from "@/infra/service";
 
 export function ActivitiesPage() {
     const navigate = useNavigate();
