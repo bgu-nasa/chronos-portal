@@ -14,7 +14,7 @@ import type { RoleAssignmentResponse } from "@/infra/service";
  * - If a navigation item has no `requiredRoles` field or it's empty, it's visible to all users
  * - If a navigation item has `requiredRoles`, the user must have at least one matching role
  * - Recursively filters children navigation items
- * - Parent items are visible if they have visible children, even if the parent itself doesn't match role requirements
+ * - Parent items with no href are only visible if they have visible children
  */
 export function filterNavigationByRoles(
     navigationItems: NavigationItem[],
@@ -38,12 +38,12 @@ export function filterNavigationByRoles(
             item.requiredRoles.length === 0 ||
             item.requiredRoles.some((role) => userRoleTypes.has(role));
 
-        // Item is visible if:
-        // 1. It matches role requirements, OR
-        // 2. It has visible children (parent items should show if they have accessible children)
-        const shouldShow =
-            isVisibleByRole ||
-            (filteredChildren && filteredChildren.length > 0);
+        // Determine if item should be shown:
+        // 1. If item has an href, it must match role requirements
+        // 2. If item has no href (parent-only), it's shown only if it has visible children
+        const hasVisibleChildren =
+            filteredChildren && filteredChildren.length > 0;
+        const shouldShow = item.href ? isVisibleByRole : hasVisibleChildren;
 
         if (shouldShow) {
             // Return the item with filtered children
