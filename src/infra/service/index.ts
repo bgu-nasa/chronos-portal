@@ -31,3 +31,12 @@ export {
     type LogLevel,
     type LogEntry,
 } from "./logger";
+
+// Notification service exports
+export {
+    notificationService,
+    NotificationProvider,
+    type INotificationService,
+    type NotificationOptions,
+    type NotificationType,
+} from "./notification";

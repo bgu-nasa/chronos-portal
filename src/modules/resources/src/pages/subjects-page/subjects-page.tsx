@@ -17,7 +17,6 @@ import {
 } from "@/modules/resources/src/hooks";
 import resources from "./subjects-page.resources.json";
 import styles from "./subjects-page.module.css";
-import { $app } from "@/infra/service";
 
 export function SubjectsPage() {
     const navigate = useNavigate();
@@ -63,7 +62,7 @@ export function SubjectsPage() {
 
     const handleCreateClick = () => {
         if (!currentDepartmentId) {
-            alert("Please search for a department first");
+            $app.notifications.showWarning("Warning", "Please search for a department first");
             return;
         }
         setCreateModalOpened(true);
