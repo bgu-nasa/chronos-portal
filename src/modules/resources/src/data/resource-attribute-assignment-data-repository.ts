@@ -40,7 +40,7 @@ export class ResourceAttributeAssignmentDataRepository {
      * Build the base URL for resource attribute assignment endpoints
      */
     private getBaseUrl(): string {
-        return `/api/resources/attribute-assignments`;
+        return `/api/resources/resource/attribute-assignments`;
     }
 
     /**

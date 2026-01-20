@@ -40,7 +40,7 @@ export class ResourceAttributeDataRepository {
      * Build the base URL for resource attribute endpoints
      */
     private getBaseUrl(): string {
-        return `/api/resources/attributes`;
+        return `/api/resources/resource/attributes`;
     }
 
     /**
