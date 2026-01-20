@@ -1,15 +1,18 @@
 import { useEffect, useState, useMemo } from "react";
-import { Table, Button, Group, Text, Badge, ActionIcon, Loader } from "@mantine/core";
 import { HiOutlinePencil, HiOutlineTrash } from "react-icons/hi";
+import { Table, Button, Text, Badge, ActionIcon, Loader } from "@mantine/core";
+
+import { $app } from "@/infra/service";
+import { useUsers } from "@/modules/auth/src/hooks";
 import {
     useUserConstraints,
     useUserPreferences,
     useSchedulingPeriods
 } from "@/modules/schedule/src/hooks";
-import { useUsers } from "@/modules/auth/src/hooks";
+
 import { UserConstraintEditor } from "./user-constraint-editor";
-import { $app } from "@/infra/service";
 import resources from "../constraints-page.resources.json";
+import styles from "../constraints-page.module.css";
 
 interface UserConstraintsPanelProps {
     readonly isAdmin: boolean;
@@ -116,68 +119,64 @@ export function UserConstraintsPanel({ isAdmin, openConfirmation }: UserConstrai
     };
 
     const handleSubmit = async (values: any) => {
-        try {
-            if (editingItem) {
-                if (isPreference) {
-                    await updateUserPreference(editingItem.userId, editingItem.schedulingPeriodId, editingItem.key, { value: values.value });
-                } else {
-                    await updateUserConstraint(editingItem.id, values);
-                }
-            } else if (isPreference) {
-                await createUserPreference(values);
+        if (editingItem) {
+            if (isPreference) {
+                await updateUserPreference(editingItem.userId, editingItem.schedulingPeriodId, editingItem.key, { value: values.value });
             } else {
-                await createUserConstraint(values);
+                await updateUserConstraint(editingItem.id, values);
             }
-
-            // Refetch data to update the table immediately
-            if (isAdmin) {
-                if (isPreference) {
-                    await fetchUserPreferences();
-                } else {
-                    await fetchUserConstraints();
-                }
-            } else if (currentUserId) {
-                if (isPreference) {
-                    await fetchUserPreferencesByUser(currentUserId);
-                } else {
-                    await fetchUserConstraintsByUser(currentUserId);
-                }
-            }
-
-            setModalOpened(false);
-        } catch (error) {
-            console.error(resources.errorMessages.saveUserConstraint, error);
+        } else if (isPreference) {
+            await createUserPreference(values);
+        } else {
+            await createUserConstraint(values);
         }
+
+        // Refetch data to update the table immediately
+        if (isAdmin) {
+            if (isPreference) {
+                await fetchUserPreferences();
+            } else {
+                await fetchUserConstraints();
+            }
+        } else if (currentUserId) {
+            if (isPreference) {
+                await fetchUserPreferencesByUser(currentUserId);
+            } else {
+                await fetchUserConstraintsByUser(currentUserId);
+            }
+        }
+
+        setModalOpened(false);
     };
 
     if (isLoading && enrichedData.length === 0 && !modalOpened) {
         return (
-            <Group justify="center" py="xl">
+            <div className={styles.loadingContainer}>
                 <Loader size="lg" />
-            </Group>
+            </div>
         );
     }
 
     return (
-        <div>
-            <Group mb="md" justify="space-between">
-                <Group>
+        <div className={styles.panel}>
+            <div className={styles.buttonGroup}>
+                <div className={styles.buttonActions}>
                     <Button variant="filled" onClick={() => handleCreate(false)}>
                         {resources.createConstraintButton}
                     </Button>
                     <Button variant="outline" onClick={() => handleCreate(true)}>
                         {resources.createPreferenceButton}
                     </Button>
-                </Group>
+                </div>
                 {isLoading && <Loader size="xs" />}
-            </Group>
+            </div>
 
             {enrichedData.length === 0 ? (
-                <Text c="dimmed" ta="center" py="xl">
+                <Text className={styles.emptyState}>
                     {resources.emptyStateMessages.noConstraintsOrPreferences}
                 </Text>
             ) : (
-                <Table striped highlightOnHover>
+                <Table striped highlightOnHover className={styles.table}>
                     <Table.Thead>
                         <Table.Tr>
                             {isAdmin && <Table.Th>{resources.labels.lecturer}</Table.Th>}
@@ -201,14 +200,14 @@ export function UserConstraintsPanel({ isAdmin, openConfirmation }: UserConstrai
                                 <Table.Td>{item.key}</Table.Td>
                                 <Table.Td>{item.value}</Table.Td>
                                 <Table.Td>
-                                    <Group gap="xs">
+                                    <div className={styles.actionIcons}>
                                         <ActionIcon variant="subtle" onClick={() => handleEdit(item)}>
                                             <HiOutlinePencil />
                                         </ActionIcon>
                                         <ActionIcon variant="subtle" onClick={() => handleDelete(item)}>
                                             <HiOutlineTrash />
                                         </ActionIcon>
-                                    </Group>
+                                    </div>
                                 </Table.Td>
                             </Table.Tr>
                         ))}

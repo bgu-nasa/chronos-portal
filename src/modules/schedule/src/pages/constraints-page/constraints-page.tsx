@@ -1,18 +1,19 @@
 import { useEffect, useState } from "react";
 import { Container, Divider, Title, Tabs } from "@mantine/core";
+
 import { ConfirmationDialog, useConfirmation } from "@/common";
-// Import specialized panels
-import { 
-    UserConstraintsPanel, 
-    ActivityConstraintsPanel, 
-    OrganizationPoliciesPanel 
+import { $app } from "@/infra/service";
+
+import {
+    UserConstraintsPanel,
+    ActivityConstraintsPanel,
+    OrganizationPoliciesPanel
 } from "./components";
 import resources from "./constraints-page.resources.json";
 import styles from "./constraints-page.module.css";
-import { $app } from "@/infra/service";
 
 export function ConstraintsPage() {
-    const [activeTab, setActiveTab] = useState<string | null>("user");
+    const [activeTab, setActiveTab] = useState<string | null>(resources.other.defaultActiveTab);
     const [isAdmin, setIsAdmin] = useState(false);
 
     const {
@@ -23,15 +24,13 @@ export function ConstraintsPage() {
         isLoading: isConfirming,
     } = useConfirmation();
 
-    // Determine user role
     useEffect(() => {
         const userIsAdmin = $app.organization.isAdministrator();
         setIsAdmin(userIsAdmin);
-        $app.logger.info("[ConstraintsPage] User is admin:", userIsAdmin);
     }, []);
 
     return (
-        <Container size="xl" py="xl">
+        <Container size={resources.other.containerSize} className={styles.pageContainer}>
             <div className={styles.container}>
                 <Title order={1}>{resources.title}</Title>
                 <Divider className={styles.divider} />
@@ -42,38 +41,44 @@ export function ConstraintsPage() {
                     className={styles.tabsContainer}
                 >
                     <Tabs.List>
-                        <Tabs.Tab value="user">User Constraints / Preferences</Tabs.Tab>
+                        <Tabs.Tab value={resources.tabs.user.value}>
+                            {resources.tabs.user.label}
+                        </Tabs.Tab>
                         {isAdmin && (
                             <>
-                                <Tabs.Tab value="activity">Activity Constraints</Tabs.Tab>
-                                <Tabs.Tab value="organization">Organization Policies</Tabs.Tab>
+                                <Tabs.Tab value={resources.tabs.activity.value}>
+                                    {resources.tabs.activity.label}
+                                </Tabs.Tab>
+                                <Tabs.Tab value={resources.tabs.organization.value}>
+                                    {resources.tabs.organization.label}
+                                </Tabs.Tab>
                             </>
                         )}
                     </Tabs.List>
 
-                    <Tabs.Panel value="user" pt="md">
-                        {activeTab === "user" && (
-                            <UserConstraintsPanel 
-                                isAdmin={isAdmin} 
-                                openConfirmation={openConfirmation} 
+                    <Tabs.Panel value={resources.tabs.user.value} className={styles.tabPanel}>
+                        {activeTab === resources.tabs.user.value && (
+                            <UserConstraintsPanel
+                                isAdmin={isAdmin}
+                                openConfirmation={openConfirmation}
                             />
                         )}
                     </Tabs.Panel>
 
                     {isAdmin && (
                         <>
-                            <Tabs.Panel value="activity" pt="md">
-                                {activeTab === "activity" && (
-                                    <ActivityConstraintsPanel 
-                                        openConfirmation={openConfirmation} 
+                            <Tabs.Panel value={resources.tabs.activity.value} className={styles.tabPanel}>
+                                {activeTab === resources.tabs.activity.value && (
+                                    <ActivityConstraintsPanel
+                                        openConfirmation={openConfirmation}
                                     />
                                 )}
                             </Tabs.Panel>
 
-                            <Tabs.Panel value="organization" pt="md">
-                                {activeTab === "organization" && (
-                                    <OrganizationPoliciesPanel 
-                                        openConfirmation={openConfirmation} 
+                            <Tabs.Panel value={resources.tabs.organization.value} className={styles.tabPanel}>
+                                {activeTab === resources.tabs.organization.value && (
+                                    <OrganizationPoliciesPanel
+                                        openConfirmation={openConfirmation}
                                     />
                                 )}
                             </Tabs.Panel>

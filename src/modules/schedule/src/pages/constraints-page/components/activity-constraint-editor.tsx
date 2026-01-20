@@ -1,8 +1,9 @@
+import { useEffect } from "react";
 import { Modal, TextInput, Button, Group, Select, Textarea } from "@mantine/core";
 import { useForm } from "@mantine/form";
-import { useEffect } from "react";
-import { useActivities } from "@/modules/resources/src/hooks";
-import { useSubjects } from "@/modules/resources/src/hooks/use-subjects";
+
+import { useActivities, useSubjects } from "@/modules/resources/src/hooks";
+
 import resources from "../constraints-page.resources.json";
 
 interface ActivityConstraintEditorProps {

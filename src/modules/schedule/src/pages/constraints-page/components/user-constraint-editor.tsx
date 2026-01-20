@@ -1,8 +1,10 @@
 import { useEffect } from "react";
 import { Modal, TextInput, Button, Group, Select, Textarea } from "@mantine/core";
 import { useForm } from "@mantine/form";
+
 import { useUsers } from "@/modules/auth/src/hooks";
 import { useSchedulingPeriods } from "@/modules/schedule/src/hooks";
+
 import resources from "../constraints-page.resources.json";
 
 interface UserConstraintEditorProps {
@@ -58,13 +60,7 @@ export function UserConstraintEditor({
     });
 
     useEffect(() => {
-        console.log("[UserConstraintEditor] Mounted");
-        return () => console.log("[UserConstraintEditor] Unmounted");
-    }, []);
-
-    useEffect(() => {
         if (opened) {
-            console.log("[UserConstraintEditor] Modal opened, triggering enrichment fetches");
             fetchUsers();
             fetchSchedulingPeriods();
         }

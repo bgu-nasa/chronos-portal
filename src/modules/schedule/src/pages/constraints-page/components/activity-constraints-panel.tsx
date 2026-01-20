@@ -1,13 +1,15 @@
 import { useEffect, useState, useMemo } from "react";
-import { Table, Button, Group, Text, ActionIcon, Loader } from "@mantine/core";
 import { HiOutlinePencil, HiOutlineTrash } from "react-icons/hi";
+import { Table, Button, Text, ActionIcon, Loader } from "@mantine/core";
+
+import { useActivities, useSubjects } from "@/modules/resources/src/hooks";
 import {
     useActivityConstraints
 } from "@/modules/schedule/src/hooks";
-import { useActivities } from "@/modules/resources/src/hooks";
-import { useSubjects } from "@/modules/resources/src/hooks/use-subjects";
+
 import { ActivityConstraintEditor } from "./activity-constraint-editor";
 import resources from "../constraints-page.resources.json";
+import styles from "../constraints-page.module.css";
 
 interface ActivityConstraintsPanelProps {
     readonly isAdmin: boolean;
@@ -71,41 +73,37 @@ export function ActivityConstraintsPanel({ openConfirmation }: Readonly<Omit<Act
     };
 
     const handleSubmit = async (values: any) => {
-        try {
-            if (editingItem) {
-                await updateActivityConstraint(editingItem.id, values);
-            } else {
-                await createActivityConstraint(values);
-            }
-            setModalOpened(false);
-        } catch (error) {
-            console.error(resources.errorMessages.saveActivityConstraint, error);
+        if (editingItem) {
+            await updateActivityConstraint(editingItem.id, values);
+        } else {
+            await createActivityConstraint(values);
         }
+        setModalOpened(false);
     };
 
     if (isLoading && enrichedData.length === 0 && !modalOpened) {
         return (
-            <Group justify="center" py="xl">
+            <div className={styles.loadingContainer}>
                 <Loader size="lg" />
-            </Group>
+            </div>
         );
     }
 
     return (
-        <div>
-            <Group mb="md" justify="space-between">
+        <div className={styles.panel}>
+            <div className={styles.buttonGroup}>
                 <Button variant="filled" onClick={handleCreate}>
                     {resources.modalTitles.createActivityConstraint}
                 </Button>
                 {isLoading && <Loader size="xs" />}
-            </Group>
+            </div>
 
             {enrichedData.length === 0 ? (
-                <Text c="dimmed" ta="center" py="xl">
+                <Text className={styles.emptyState}>
                     {resources.emptyStateMessages.noActivityConstraints}
                 </Text>
             ) : (
-                <Table striped highlightOnHover>
+                <Table striped highlightOnHover className={styles.table}>
                     <Table.Thead>
                         <Table.Tr>
                             <Table.Th>{resources.labels.subject}</Table.Th>
@@ -123,14 +121,14 @@ export function ActivityConstraintsPanel({ openConfirmation }: Readonly<Omit<Act
                                 <Table.Td>{item.key}</Table.Td>
                                 <Table.Td>{item.value}</Table.Td>
                                 <Table.Td>
-                                    <Group gap="xs">
+                                    <div className={styles.actionIcons}>
                                         <ActionIcon variant="subtle" onClick={() => handleEdit(item)}>
                                             <HiOutlinePencil />
                                         </ActionIcon>
                                         <ActionIcon variant="subtle" onClick={() => handleDelete(item)}>
                                             <HiOutlineTrash />
                                         </ActionIcon>
-                                    </Group>
+                                    </div>
                                 </Table.Td>
                             </Table.Tr>
                         ))}

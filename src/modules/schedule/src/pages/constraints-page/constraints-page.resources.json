@@ -1,5 +1,19 @@
 {
     "title": "Constraints",
+    "tabs": {
+        "user": {
+            "value": "user",
+            "label": "User Constraints / Preferences"
+        },
+        "activity": {
+            "value": "activity",
+            "label": "Activity Constraints"
+        },
+        "organization": {
+            "value": "organization",
+            "label": "Organization Policies"
+        }
+    },
     "userConstraintsTab": "User Constraints / Preferences",
     "activityConstraintsTab": "Activity Constraints",
     "organizationConstraintsTab": "Organization Constraints",
@@ -87,7 +101,9 @@
     "other": {
         "currentUser": "Current User",
         "unknownSubject": "Unknown Subject",
-        "textareaMinRows": 3
+        "textareaMinRows": 3,
+        "defaultActiveTab": "user",
+        "containerSize": "xl"
     },
     "errorMessages": {
         "saveUserConstraint": "Error saving user constraint:",

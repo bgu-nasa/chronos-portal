@@ -1,7 +1,9 @@
 import { useEffect } from "react";
 import { Modal, TextInput, Button, Group, Select, Textarea } from "@mantine/core";
 import { useForm } from "@mantine/form";
+
 import { useSchedulingPeriods } from "@/modules/schedule/src/hooks";
+
 import resources from "../constraints-page.resources.json";
 
 interface OrganizationPolicyEditorProps {

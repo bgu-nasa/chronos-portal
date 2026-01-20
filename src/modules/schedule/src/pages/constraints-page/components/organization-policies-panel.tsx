@@ -1,12 +1,15 @@
 import { useEffect, useState, useMemo } from "react";
-import { Table, Button, Group, Text, ActionIcon, Loader } from "@mantine/core";
 import { HiOutlinePencil, HiOutlineTrash } from "react-icons/hi";
+import { Table, Button, Text, ActionIcon, Loader } from "@mantine/core";
+
 import {
     useOrganizationPolicies,
     useSchedulingPeriods
 } from "@/modules/schedule/src/hooks";
+
 import { OrganizationPolicyEditor } from "./organization-policy-editor";
 import resources from "../constraints-page.resources.json";
+import styles from "../constraints-page.module.css";
 
 interface OrganizationPoliciesPanelProps {
     readonly isAdmin: boolean;
@@ -66,41 +69,37 @@ export function OrganizationPoliciesPanel({ openConfirmation }: Readonly<Omit<Or
     };
 
     const handleSubmit = async (values: any) => {
-        try {
-            if (editingItem) {
-                await updateOrganizationPolicy(editingItem.id, values);
-            } else {
-                await createOrganizationPolicy(values);
-            }
-            setModalOpened(false);
-        } catch (error) {
-            console.error(resources.errorMessages.saveOrganizationPolicy, error);
+        if (editingItem) {
+            await updateOrganizationPolicy(editingItem.id, values);
+        } else {
+            await createOrganizationPolicy(values);
         }
+        setModalOpened(false);
     };
 
     if (isLoading && enrichedData.length === 0 && !modalOpened) {
         return (
-            <Group justify="center" py="xl">
+            <div className={styles.loadingContainer}>
                 <Loader size="lg" />
-            </Group>
+            </div>
         );
     }
 
     return (
-        <div>
-            <Group mb="md" justify="space-between">
+        <div className={styles.panel}>
+            <div className={styles.buttonGroup}>
                 <Button variant="filled" onClick={handleCreate}>
                     {resources.modalTitles.createOrganizationPolicy}
                 </Button>
                 {isLoading && <Loader size="xs" />}
-            </Group>
+            </div>
 
             {enrichedData.length === 0 ? (
-                <Text c="dimmed" ta="center" py="xl">
+                <Text className={styles.emptyState}>
                     {resources.emptyStateMessages.noOrganizationPolicies}
                 </Text>
             ) : (
-                <Table striped highlightOnHover>
+                <Table striped highlightOnHover className={styles.table}>
                     <Table.Thead>
                         <Table.Tr>
                             <Table.Th>{resources.labels.period}</Table.Th>
@@ -116,14 +115,14 @@ export function OrganizationPoliciesPanel({ openConfirmation }: Readonly<Omit<Or
                                 <Table.Td>{item.key}</Table.Td>
                                 <Table.Td>{item.value}</Table.Td>
                                 <Table.Td>
-                                    <Group gap="xs">
+                                    <div className={styles.actionIcons}>
                                         <ActionIcon variant="subtle" onClick={() => handleEdit(item)}>
                                             <HiOutlinePencil />
                                         </ActionIcon>
                                         <ActionIcon variant="subtle" onClick={() => handleDelete(item)}>
                                             <HiOutlineTrash />
                                         </ActionIcon>
-                                    </Group>
+                                    </div>
                                 </Table.Td>
                             </Table.Tr>
                         ))}
