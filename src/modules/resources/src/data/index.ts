@@ -18,3 +18,6 @@ export * from "./resource-data-repository";
 // ResourceType types and repository
 export * from "./resource-type.types";
 export * from "./resource-type-data-repository";
+
+// External data (lightweight cross-module data access)
+export * from "./external";
