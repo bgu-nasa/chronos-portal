@@ -1,2 +1,2 @@
-export { UpdatePasswordModal } from "./update-password-modal";
-export { ProfileUpdateForm } from "./profile-update-form";
+export { UpdatePasswordModal } from "./update-password-modal.tsx";
+export { ProfileUpdateForm } from "./profile-update-form.tsx";
