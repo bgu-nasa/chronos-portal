@@ -12,25 +12,14 @@ import {
     useCreateResourceType,
     useUpdateResourceType,
     useDeleteResourceType,
-    useNotification,
 } from "@/modules/resources/src/hooks";
 import { ResourceTypeActions, ResourceTypeTable, ResourceTypeCreator, ResourceTypeEditor, type ResourceTypeData } from "../resource-types-page/components";
-import { NotificationProvider } from "../../components";
 import resourcesJson from "./resources-page.resources.json";
 import resourceTypesJson from "../resource-types-page/resource-types-page.resources.json";
 import styles from "./resources-page.module.css";
 import { $app } from "@/infra/service";
 
 export function ResourcesPage() {
-    return (
-        <NotificationProvider>
-            <ResourcesPageContent />
-        </NotificationProvider>
-    );
-}
-
-function ResourcesPageContent() {
-    const { showInfo, showError, showWarning } = useNotification();
     const [activeTab, setActiveTab] = useState<string | null>("resources");
     
     // Resources state
@@ -103,14 +92,14 @@ function ResourcesPageContent() {
 
             if (result) {
                 setResourceCreateModalOpened(false);
-                showInfo("Resource created successfully");
+                $app.notifications.showSuccess("Success", "Resource created successfully");
             } else {
                 $app.logger.error("[ResourcesPage] Create resource returned null");
-                showError("Failed to create resource. Check console for details.");
+                $app.notifications.showError("Error", "Failed to create resource. Check console for details.");
             }
         } catch (error) {
             $app.logger.error("[ResourcesPage] Error creating resource:", error);
-            showError(`Error creating resource: ${error instanceof Error ? error.message : "Unknown error"}`);
+            $app.notifications.showError("Error", `Error creating resource: ${error instanceof Error ? error.message : "Unknown error"}`);
         }
     };
 
@@ -131,7 +120,7 @@ function ResourcesPageContent() {
 
         if (!selectedResource) {
             $app.logger.error("[ResourcesPage] Missing selectedResource");
-            showWarning("Missing resource context for edit.");
+            $app.notifications.showWarning("Warning", "Missing resource context for edit.");
             return;
         }
 
@@ -151,14 +140,14 @@ function ResourcesPageContent() {
             if (success) {
                 setResourceEditModalOpened(false);
                 setSelectedResource(null);
-                showInfo("Resource updated successfully");
+                $app.notifications.showSuccess("Success", "Resource updated successfully");
             } else {
                 $app.logger.error("[ResourcesPage] Update resource returned false");
-                showError("Failed to update resource. Check console for details.");
+                $app.notifications.showError("Error", "Failed to update resource. Check console for details.");
             }
         } catch (error) {
             $app.logger.error("[ResourcesPage] Error updating resource:", error);
-            showError(`Error updating resource: ${error instanceof Error ? error.message : "Unknown error"}`);
+            $app.notifications.showError("Error", `Error updating resource: ${error instanceof Error ? error.message : "Unknown error"}`);
         }
     };
 
@@ -206,14 +195,14 @@ function ResourcesPageContent() {
 
             if (result) {
                 setResourceTypeCreateModalOpened(false);
-                showInfo("Resource type created successfully");
+                $app.notifications.showSuccess("Success", "Resource type created successfully");
             } else {
                 $app.logger.error("[ResourcesPage] Create resource type returned null");
-                showError("Failed to create resource type. Check console for details.");
+                $app.notifications.showError("Error", "Failed to create resource type. Check console for details.");
             }
         } catch (error) {
             $app.logger.error("[ResourcesPage] Error creating resource type:", error);
-            showError(`Error creating resource type: ${error instanceof Error ? error.message : "Unknown error"}`);
+            $app.notifications.showError("Error", `Error creating resource type: ${error instanceof Error ? error.message : "Unknown error"}`);
         }
     };
 
@@ -229,7 +218,7 @@ function ResourcesPageContent() {
 
         if (!selectedResourceType) {
             $app.logger.error("[ResourcesPage] Missing selectedResourceType");
-            showWarning("Missing resource type context for edit.");
+            $app.notifications.showWarning("Warning", "Missing resource type context for edit.");
             return;
         }
 
@@ -246,14 +235,14 @@ function ResourcesPageContent() {
             if (success) {
                 setResourceTypeEditModalOpened(false);
                 setSelectedResourceType(null);
-                showInfo("Resource type updated successfully");
+                $app.notifications.showSuccess("Success", "Resource type updated successfully");
             } else {
                 $app.logger.error("[ResourcesPage] Update resource type returned false");
-                showError("Failed to update resource type. Check console for details.");
+                $app.notifications.showError("Error", "Failed to update resource type. Check console for details.");
             }
         } catch (error) {
             $app.logger.error("[ResourcesPage] Error updating resource type:", error);
-            showError(`Error updating resource type: ${error instanceof Error ? error.message : "Unknown error"}`);
+            $app.notifications.showError("Error", `Error updating resource type: ${error instanceof Error ? error.message : "Unknown error"}`);
         }
     };
 
