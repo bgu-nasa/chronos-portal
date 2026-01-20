@@ -18,8 +18,6 @@ import {
 import resources from "./subjects-page.resources.json";
 import styles from "./subjects-page.module.css";
 import { $app } from "@/infra/service";
-import { showWarningNotification } from "../../utils/notification-functions";
-import { ResourceNotifications } from "../../utils/notifications";
 
 export function SubjectsPage() {
     const navigate = useNavigate();
@@ -65,7 +63,7 @@ export function SubjectsPage() {
 
     const handleCreateClick = () => {
         if (!currentDepartmentId) {
-            showWarningNotification({ message: "Please search for a department first" });
+            $app.notifications.showWarning("Warning", "Please search for a department first");
             return;
         }
         setCreateModalOpened(true);
@@ -199,7 +197,6 @@ export function SubjectsPage() {
 
     return (
         <Container size="xl" py="xl">
-            <ResourceNotifications />
             <div className={styles.container}>
                 <Title order={1}>{resources.title}</Title>
                 <Divider className={styles.divider} />
