@@ -1,11 +1,21 @@
-import { useEffect } from "react";
-import { Modal, TextInput, Button, Group, Select, Textarea } from "@mantine/core";
+import { useEffect, useMemo, useState } from "react";
+import { HiOutlineTrash } from "react-icons/hi";
+
+import {
+    Modal, TextInput, Button,
+    Group, Select, MultiSelect,
+    ActionIcon, Stack
+} from "@mantine/core";
+import { TimeInput } from "@mantine/dates";
 import { useForm } from "@mantine/form";
 
 import { useUsers } from "@/modules/auth/src/hooks";
 import { useSchedulingPeriods } from "@/modules/schedule/src/hooks";
 
 import resources from "../constraints-page.resources.json";
+import { parseForbiddenTimeRange, parsePreferredWeekdays } from "../utils/constraint-value-parser";
+import { serializeForbiddenTimeRange, serializePreferredWeekdays } from "../utils/constraint-value-serializer";
+import type { ForbiddenTimeRangeEntry } from "../utils/constraint-value-parser";
 
 interface UserConstraintEditorProps {
     readonly opened: boolean;
@@ -43,19 +53,38 @@ export function UserConstraintEditor({
     const { users, fetchUsers } = useUsers();
     const { schedulingPeriods, fetchSchedulingPeriods } = useSchedulingPeriods();
 
+    // Determine the constraint key based on isPreference
+    const constraintKey = useMemo(() => {
+        if (initialData?.key) {
+            return initialData.key;
+        }
+        return isPreference ? "preferred_weekdays" : "forbidden_timerange";
+    }, [initialData?.key, isPreference]);
+
+    // Get the constraint type label
+    const constraintTypeLabel = useMemo(() => {
+        const options = isPreference
+            ? resources.constraintTypeOptions.userPreferences
+            : resources.constraintTypeOptions.userConstraints;
+        return options.find(opt => opt.value === constraintKey)?.label || constraintKey;
+    }, [constraintKey, isPreference]);
+
+    // Form state for forbidden_timerange: array of time range entries with unique IDs
+    const [timeRangeEntries, setTimeRangeEntries] = useState<Array<ForbiddenTimeRangeEntry & { id: string }>>([]);
+    
+    // Form state for preferred_weekdays: array of selected weekdays
+    const [selectedWeekdays, setSelectedWeekdays] = useState<string[]>([]);
+
     const form = useForm({
         initialValues: {
             userId: initialData?.userId || currentUserId || "",
             schedulingPeriodId: initialData?.schedulingPeriodId || "",
-            key: initialData?.key || "",
-            value: initialData?.value || "",
+            key: constraintKey,
             isPreference: initialData?.isPreference ?? isPreference,
         },
         validate: {
             userId: (value: string) => (value ? null : resources.validationMessages.userRequired),
             schedulingPeriodId: (value: string) => (value ? null : resources.validationMessages.schedulingPeriodRequired),
-            key: (value: string) => (value ? null : resources.validationMessages.keyRequired),
-            value: (value: string) => (value ? null : resources.validationMessages.valueRequired),
         },
     });
 
@@ -66,29 +95,140 @@ export function UserConstraintEditor({
         }
     }, [opened]);
 
+    // Generate unique ID for time range entries
+    const generateEntryId = () => `entry-${Date.now()}-${Math.random().toString(36).slice(2, 11)}`;
+
+    // Initialize form data when editing
+    const initializeEditData = () => {
+        if (!initialData) return;
+        
+        form.setValues({
+            userId: initialData.userId,
+            schedulingPeriodId: initialData.schedulingPeriodId,
+            key: initialData.key,
+            isPreference: initialData.isPreference,
+        });
+        
+        // Parse the value based on constraint type
+        if (initialData.key === "forbidden_timerange") {
+            const entries = parseForbiddenTimeRange(initialData.value);
+            const entriesWithIds = entries.length > 0 
+                ? entries.map(e => ({ ...e, id: generateEntryId() }))
+                : [{ weekday: "", startTime: "", endTime: "", id: generateEntryId() }];
+            setTimeRangeEntries(entriesWithIds);
+        } else if (initialData.key === "preferred_weekdays") {
+            const weekdays = parsePreferredWeekdays(initialData.value);
+            setSelectedWeekdays(weekdays);
+        }
+    };
+
+    // Initialize form data when creating new
+    const initializeNewData = () => {
+        form.setValues({
+            userId: !isAdmin && currentUserId ? currentUserId : "",
+            schedulingPeriodId: "",
+            key: constraintKey,
+            isPreference: isPreference,
+        });
+        
+        // Initialize empty form data based on constraint type
+        if (constraintKey === "forbidden_timerange") {
+            setTimeRangeEntries([{ weekday: "", startTime: "", endTime: "", id: generateEntryId() }]);
+        } else if (constraintKey === "preferred_weekdays") {
+            setSelectedWeekdays([]);
+        }
+    };
+
     useEffect(() => {
         if (opened) {
             if (initialData) {
-                form.setValues(initialData);
+                initializeEditData();
             } else {
-                form.setValues({
-                    userId: !isAdmin && currentUserId ? currentUserId : "",
-                    schedulingPeriodId: "",
-                    key: "",
-                    value: "",
-                    isPreference: isPreference,
-                });
+                initializeNewData();
             }
         }
-    }, [opened, initialData, isAdmin, currentUserId, isPreference]);
+    }, [opened, initialData, isAdmin, currentUserId, isPreference, constraintKey]);
 
     const handleSubmit = async (values: typeof form.values) => {
+        // Validate before submitting
+        const validationError = validateForm();
+        if (validationError) {
+            form.setFieldError("value", validationError);
+            return;
+        }
+
+        // Serialize form data based on constraint type
+        let serializedValue = "";
+        
+        if (constraintKey === "forbidden_timerange") {
+            // Remove id field before serializing
+            const entriesWithoutIds = timeRangeEntries.map(({ id, ...entry }) => entry);
+            serializedValue = serializeForbiddenTimeRange(entriesWithoutIds);
+        } else if (constraintKey === "preferred_weekdays") {
+            serializedValue = serializePreferredWeekdays(selectedWeekdays);
+        }
+        
         await onSubmit({
             ...values,
+            value: serializedValue,
             isPreference: initialData?.isPreference ?? isPreference,
         });
         form.reset();
+        setTimeRangeEntries([]);
+        setSelectedWeekdays([]);
         onClose();
+    };
+
+    const addTimeRangeEntry = () => {
+        setTimeRangeEntries([...timeRangeEntries, { weekday: "", startTime: "", endTime: "", id: generateEntryId() }]);
+    };
+
+    const removeTimeRangeEntry = (id: string) => {
+        setTimeRangeEntries(timeRangeEntries.filter(entry => entry.id !== id));
+    };
+
+    const updateTimeRangeEntry = (id: string, field: keyof ForbiddenTimeRangeEntry, value: string) => {
+        setTimeRangeEntries(timeRangeEntries.map(entry => 
+            entry.id === id ? { ...entry, [field]: value } : entry
+        ));
+    };
+
+    // Validation for form submission
+    const validateForm = (): string | null => {
+        if (constraintKey === "forbidden_timerange") {
+            const validEntries = timeRangeEntries.filter(e => e.weekday && e.startTime && e.endTime);
+            if (validEntries.length === 0) {
+                return resources.validationMessages.atLeastOneTimeRange;
+            }
+            
+            // Validate each entry
+            for (const entry of validEntries) {
+                const [startHours, startMinutes] = entry.startTime.split(':').map(Number);
+                const [endHours, endMinutes] = entry.endTime.split(':').map(Number);
+                const startTotal = startHours * 60 + startMinutes;
+                const endTotal = endHours * 60 + endMinutes;
+                
+                if (startTotal >= endTotal) {
+                    return resources.validationMessages.startTimeBeforeEndTime;
+                }
+            }
+        } else if (constraintKey === "preferred_weekdays") {
+            if (selectedWeekdays.length === 0) {
+                return resources.validationMessages.atLeastOneWeekday;
+            }
+        }
+        return null;
+    };
+
+    // Handle form submission with validation
+    const handleFormSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+        e.preventDefault();
+        const validationError = validateForm();
+        if (validationError) {
+            form.setFieldError("value", validationError);
+        } else {
+            form.onSubmit(handleSubmit)(e);
+        }
     };
 
     const userOptions = users.map((user) => ({
@@ -119,7 +259,7 @@ export function UserConstraintEditor({
             title={modalTitle}
             size={resources.modalSize}
         >
-            <form onSubmit={form.onSubmit(handleSubmit)}>
+            <form onSubmit={handleFormSubmit}>
                 {isAdmin ? (
                     <Select
                         label={resources.labels.user}
@@ -134,9 +274,10 @@ export function UserConstraintEditor({
                     <TextInput
                         label={resources.labels.user}
                         value={
-                            users.some((u) => u.id === currentUserId)
-                                ? `${users.find((u) => u.id === currentUserId)?.firstName} ${users.find((u) => u.id === currentUserId)?.lastName}`
-                                : resources.other.currentUser
+                            (() => {
+                                const user = users.find((u) => u.id === currentUserId);
+                                return user ? `${user.firstName} ${user.lastName}` : resources.other.currentUser;
+                            })()
                         }
                         disabled
                         mb="md"
@@ -155,26 +296,82 @@ export function UserConstraintEditor({
 
                 <TextInput
                     label={resources.labels.key}
-                    placeholder={resources.placeholders.keyExamples.user}
-                    required
+                    value={constraintTypeLabel}
+                    disabled
                     mb="md"
-                    {...form.getInputProps("key")}
                 />
 
-                <Textarea
-                    label={resources.labels.value}
-                    placeholder={resources.placeholders.valueExamples.user}
-                    required
-                    mb="md"
-                    minRows={resources.other.textareaMinRows}
-                    {...form.getInputProps("value")}
-                />
+                {constraintKey === "forbidden_timerange" && (
+                    <Stack gap="md" mb="md">
+                        {timeRangeEntries.map((entry, index) => (
+                            <Group key={entry.id} align="flex-start" gap="xs">
+                                <Select
+                                    label={index === 0 ? resources.labels.weekday : undefined}
+                                    placeholder={resources.placeholders.selectWeekday}
+                                    data={resources.other.weekdays}
+                                    value={entry.weekday}
+                                    onChange={(value) => updateTimeRangeEntry(entry.id, "weekday", value || "")}
+                                    style={{ flex: 1 }}
+                                    required
+                                />
+                                <TimeInput
+                                    label={index === 0 ? resources.labels.startTime : undefined}
+                                    placeholder={resources.placeholders.selectStartTime}
+                                    value={entry.startTime}
+                                    onChange={(e) => updateTimeRangeEntry(entry.id, "startTime", e.currentTarget.value)}
+                                    style={{ flex: 1 }}
+                                    required
+                                />
+                                <TimeInput
+                                    label={index === 0 ? resources.labels.endTime : undefined}
+                                    placeholder={resources.placeholders.selectEndTime}
+                                    value={entry.endTime}
+                                    onChange={(e) => updateTimeRangeEntry(entry.id, "endTime", e.currentTarget.value)}
+                                    style={{ flex: 1 }}
+                                    required
+                                />
+                                {timeRangeEntries.length > 1 && (
+                                    <ActionIcon
+                                        color="red"
+                                        variant="subtle"
+                                        onClick={() => removeTimeRangeEntry(entry.id)}
+                                        mt={index === 0 ? 28 : 0}
+                                    >
+                                        <HiOutlineTrash size={16} />
+                                    </ActionIcon>
+                                )}
+                            </Group>
+                        ))}
+                        <Button
+                            variant="light"
+                            onClick={addTimeRangeEntry}
+                            size="sm"
+                        >
+                            {resources.labels.addTimeRange}
+                        </Button>
+                    </Stack>
+                )}
+
+                {constraintKey === "preferred_weekdays" && (
+                    <MultiSelect
+                        label={resources.labels.value}
+                        placeholder={resources.placeholders.selectWeekday}
+                        data={resources.other.weekdays}
+                        value={selectedWeekdays}
+                        onChange={setSelectedWeekdays}
+                        required
+                        mb="md"
+                    />
+                )}
 
                 <Group justify="flex-end" mt="xl">
                     <Button variant="subtle" onClick={onClose} disabled={loading}>
                         {resources.cancelButton}
                     </Button>
-                    <Button type="submit" loading={loading}>
+                    <Button 
+                        type="submit" 
+                        loading={loading}
+                    >
                         {initialData ? resources.updateButton : resources.createButton}
                     </Button>
                 </Group>

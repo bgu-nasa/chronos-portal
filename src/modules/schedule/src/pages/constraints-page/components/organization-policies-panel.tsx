@@ -88,7 +88,7 @@ export function OrganizationPoliciesPanel({ openConfirmation }: Readonly<Omit<Or
     return (
         <div className={styles.panel}>
             <div className={styles.buttonGroup}>
-                <Button variant="filled" onClick={handleCreate}>
+                <Button variant="filled" onClick={handleCreate} disabled>
                     {resources.modalTitles.createOrganizationPolicy}
                 </Button>
                 {isLoading && <Loader size="xs" />}

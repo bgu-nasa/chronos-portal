@@ -41,12 +41,28 @@
         "period": "Period",
         "type": "Type",
         "lecturer": "Lecturer",
-        "actions": "Actions"
+        "actions": "Actions",
+        "weekday": "Weekday",
+        "startTime": "Start Time",
+        "endTime": "End Time",
+        "minCapacity": "Minimum Capacity",
+        "maxCapacity": "Maximum Capacity",
+        "locations": "Locations",
+        "resourceTypes": "Resource Types",
+        "addTimeRange": "Add Time Range",
+        "removeTimeRange": "Remove"
     },
     "placeholders": {
         "selectUser": "Select user",
         "selectSchedulingPeriod": "Select scheduling period",
         "selectActivity": "Select activity",
+        "selectWeekday": "Select weekday",
+        "selectStartTime": "Select start time",
+        "selectEndTime": "Select end time",
+        "enterMinCapacity": "Enter minimum capacity",
+        "enterMaxCapacity": "Enter maximum capacity",
+        "enterLocations": "Enter locations (comma-separated or press Enter)",
+        "enterResourceTypes": "Enter resource types (comma-separated or press Enter)",
         "keyExamples": {
             "user": "e.g., preferred_time, max_hours_per_day",
             "activity": "e.g., required_room_type, max_students",
@@ -73,7 +89,57 @@
         "schedulingPeriodRequired": "Scheduling period is required",
         "activityRequired": "Activity is required",
         "keyRequired": "Key is required",
-        "valueRequired": "Value is required"
+        "valueRequired": "Value is required",
+        "weekdayRequired": "Weekday is required",
+        "startTimeRequired": "Start time is required",
+        "endTimeRequired": "End time is required",
+        "startTimeBeforeEndTime": "Start time must be before end time",
+        "atLeastOneTimeRange": "At least one time range is required",
+        "atLeastOneWeekday": "At least one weekday is required",
+        "atLeastOneLocation": "At least one location is required",
+        "atLeastOneResourceType": "At least one resource type is required",
+        "minOrMaxRequired": "At least one of minimum or maximum capacity is required",
+        "minGreaterThanMax": "Minimum capacity cannot be greater than maximum capacity",
+        "invalidForbiddenTimeRange": "Invalid format. Expected: 'Weekday HH:mm - HH:mm' (e.g., 'Monday 09:30 - 11:00'). Multiple entries can be separated by commas.",
+        "invalidPreferredWeekdays": "Invalid format. Expected comma-separated weekday names (e.g., 'Monday,Wednesday,Friday')",
+        "invalidRequiredCapacity": "Invalid format. Expected JSON: {\"min\": number} or {\"max\": number} or {\"min\": number, \"max\": number}",
+        "invalidLocationPreference": "Invalid format. Expected comma-separated location names (e.g., 'Building A,Building B')",
+        "invalidCompatibleResourceTypes": "Invalid format. Expected comma-separated resource type names (e.g., 'Lecture Hall,Seminar Room')"
+    },
+    "constraintTypeOptions": {
+        "userConstraints": [
+            {
+                "value": "forbidden_timerange",
+                "label": "Forbidden Time Range"
+            }
+        ],
+        "userPreferences": [
+            {
+                "value": "preferred_weekdays",
+                "label": "Preferred Weekdays"
+            }
+        ],
+        "activityConstraints": [
+            {
+                "value": "required_capacity",
+                "label": "Required Capacity"
+            },
+            {
+                "value": "location_preference",
+                "label": "Location Preference"
+            },
+            {
+                "value": "compatible_resource_types",
+                "label": "Compatible Resource Types"
+            }
+        ]
+    },
+    "valueFormatGuidance": {
+        "forbidden_timerange": "Format: 'Weekday HH:mm - HH:mm' (e.g., 'Monday 09:30 - 11:00'). Multiple entries separated by commas.",
+        "preferred_weekdays": "Format: Comma-separated weekday names (e.g., 'Monday,Wednesday,Friday')",
+        "required_capacity": "Format: JSON object with 'min' and/or 'max' (e.g., {\"min\": 30} or {\"min\": 20, \"max\": 50})",
+        "location_preference": "Format: Comma-separated location names (e.g., 'Building A,Building B')",
+        "compatible_resource_types": "Format: Comma-separated resource type names (e.g., 'Lecture Hall,Seminar Room')"
     },
     "deleteMessages": {
         "deleteConstraint": "Delete Constraint",
@@ -103,7 +169,16 @@
         "unknownSubject": "Unknown Subject",
         "textareaMinRows": 3,
         "defaultActiveTab": "user",
-        "containerSize": "xl"
+        "containerSize": "xl",
+        "weekdays": [
+            "Sunday",
+            "Monday",
+            "Tuesday",
+            "Wednesday",
+            "Thursday",
+            "Friday",
+            "Saturday"
+        ]
     },
     "errorMessages": {
         "saveUserConstraint": "Error saving user constraint:",
