@@ -19,6 +19,7 @@ export function useSubjects() {
         (state) => state.setCurrentDepartment
     );
     const fetchSubjects = useSubjectStore((state) => state.fetchSubjects);
+    const clearState = useSubjectStore((state) => state.clearState);
 
     return {
         subjects,
@@ -27,6 +28,7 @@ export function useSubjects() {
         error,
         setCurrentDepartment,
         fetchSubjects,
+        clearState,
     };
 }
 

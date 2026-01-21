@@ -117,9 +117,15 @@ export function ActivitiesPage() {
         const org = $app.organization.getOrganization();
         $app.logger.info("[ActivitiesPage] Organization from context:", org);
 
+        if (!org?.id) {
+            $app.logger.error("[ActivitiesPage] No organization context available");
+            $app.notifications.showError("Error", "Organization context missing. Please refresh and try again.");
+            return;
+        }
+
         const request: CreateActivityRequest = {
             id: crypto.randomUUID(),
-            organizationId: org?.id || "00000000-0000-0000-0000-000000000000",
+            organizationId: org.id,
             subjectId: subjectId,
             assignedUserId: data.assignedUserId || "00000000-0000-0000-0000-000000000000",
             activityType: data.activityType,
@@ -134,8 +140,8 @@ export function ActivitiesPage() {
             
             if (result) {
                 setCreateModalOpened(false);
-                fetchActivities();
                 $app.notifications.showSuccess("Success", "Activity created successfully");
+                fetchActivities();
             } else {
                 $app.logger.error("[ActivitiesPage] Create activity returned null");
                 setCreateModalOpened(false);
@@ -172,8 +178,14 @@ export function ActivitiesPage() {
         const org = $app.organization.getOrganization();
         $app.logger.info("[ActivitiesPage] Organization from context:", org);
 
+        if (!org?.id) {
+            $app.logger.error("[ActivitiesPage] No organization context available");
+            $app.notifications.showError("Error", "Organization context missing. Please refresh and try again.");
+            return;
+        }
+
         const request: UpdateActivityRequest = {
-            organizationId: org?.id || "00000000-0000-0000-0000-000000000000",
+            organizationId: org.id,
             subjectId: subjectId,
             assignedUserId: data.assignedUserId || "00000000-0000-0000-0000-000000000000",
             activityType: data.activityType,
@@ -189,8 +201,8 @@ export function ActivitiesPage() {
             if (success) {
                 setEditModalOpened(false);
                 setSelectedActivity(null);
-                fetchActivities();
                 $app.notifications.showSuccess("Success", "Activity updated successfully");
+                fetchActivities();
             } else {
                 $app.logger.error("[ActivitiesPage] Update activity returned false");
                 setEditModalOpened(false);

@@ -4,7 +4,6 @@
  * Used for dropdowns and display purposes in the resources module
  */
 
-import { $app } from "@/infra/service";
 import type { Department } from "./department.types";
 
 export class DepartmentRepository {

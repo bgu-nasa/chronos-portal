@@ -1,6 +1,6 @@
 import { Button, TextInput, Group, Paper } from "@mantine/core";
 import { DepartmentSelect } from "@/common/components/department-select";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 export interface SubjectSearchFilters {
     departmentId: string;
@@ -17,6 +17,15 @@ export function SubjectSearch({ onSearch, onClear }: SubjectSearchProps) {
     const [departmentId, setDepartmentId] = useState<string>("");
     const [code, setCode] = useState("");
     const [name, setName] = useState("");
+
+    // Automatically trigger search when department changes
+    useEffect(() => {
+        if (departmentId) {
+            onSearch({ departmentId, code, name });
+        }
+        // Note: We only want to trigger on departmentId changes, not code/name
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [departmentId]);
 
     const handleSearch = () => {
         onSearch({ departmentId, code, name });

@@ -30,6 +30,7 @@ interface SubjectStore {
     // Utility actions
     setError: (error: string | null) => void;
     clearError: () => void;
+    clearState: () => void;
 }
 
 export const useSubjectStore = create<SubjectStore>((set, get) => ({
@@ -41,7 +42,8 @@ export const useSubjectStore = create<SubjectStore>((set, get) => ({
 
     // Set current department
     setCurrentDepartment: (departmentId: string) => {
-        set({ currentDepartmentId: departmentId });
+        // Clear subjects when changing departments to avoid showing stale data
+        set({ currentDepartmentId: departmentId, subjects: [] });
     },
 
     // Helper to get department ID
@@ -168,4 +170,5 @@ export const useSubjectStore = create<SubjectStore>((set, get) => ({
     // Utility actions
     setError: (error: string | null) => set({ error }),
     clearError: () => set({ error: null }),
+    clearState: () => set({ subjects: [], currentDepartmentId: null, error: null }),
 }));

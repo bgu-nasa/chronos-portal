@@ -37,6 +37,9 @@ export const moduleConfig: ModuleConfig = {
                     label: "Courses",
                     href: "/resources/subjects",
                     location: "dashboard",
+                    requiredRoles: [
+                        "Viewer"
+                    ],
                     icon: React.createElement(CoursesIcon),
                 },
                 {
