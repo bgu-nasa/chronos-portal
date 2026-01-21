@@ -42,8 +42,9 @@ export function ActivityEditor({
     useEffect(() => {
         if (initialData) {
             setActivityType(initialData.activityType);
-            // Check if assigned user is the "unassigned" GUID, if so set to null
-            const isUnassigned = initialData.assignedUserId === "00000000-0000-0000-0000-000000000000";
+            // Check if assigned user is empty or unassigned, if so set to null
+            const isUnassigned = !initialData.assignedUserId || 
+                initialData.assignedUserId.trim().length === 0;
             setAssignedUserId(isUnassigned ? null : initialData.assignedUserId);
             setExpectedStudents(initialData.expectedStudents);
         }
@@ -82,7 +83,7 @@ export function ActivityEditor({
         $app.logger.info("[ActivityEditor] Calling onSubmit...");
         await onSubmit({
             activityType,
-            assignedUserId: assignedUserId || "00000000-0000-0000-0000-000000000000",
+            assignedUserId: assignedUserId || "",
             expectedStudents,
         });
 

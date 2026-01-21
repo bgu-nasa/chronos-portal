@@ -49,7 +49,7 @@ export function ActivitiesPage() {
             const uniqueUserIds = new Set(
                 activities
                     .map((a) => a.assignedUserId)
-                    .filter((id) => id !== "00000000-0000-0000-0000-000000000000")
+                    .filter((id) => id && id.trim().length > 0)
             );
 
             $app.logger.info("[ActivitiesPage] Unique user IDs to fetch:", Array.from(uniqueUserIds));
@@ -127,7 +127,7 @@ export function ActivitiesPage() {
             id: crypto.randomUUID(),
             organizationId: org.id,
             subjectId: subjectId,
-            assignedUserId: data.assignedUserId || "00000000-0000-0000-0000-000000000000",
+            assignedUserId: data.assignedUserId || "",
             activityType: data.activityType,
             expectedStudents: data.expectedStudents,
         };
@@ -187,7 +187,7 @@ export function ActivitiesPage() {
         const request: UpdateActivityRequest = {
             organizationId: org.id,
             subjectId: subjectId,
-            assignedUserId: data.assignedUserId || "00000000-0000-0000-0000-000000000000",
+            assignedUserId: data.assignedUserId || "",
             activityType: data.activityType,
             expectedStudents: data.expectedStudents,
         };
@@ -238,7 +238,7 @@ export function ActivitiesPage() {
     const subjectActivities: ActivityData[] = activities
         .filter((activity) => activity.subjectId === subjectId)
         .map((activity) => {
-            const isUnassigned = activity.assignedUserId === "00000000-0000-0000-0000-000000000000";
+            const isUnassigned = !activity.assignedUserId || activity.assignedUserId.trim().length === 0;
             const userName = isUnassigned 
                 ? "Unassigned" 
                 : userNames.get(activity.assignedUserId) || "Loading...";

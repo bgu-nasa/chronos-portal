@@ -111,9 +111,14 @@ export function SubjectsPage() {
         const org = $app.organization.getOrganization();
         $app.logger.info("[SubjectsPage] Organization from context:", org);
 
+        if (!org?.id) {
+            $app.logger.error("[SubjectsPage] No organization context available");
+            return;
+        }
+
         const request = {
             id: crypto.randomUUID(),
-            organizationId: org?.id || "00000000-0000-0000-0000-000000000000",
+            organizationId: org.id,
             departmentId: currentDepartmentId,
             schedulingPeriodId: data.schedulingPeriodId,
             code: data.code,
@@ -156,8 +161,13 @@ export function SubjectsPage() {
         const org = $app.organization.getOrganization();
         $app.logger.info("[SubjectsPage] Organization from context:", org);
 
+        if (!org?.id) {
+            $app.logger.error("[SubjectsPage] No organization context available");
+            return;
+        }
+
         const request: UpdateSubjectRequest = {
-            organizationId: org?.id || "00000000-0000-0000-0000-000000000000",
+            organizationId: org.id,
             departmentId: currentDepartmentId,
             schedulingPeriodId: data.schedulingPeriodId,
             code: data.code,

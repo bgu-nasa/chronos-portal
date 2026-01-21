@@ -66,7 +66,7 @@ export function ActivityCreator({
         $app.logger.info("[ActivityCreator] Calling onSubmit...");
         await onSubmit({
             activityType,
-            assignedUserId: assignedUserId || "00000000-0000-0000-0000-000000000000",
+            assignedUserId: assignedUserId || "",
             expectedStudents,
         });
 
