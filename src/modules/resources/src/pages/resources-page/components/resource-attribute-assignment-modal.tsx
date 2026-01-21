@@ -52,7 +52,7 @@ export function ResourceAttributeAssignmentModal({
 
         const org = $app.organization.getOrganization();
         const request: CreateResourceAttributeAssignmentRequest = {
-            organizationId: org?.id || "00000000-0000-0000-0000-000000000000",
+            organizationId: org?.id!,
             resourceId,
             resourceAttributeId: selectedAttributeId,
         };

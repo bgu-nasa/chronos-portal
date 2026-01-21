@@ -316,7 +316,7 @@ export function ResourcesPage() {
 
         const request = {
             id: crypto.randomUUID(),
-            organizationId: org?.id || "00000000-0000-0000-0000-000000000000",
+            organizationId: org?.id!,
             title: data.title,
             description: data.description,
         };
