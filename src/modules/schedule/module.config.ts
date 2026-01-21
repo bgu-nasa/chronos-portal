@@ -1,6 +1,6 @@
 import type { ModuleConfig } from "@/infra";
 import React from "react";
-import { CalendarIcon, ScheduleIcon, SchedulingPeriodsIcon, ConstraintsIcon } from "@/common/icons";
+import { CalendarIcon, ScheduleIcon, ConstraintsIcon, CoursesIcon } from "@/common/icons";
 import { CalendarPage, SchedulingPeriodsPage, ConstraintsPage } from "./src";
 
 export const moduleConfig: ModuleConfig = {
@@ -46,10 +46,14 @@ export const moduleConfig: ModuleConfig = {
                     icon: React.createElement(CalendarIcon),
                 },
                 {
-                    label: "Scheduling Periods",
+                    label: "Semesters",
                     href: "/schedule/scheduling-periods",
                     location: "dashboard",
-                    icon: React.createElement(SchedulingPeriodsIcon),
+                    icon: React.createElement(CoursesIcon),
+                    requiredRoles: [
+                        "ResourceManager",
+                        "Administrator"
+                    ],
                 },
                 {
                     label: "Constraints",

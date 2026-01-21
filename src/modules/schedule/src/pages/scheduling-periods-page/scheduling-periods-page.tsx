@@ -5,18 +5,18 @@ import { SchedulingPeriodActions } from "@/modules/schedule/src/pages/scheduling
 import { SchedulingPeriodTable } from "@/modules/schedule/src/pages/scheduling-periods-page/components/scheduling-period-table";
 import { SchedulingPeriodEditor } from "@/modules/schedule/src/pages/scheduling-periods-page/components/scheduling-period-editor";
 import { AssignmentPanel } from "@/modules/schedule/src/pages/scheduling-periods-page/components/assignment-panel";
-import { SlotTable } from "@/modules/schedule/src/pages/slots-page/components/slot-table";
-import { SlotActions } from "@/modules/schedule/src/pages/slots-page/components/slot-actions";
-import { SlotEditor } from "@/modules/schedule/src/pages/slots-page/components/slot-editor";
-import type { SchedulingPeriodData } from "@/modules/schedule/src/stores/scheduling-period-editor.store";
-import { useSchedulingPeriodEditorStore } from "@/modules/schedule/src/stores/scheduling-period-editor.store";
-import { useSlotEditorStore } from "@/modules/schedule/src/stores/slot-editor.store";
+import { SlotTable } from "@/modules/schedule/src/pages/scheduling-periods-page/components/slot-table";
+import { SlotActions } from "@/modules/schedule/src/pages/scheduling-periods-page/components/slot-actions";
+import { SlotEditor } from "@/modules/schedule/src/pages/scheduling-periods-page/components/slot-editor";
+import type { SchedulingPeriodData } from "@/modules/schedule/src/stores";
+import { useSchedulingPeriodEditorStore, useSlotEditorStore } from "@/modules/schedule/src/stores";
 import {
     useSchedulingPeriods,
     useDeleteSchedulingPeriod,
-} from "@/modules/schedule/src/hooks/use-scheduling-periods";
-import { useSlots, useDeleteSlot } from "@/modules/schedule/src/hooks/use-slots";
-import type { SlotResponse } from "@/modules/schedule/src/data/slot.types";
+    useSlots,
+    useDeleteSlot,
+} from "@/modules/schedule/src/hooks";
+import type { SlotResponse } from "@/modules/schedule/src/data";
 import resources from "@/modules/schedule/src/pages/scheduling-periods-page/scheduling-periods-page.resources.json";
 import styles from "@/modules/schedule/src/pages/scheduling-periods-page/scheduling-periods-page.module.css";
 
