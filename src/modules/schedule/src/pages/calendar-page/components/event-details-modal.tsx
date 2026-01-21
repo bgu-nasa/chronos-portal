@@ -2,6 +2,7 @@ import { Modal, Button, Group, Text, Stack, Divider, Badge } from "@mantine/core
 import { useState, useEffect } from "react";
 import { resourceDataRepository } from "@/modules/schedule/src/data/resource-data-repository";
 import type { ResourceResponse } from "@/modules/schedule/src/data/resource.types";
+import resources from "../calendar-page.resources.json";
 
 interface EventBlock {
     weekday?: string;
@@ -52,23 +53,23 @@ export function EventDetailsModal({
         return null;
     }
 
-    const weekdayName = eventBlock.weekday || "Unknown Day";
+    const weekdayName = eventBlock.weekday || resources.eventDetailsModal.unknown.day;
     const timeRange = `${eventBlock.startTime} - ${eventBlock.endTime}`;
 
     return (
         <Modal
             opened={opened}
             onClose={onClose}
-            title="Event Details"
+            title={resources.eventDetailsModal.title}
             size="md"
         >
             <Stack gap="md">
                 <div>
                     <Text size="sm" c="dimmed" mb={4}>
-                        Subject
+                        {resources.eventDetailsModal.labels.subject}
                     </Text>
                     <Text fw={600} size="lg">
-                        {eventBlock.subjectName || "Unknown Subject"}
+                        {eventBlock.subjectName || resources.eventDetailsModal.unknown.subject}
                     </Text>
                 </div>
 
@@ -76,10 +77,10 @@ export function EventDetailsModal({
 
                 <div>
                     <Text size="sm" c="dimmed" mb={4}>
-                        Activity Type
+                        {resources.eventDetailsModal.labels.activityType}
                     </Text>
                     <Badge size="lg" variant="light" color="blue">
-                        {eventBlock.activityType || "Unknown"}
+                        {eventBlock.activityType || resources.eventDetailsModal.unknown.activityType}
                     </Badge>
                 </div>
 
@@ -87,7 +88,7 @@ export function EventDetailsModal({
 
                 <div>
                     <Text size="sm" c="dimmed" mb={4}>
-                        Schedule
+                        {resources.eventDetailsModal.labels.schedule}
                     </Text>
                     <Text fw={500}>
                         {weekdayName}
@@ -102,19 +103,19 @@ export function EventDetailsModal({
                         <Divider />
                         <div>
                             <Text size="sm" c="dimmed" mb={4}>
-                                Resource
+                                {resources.eventDetailsModal.labels.resource}
                             </Text>
                             <Text fw={500}>
                                 {resource.identifier || resource.id}
                             </Text>
                             {resource.location && (
                                 <Text size="sm" c="dimmed">
-                                    Location: {resource.location}
+                                    {resources.eventDetailsModal.labels.location} {resource.location}
                                 </Text>
                             )}
                             {resource.capacity && (
                                 <Text size="sm" c="dimmed">
-                                    Capacity: {resource.capacity}
+                                    {resources.eventDetailsModal.labels.capacity} {resource.capacity}
                                 </Text>
                             )}
                         </div>
@@ -123,13 +124,13 @@ export function EventDetailsModal({
 
                 {loadingResource && (
                     <Text size="sm" c="dimmed" style={{ fontStyle: "italic" }}>
-                        Loading resource details...
+                        {resources.eventDetailsModal.loading}
                     </Text>
                 )}
 
                 <Group justify="flex-end" mt="xl">
                     <Button onClick={onClose}>
-                        Close
+                        {resources.eventDetailsModal.closeButton}
                     </Button>
                 </Group>
             </Stack>

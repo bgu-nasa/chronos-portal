@@ -8,6 +8,7 @@ import { serializeForbiddenTimeRange, parseForbiddenTimeRange, type ForbiddenTim
 import { assignmentDataRepository, activityDataRepository, slotDataRepository, type AssignmentResponse, type ActivityResponse, type SubjectResponse, type SlotResponse } from "@/modules/schedule/src/data";
 import { SchedulingPeriodSelect, TimeRangeSelectionModal, UserSelect, EventDetailsModal } from "./components";
 import styles from "./calendar-page.module.css";
+import resources from "./calendar-page.resources.json";
 
 interface TimeRangeSelection {
   date: Date;
@@ -267,8 +268,8 @@ export function CalendarPage() {
 
       // Show success notification
       $app.notifications.showSuccess(
-        "Constraint Created",
-        "Unavailable time range has been set successfully"
+        resources.notifications.constraintCreated.title,
+        resources.notifications.constraintCreated.message
       );
 
       // Close modal and reset selection
@@ -277,8 +278,8 @@ export function CalendarPage() {
     } catch (error) {
       $app.logger.error("[CalendarPage] Error creating constraint:", error);
       $app.notifications.showError(
-        "Failed to Create Constraint",
-        error instanceof Error ? error.message : "An unexpected error occurred"
+        resources.notifications.constraintCreateFailed.title,
+        error instanceof Error ? error.message : resources.notifications.constraintCreateFailed.message
       );
     }
   };
