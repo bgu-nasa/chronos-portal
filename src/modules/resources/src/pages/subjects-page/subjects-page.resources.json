@@ -5,6 +5,7 @@
     "deleteButton": "Delete",
     "viewActivitiesButton": "View Groups",
     "departmentColumn": "Department",
+    "schedulingPeriodColumn": "Scheduling Period",
     "codeColumn": "Code",
     "nameColumn": "Name",
     "emptyStateMessage": "No courses yet. Get started by creating your first course!",

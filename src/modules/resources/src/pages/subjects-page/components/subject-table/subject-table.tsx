@@ -51,6 +51,7 @@ export function SubjectTable({
         >
             <Column selectionMode="single" headerStyle={{ width: "3rem" }} />
             <Column field="departmentName" header={resources.departmentColumn} sortable />
+            <Column field="schedulingPeriodName" header={resources.schedulingPeriodColumn} sortable />
             <Column field="code" header={resources.codeColumn} sortable />
             <Column field="name" header={resources.nameColumn} sortable />
         </DataTable>

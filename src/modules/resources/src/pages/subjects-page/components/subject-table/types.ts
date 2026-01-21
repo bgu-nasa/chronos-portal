@@ -5,4 +5,5 @@ export type SubjectData = {
     departmentId: string;
     departmentName: string;
     schedulingPeriodId: string;
+    schedulingPeriodName: string;
 };

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Container, Divider, Title } from "@mantine/core";
 import { useNavigate } from "react-router";
 import { ConfirmationDialog, useConfirmation } from "@/common";
@@ -18,6 +18,7 @@ import {
 import resources from "./subjects-page.resources.json";
 import styles from "./subjects-page.module.css";
 import { $app } from "@/infra/service";
+import { schedulingPeriodRepository } from "@/modules/resources/src/data";
 
 export function SubjectsPage() {
     const navigate = useNavigate();
@@ -25,6 +26,7 @@ export function SubjectsPage() {
     const [createModalOpened, setCreateModalOpened] = useState(false);
     const [editModalOpened, setEditModalOpened] = useState(false);
     const [currentDepartmentId, setCurrentDepartmentId] = useState<string | null>(null);
+    const [schedulingPeriods, setSchedulingPeriods] = useState<Map<string, string>>(new Map());
     
     const { subjects, fetchSubjects, setCurrentDepartment } = useSubjects();
     const { createSubject, isLoading: isCreating } = useCreateSubject();
@@ -38,6 +40,21 @@ export function SubjectsPage() {
         handleConfirm,
         isLoading: isDeleting,
     } = useConfirmation();
+
+    // Fetch scheduling periods on mount
+    useEffect(() => {
+        const loadSchedulingPeriods = async () => {
+            try {
+                const periods = await schedulingPeriodRepository.getAll();
+                const periodsMap = new Map(periods.map((p) => [p.id, p.name]));
+                setSchedulingPeriods(periodsMap);
+                $app.logger.info("[SubjectsPage] Loaded scheduling periods", { count: periods.length });
+            } catch (error) {
+                $app.logger.error("[SubjectsPage] Error loading scheduling periods:", error);
+            }
+        };
+        loadSchedulingPeriods();
+    }, []);
 
     const handleSearch = (filters: SubjectSearchFilters) => {
         // TODO: Backend endpoint needed for filtered search
@@ -65,7 +82,7 @@ export function SubjectsPage() {
         setCreateModalOpened(true);
     };
 
-    const handleCreateSubmit = async (data: { code: string; name: string }) => {
+    const handleCreateSubmit = async (data: { code: string; name: string; schedulingPeriodId: string }) => {
         $app.logger.info("[SubjectsPage] handleCreateSubmit called with:", data);
         $app.logger.info("[SubjectsPage] currentDepartmentId:", currentDepartmentId);
         
@@ -74,16 +91,14 @@ export function SubjectsPage() {
             return;
         }
 
-        // Get organization from context
         const org = $app.organization.getOrganization();
         $app.logger.info("[SubjectsPage] Organization from context:", org);
 
-        // TODO: Get schedulingPeriodId from context (using placeholder for now)
         const request = {
             id: crypto.randomUUID(),
             organizationId: org?.id || "00000000-0000-0000-0000-000000000000",
             departmentId: currentDepartmentId,
-            schedulingPeriodId: "00000000-0000-0000-0000-000000000000", // TODO: Get from context
+            schedulingPeriodId: data.schedulingPeriodId,
             code: data.code,
             name: data.name,
         };
@@ -96,7 +111,7 @@ export function SubjectsPage() {
             
             if (result) {
                 setCreateModalOpened(false);
-                fetchSubjects(); // Refresh the list
+                fetchSubjects();
             } else {
                 $app.logger.error("[SubjectsPage] Create subject returned null");
             }
@@ -111,7 +126,7 @@ export function SubjectsPage() {
         }
     };
 
-    const handleEditSubmit = async (data: { code: string; name: string }) => {
+    const handleEditSubmit = async (data: { code: string; name: string; schedulingPeriodId: string }) => {
         $app.logger.info("[SubjectsPage] handleEditSubmit called with:", data);
         $app.logger.info("[SubjectsPage] selectedSubject:", selectedSubject);
         $app.logger.info("[SubjectsPage] currentDepartmentId:", currentDepartmentId);
@@ -121,15 +136,13 @@ export function SubjectsPage() {
             return;
         }
 
-        // Get organization from context
         const org = $app.organization.getOrganization();
         $app.logger.info("[SubjectsPage] Organization from context:", org);
 
-        // TODO: Get schedulingPeriodId from context (using placeholder for now)
         const request: UpdateSubjectRequest = {
             organizationId: org?.id || "00000000-0000-0000-0000-000000000000",
             departmentId: currentDepartmentId,
-            schedulingPeriodId: selectedSubject.schedulingPeriodId, // Use existing value from subject
+            schedulingPeriodId: data.schedulingPeriodId,
             code: data.code,
             name: data.name,
         };
@@ -143,7 +156,7 @@ export function SubjectsPage() {
             if (success) {
                 setEditModalOpened(false);
                 setSelectedSubject(null);
-                fetchSubjects(); // Refresh the list
+                fetchSubjects();
             } else {
                 $app.logger.error("[SubjectsPage] Update subject returned false");
             }
@@ -181,13 +194,13 @@ export function SubjectsPage() {
 
     // Convert SubjectResponse to SubjectData with display names
     // Only show subjects if department context is set
-    // TODO: Fetch actual department names from backend
     const subjectData: SubjectData[] = currentDepartmentId
         ? subjects.map((subject) => ({
             id: subject.id,
             code: subject.code,
             name: subject.name,
             departmentName: "Department", // TODO: Fetch from backend
+            schedulingPeriodName: schedulingPeriods.get(subject.schedulingPeriodId) || "Unknown",
             departmentId: subject.departmentId,
             schedulingPeriodId: subject.schedulingPeriodId,
         }))
@@ -233,7 +246,11 @@ export function SubjectsPage() {
                     loading={isEditing}
                     initialData={
                         selectedSubject
-                            ? { code: selectedSubject.code, name: selectedSubject.name }
+                            ? { 
+                                code: selectedSubject.code, 
+                                name: selectedSubject.name,
+                                schedulingPeriodId: selectedSubject.schedulingPeriodId
+                            }
                             : undefined
                     }
                 />
