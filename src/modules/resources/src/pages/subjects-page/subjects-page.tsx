@@ -18,7 +18,7 @@ import {
 import resources from "./subjects-page.resources.json";
 import styles from "./subjects-page.module.css";
 import { $app } from "@/infra/service";
-import { schedulingPeriodRepository } from "@/modules/resources/src/data";
+import { schedulingPeriodRepository, departmentRepository } from "@/modules/resources/src/data";
 
 export function SubjectsPage() {
     const navigate = useNavigate();
@@ -26,6 +26,7 @@ export function SubjectsPage() {
     const [createModalOpened, setCreateModalOpened] = useState(false);
     const [editModalOpened, setEditModalOpened] = useState(false);
     const [currentDepartmentId, setCurrentDepartmentId] = useState<string | null>(null);
+    const [currentDepartmentName, setCurrentDepartmentName] = useState<string | null>(null);
     const [schedulingPeriods, setSchedulingPeriods] = useState<Map<string, string>>(new Map());
     
     const { subjects, fetchSubjects, setCurrentDepartment } = useSubjects();
@@ -56,7 +57,7 @@ export function SubjectsPage() {
         loadSchedulingPeriods();
     }, []);
 
-    const handleSearch = (filters: SubjectSearchFilters) => {
+    const handleSearch = async (filters: SubjectSearchFilters) => {
         // TODO: Backend endpoint needed for filtered search
         // Expected endpoint: GET /api/department/{departmentId}/resources/subjects/subject
         // Query params: ?code={code}&name={name}
@@ -67,6 +68,16 @@ export function SubjectsPage() {
             return;
         }
 
+        // Fetch department name
+        try {
+            const department = await departmentRepository.getById(filters.departmentId);
+            setCurrentDepartmentName(department.name);
+            $app.logger.info("[SubjectsPage] Fetched department:", { id: department.id, name: department.name });
+        } catch (error) {
+            $app.logger.error("[SubjectsPage] Error fetching department:", error);
+            setCurrentDepartmentName("Unknown Department");
+        }
+
         setCurrentDepartmentId(filters.departmentId);
         setCurrentDepartment(filters.departmentId);
         fetchSubjects();
@@ -75,6 +86,7 @@ export function SubjectsPage() {
     const handleClearFilters = () => {
         // Reset all state - clear department context and selected subject
         setCurrentDepartmentId(null);
+        setCurrentDepartmentName(null);
         setSelectedSubject(null);
     };
 
@@ -199,7 +211,7 @@ export function SubjectsPage() {
             id: subject.id,
             code: subject.code,
             name: subject.name,
-            departmentName: "Department", // TODO: Fetch from backend
+            departmentName: currentDepartmentName || "Loading...",
             schedulingPeriodName: schedulingPeriods.get(subject.schedulingPeriodId) || "Unknown",
             departmentId: subject.departmentId,
             schedulingPeriodId: subject.schedulingPeriodId,
