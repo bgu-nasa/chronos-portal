@@ -26,6 +26,8 @@ export function SubjectsPage() {
     const [editModalOpened, setEditModalOpened] = useState(false);
     const [currentDepartmentId, setCurrentDepartmentId] = useState<string | null>(null);
     const [currentDepartmentName, setCurrentDepartmentName] = useState<string | null>(null);
+    const [codeFilter, setCodeFilter] = useState<string>("");
+    const [nameFilter, setNameFilter] = useState<string>("");
     const [schedulingPeriods, setSchedulingPeriods] = useState<Map<string, string>>(new Map());
     
     const { subjects, fetchSubjects, setCurrentDepartment } = useSubjects();
@@ -79,6 +81,8 @@ export function SubjectsPage() {
 
         setCurrentDepartmentId(filters.departmentId);
         setCurrentDepartment(filters.departmentId);
+        setCodeFilter(filters.code);
+        setNameFilter(filters.name);
         fetchSubjects();
     };
 
@@ -86,6 +90,8 @@ export function SubjectsPage() {
         // Reset all state - clear department context and selected subject
         setCurrentDepartmentId(null);
         setCurrentDepartmentName(null);
+        setCodeFilter("");
+        setNameFilter("");
         setSelectedSubject(null);
     };
 
@@ -205,10 +211,25 @@ export function SubjectsPage() {
 
     // Convert SubjectResponse to SubjectData with display names
     // Only show subjects if department context is set
-    // Filter subjects by the selected department ID
+    // Filter subjects by department ID, code, and name
     const subjectData: SubjectData[] = currentDepartmentId
         ? subjects
-            .filter((subject) => subject.departmentId === currentDepartmentId)
+            .filter((subject) => {
+                // Filter by department
+                if (subject.departmentId !== currentDepartmentId) return false;
+                
+                // Filter by code if specified
+                if (codeFilter && !subject.code.toLowerCase().includes(codeFilter.toLowerCase())) {
+                    return false;
+                }
+                
+                // Filter by name if specified
+                if (nameFilter && !subject.name.toLowerCase().includes(nameFilter.toLowerCase())) {
+                    return false;
+                }
+                
+                return true;
+            })
             .map((subject) => ({
                 id: subject.id,
                 code: subject.code,

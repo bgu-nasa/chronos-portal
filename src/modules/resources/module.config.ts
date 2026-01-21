@@ -37,15 +37,14 @@ export const moduleConfig: ModuleConfig = {
                     label: "Courses",
                     href: "/resources/subjects",
                     location: "dashboard",
-                    requiredRoles: [
-                        // "Viewer"
-                    ],
+                    // requiredRoles: ["Administrator", "Viewer", "ResourceManager"],
                     icon: React.createElement(CoursesIcon),
                 },
                 {
                     label: "Resources",
                     href: "/resources/manage",
                     location: "dashboard",
+                    // requiredRoles: ["Administrator", "Viewer", "ResourceManager"],
                     icon: React.createElement(ResourceManagementIcon),
                 },
             ],

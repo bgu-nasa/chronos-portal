@@ -18,14 +18,13 @@ export function SubjectSearch({ onSearch, onClear }: SubjectSearchProps) {
     const [code, setCode] = useState("");
     const [name, setName] = useState("");
 
-    // Automatically trigger search when department changes
+    // Automatically trigger search when any filter changes
     useEffect(() => {
         if (departmentId) {
             onSearch({ departmentId, code, name });
         }
-        // Note: We only want to trigger on departmentId changes, not code/name
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [departmentId]);
+    }, [departmentId, code, name]);
 
     const handleClear = () => {
         setDepartmentId("");
@@ -37,13 +36,14 @@ export function SubjectSearch({ onSearch, onClear }: SubjectSearchProps) {
     return (
         <Paper shadow="xs" p="md" mb="md">
             <Group align="flex-end">
-                <DepartmentSelect
-                    value={departmentId}
-                    onChange={(value) => setDepartmentId(value || "")}
-                    label="Department"
-                    placeholder="Select department"
-                    style={{ flex: 1 }}
-                />
+                <div style={{ flex: 1 }}>
+                    <DepartmentSelect
+                        value={departmentId}
+                        onChange={(value) => setDepartmentId(value || "")}
+                        label="Department"
+                        placeholder="Select department"
+                    />
+                </div>
                 <TextInput
                     label="Course Code"
                     placeholder="e.g. CS101"
