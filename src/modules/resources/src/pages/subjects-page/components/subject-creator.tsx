@@ -1,6 +1,7 @@
 import { Modal, TextInput, Button, Stack, Select } from "@mantine/core";
 import { useState, useEffect } from "react";
 import { schedulingPeriodRepository } from "@/modules/resources/src/data";
+import resources from "./subject-creator.resources.json";
 
 interface SubjectCreatorProps {
     opened: boolean;
@@ -37,27 +38,30 @@ export function SubjectCreator({
                 label: period.name,
             }));
             setSchedulingPeriods(options);
-            $app.logger.info("[SubjectCreator] Fetched scheduling periods", { count: options.length });
+            $app.logger.info(resources.logger.fetchedSchedulingPeriods, { count: options.length });
         } catch (error) {
-            $app.logger.error("[SubjectCreator] Error fetching scheduling periods:", error);
-            $app.notifications.showError("Error", "Failed to load scheduling periods");
+            $app.logger.error(resources.logger.errorFetchingSchedulingPeriods, error);
+            $app.notifications.showError(
+                resources.notifications.loadSchedulingPeriodsError.title,
+                resources.notifications.loadSchedulingPeriodsError.message
+            );
         } finally {
             setIsLoadingPeriods(false);
         }
     };
 
     const handleSubmit = async () => {
-        $app.logger.info("[SubjectCreator] handleSubmit called", { code, name, schedulingPeriodId });
+        $app.logger.info(resources.logger.handleSubmitCalled, { code, name, schedulingPeriodId });
         
         if (!code.trim() || !name.trim() || !schedulingPeriodId) {
-            $app.logger.warn("[SubjectCreator] Validation failed - empty fields");
+            $app.logger.warn(resources.logger.validationFailed);
             return;
         }
         
-        $app.logger.info("[SubjectCreator] Calling onSubmit...");
+        $app.logger.info(resources.logger.callingOnSubmit);
         await onSubmit({ code, name, schedulingPeriodId });
         
-        $app.logger.info("[SubjectCreator] onSubmit completed, resetting form");
+        $app.logger.info(resources.logger.onSubmitCompleted);
         setCode("");
         setName("");
         setSchedulingPeriodId(null);
@@ -74,27 +78,27 @@ export function SubjectCreator({
         <Modal
             opened={opened}
             onClose={handleClose}
-            title="Create Course"
+            title={resources.modalTitle}
             centered
         >
             <Stack>
                 <TextInput
-                    label="Course Code"
-                    placeholder="e.g. CS101"
+                    label={resources.codeLabel}
+                    placeholder={resources.codePlaceholder}
                     value={code}
                     onChange={(e) => setCode(e.currentTarget.value)}
                     required
                 />
                 <TextInput
-                    label="Course Name"
-                    placeholder="e.g. Operating Systems"
+                    label={resources.nameLabel}
+                    placeholder={resources.namePlaceholder}
                     value={name}
                     onChange={(e) => setName(e.currentTarget.value)}
                     required
                 />
                 <Select
-                    label="Scheduling Period"
-                    placeholder="Select scheduling period"
+                    label={resources.schedulingPeriodLabel}
+                    placeholder={resources.schedulingPeriodPlaceholder}
                     data={schedulingPeriods}
                     value={schedulingPeriodId}
                     onChange={setSchedulingPeriodId}
@@ -108,7 +112,7 @@ export function SubjectCreator({
                     disabled={!code.trim() || !name.trim() || !schedulingPeriodId || isLoadingPeriods}
                     fullWidth
                 >
-                    Create Course
+                    {resources.submitButton}
                 </Button>
             </Stack>
         </Modal>

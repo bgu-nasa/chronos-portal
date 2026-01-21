@@ -50,9 +50,9 @@ export function SubjectsPage() {
                 const periods = await schedulingPeriodRepository.getAll();
                 const periodsMap = new Map(periods.map((p) => [p.id, p.name]));
                 setSchedulingPeriods(periodsMap);
-                $app.logger.info("[SubjectsPage] Loaded scheduling periods", { count: periods.length });
+                $app.logger.info(resources.logger.loadedSchedulingPeriods, { count: periods.length });
             } catch (error) {
-                $app.logger.error("[SubjectsPage] Error loading scheduling periods:", error);
+                $app.logger.error(resources.logger.errorLoadingSchedulingPeriods, error);
             }
         };
         loadSchedulingPeriods();
@@ -64,8 +64,11 @@ export function SubjectsPage() {
         // Query params: ?code={code}&name={name}
         
         if (!filters.departmentId) {
-            $app.logger.warn("[SubjectsPage] Department ID is required for search");
-            $app.notifications.showWarning("Department Required", "Please select a department to search for courses");
+            $app.logger.warn(resources.logger.departmentIdRequired);
+            $app.notifications.showWarning(
+                resources.notifications.departmentRequired.title,
+                resources.notifications.departmentRequired.message
+            );
             return;
         }
 
@@ -73,10 +76,10 @@ export function SubjectsPage() {
         try {
             const department = await departmentRepository.getById(filters.departmentId);
             setCurrentDepartmentName(department.name);
-            $app.logger.info("[SubjectsPage] Fetched department:", { id: department.id, name: department.name });
+            $app.logger.info(resources.logger.fetchedDepartment, { id: department.id, name: department.name });
         } catch (error) {
-            $app.logger.error("[SubjectsPage] Error fetching department:", error);
-            setCurrentDepartmentName("Unknown Department");
+            $app.logger.error(resources.logger.errorFetchingDepartment, error);
+            setCurrentDepartmentName(resources.unknownDepartment);
         }
 
         setCurrentDepartmentId(filters.departmentId);
@@ -100,19 +103,19 @@ export function SubjectsPage() {
     };
 
     const handleCreateSubmit = async (data: { code: string; name: string; schedulingPeriodId: string }) => {
-        $app.logger.info("[SubjectsPage] handleCreateSubmit called with:", data);
-        $app.logger.info("[SubjectsPage] currentDepartmentId:", currentDepartmentId);
+        $app.logger.info(resources.logger.handleCreateSubmitCalled, data);
+        $app.logger.info(resources.logger.currentDepartmentId, currentDepartmentId);
         
         if (!currentDepartmentId) {
-            $app.logger.error("[SubjectsPage] No department ID set");
+            $app.logger.error(resources.logger.noDepartmentIdSet);
             return;
         }
 
         const org = $app.organization.getOrganization();
-        $app.logger.info("[SubjectsPage] Organization from context:", org);
+        $app.logger.info(resources.logger.organizationFromContext, org);
 
         if (!org?.id) {
-            $app.logger.error("[SubjectsPage] No organization context available");
+            $app.logger.error(resources.logger.noOrganizationContext);
             return;
         }
 
@@ -125,20 +128,20 @@ export function SubjectsPage() {
             name: data.name,
         };
 
-        $app.logger.info("[SubjectsPage] Sending create request:", request);
+        $app.logger.info(resources.logger.sendingCreateRequest, request);
 
         try {
             const result = await createSubject(request);
-            $app.logger.info("[SubjectsPage] Create subject result:", result);
+            $app.logger.info(resources.logger.createSubjectResult, result);
             
             if (result) {
                 setCreateModalOpened(false);
                 fetchSubjects();
             } else {
-                $app.logger.error("[SubjectsPage] Create subject returned null");
+                $app.logger.error(resources.logger.createSubjectReturnedNull);
             }
         } catch (error) {
-            $app.logger.error("[SubjectsPage] Error creating subject:", error);
+            $app.logger.error(resources.logger.errorCreatingSubject, error);
         }
     };
 
@@ -149,20 +152,20 @@ export function SubjectsPage() {
     };
 
     const handleEditSubmit = async (data: { code: string; name: string; schedulingPeriodId: string }) => {
-        $app.logger.info("[SubjectsPage] handleEditSubmit called with:", data);
-        $app.logger.info("[SubjectsPage] selectedSubject:", selectedSubject);
-        $app.logger.info("[SubjectsPage] currentDepartmentId:", currentDepartmentId);
+        $app.logger.info(resources.logger.handleEditSubmitCalled, data);
+        $app.logger.info(resources.logger.selectedSubject, selectedSubject);
+        $app.logger.info(resources.logger.currentDepartmentId, currentDepartmentId);
         
         if (!selectedSubject || !currentDepartmentId) {
-            $app.logger.error("[SubjectsPage] Missing selectedSubject or currentDepartmentId");
+            $app.logger.error(resources.logger.missingSubjectOrDepartment);
             return;
         }
 
         const org = $app.organization.getOrganization();
-        $app.logger.info("[SubjectsPage] Organization from context:", org);
+        $app.logger.info(resources.logger.organizationFromContext, org);
 
         if (!org?.id) {
-            $app.logger.error("[SubjectsPage] No organization context available");
+            $app.logger.error(resources.logger.noOrganizationContext);
             return;
         }
 
@@ -174,21 +177,21 @@ export function SubjectsPage() {
             name: data.name,
         };
 
-        $app.logger.info("[SubjectsPage] Sending update request:", request);
+        $app.logger.info(resources.logger.sendingUpdateRequest, request);
 
         try {
             const success = await updateSubject(selectedSubject.id, request);
-            $app.logger.info("[SubjectsPage] Update subject result:", success);
+            $app.logger.info(resources.logger.updateSubjectResult, success);
             
             if (success) {
                 setEditModalOpened(false);
                 setSelectedSubject(null);
                 fetchSubjects();
             } else {
-                $app.logger.error("[SubjectsPage] Update subject returned false");
+                $app.logger.error(resources.logger.updateSubjectReturnedFalse);
             }
         } catch (error) {
-            $app.logger.error("[SubjectsPage] Error updating subject:", error);
+            $app.logger.error(resources.logger.errorUpdatingSubject, error);
         }
     };
 
@@ -240,15 +243,15 @@ export function SubjectsPage() {
                 
                 return true;
             })
-            .map((subject) => ({
-                id: subject.id,
-                code: subject.code,
-                name: subject.name,
-                departmentName: currentDepartmentName || "Loading...",
-                schedulingPeriodName: schedulingPeriods.get(subject.schedulingPeriodId) || "Unknown",
-                departmentId: subject.departmentId,
-                schedulingPeriodId: subject.schedulingPeriodId,
-            }))
+             .map((subject) => ({
+                 id: subject.id,
+                 code: subject.code,
+                 name: subject.name,
+                 departmentName: currentDepartmentName || resources.loadingText,
+                 schedulingPeriodName: schedulingPeriods.get(subject.schedulingPeriodId) || resources.unknownText,
+                 departmentId: subject.departmentId,
+                 schedulingPeriodId: subject.schedulingPeriodId,
+             }))
         : [];
 
     return (
