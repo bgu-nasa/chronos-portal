@@ -3,7 +3,6 @@
  * Handles resource attribute assignment API calls with organization context
  */
 
-import { $app } from "@/infra/service";
 import type {
     ResourceAttributeAssignmentResponse,
     CreateResourceAttributeAssignmentRequest,

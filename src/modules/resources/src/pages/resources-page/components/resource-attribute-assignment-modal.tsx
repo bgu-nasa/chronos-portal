@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 import { Modal, Button, Select, Stack, Group, Text, Badge, Divider, Loader } from "@mantine/core";
-import { $app } from "@/infra/service";
 import {
     useResourceAttributes,
     useResourceAttributeAssignments,
