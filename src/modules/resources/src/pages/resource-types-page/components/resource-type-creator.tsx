@@ -1,6 +1,5 @@
 import { Modal, TextInput, Button, Stack } from "@mantine/core";
 import { useState } from "react";
-import { $app } from "@/infra/service";
 import resources from "../resource-types-page.resources.json";
 
 interface ResourceTypeCreatorProps {
