@@ -36,6 +36,7 @@ export interface RegisterRequest {
     AdminUser: RegisterUserRequest;
     OrganizationName: string;
     Plan: string; // "Free" | "Consumption" | "Enterprise"
+    InviteCode: string;
 }
 
 /**
