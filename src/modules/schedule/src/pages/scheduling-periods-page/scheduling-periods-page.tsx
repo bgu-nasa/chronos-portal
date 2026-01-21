@@ -91,6 +91,34 @@ export function SchedulingPeriodsPage() {
         }
     }, [showSlots, selectedPeriod]);
 
+    // Sync selectedPeriod with updated processedPeriods list after edits
+    useEffect(() => {
+        if (selectedPeriod) {
+            const updatedPeriod = processedPeriods.find((p) => p.id === selectedPeriod.id);
+            if (updatedPeriod) {
+                // Update the selected period with fresh data
+                setSelectedPeriod(updatedPeriod);
+            } else {
+                // Period was deleted, clear selection
+                setSelectedPeriod(null);
+            }
+        }
+    }, [processedPeriods]);
+
+    // Sync selectedSlot with updated slots list after edits
+    useEffect(() => {
+        if (selectedSlot) {
+            const updatedSlot = slots.find((s) => s.id === selectedSlot.id);
+            if (updatedSlot) {
+                // Update the selected slot with fresh data
+                setSelectedSlot(updatedSlot);
+            } else {
+                // Slot was deleted, clear selection
+                setSelectedSlot(null);
+            }
+        }
+    }, [slots]);
+
     const handleCreateClick = () => openCreate();
 
     const handleEditClick = () => {

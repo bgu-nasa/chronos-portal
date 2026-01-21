@@ -43,6 +43,20 @@ export function AssignmentPanel({ isOpen, slot, onClose }: AssignmentPanelProps)
         }
     }, [isOpen, slot]);
 
+    // Sync selectedAssignment with updated assignments list after edits
+    useEffect(() => {
+        if (selectedAssignment) {
+            const updatedAssignment = assignments.find((a) => a.id === selectedAssignment.id);
+            if (updatedAssignment) {
+                // Update the selected assignment with fresh data
+                setSelectedAssignment(updatedAssignment);
+            } else {
+                // Assignment was deleted, clear selection
+                setSelectedAssignment(null);
+            }
+        }
+    }, [assignments]);
+
     // Clear assignments when panel closes
     const handleClose = () => {
         clearAssignments();

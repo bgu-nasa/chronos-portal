@@ -85,6 +85,7 @@ export function AssignmentEditor() {
             success = result !== null;
         } else if (mode === "edit" && assignment && resourceId && activityId) {
             success = await updateAssignment(assignment.id, {
+                slotId: assignment.slotId,
                 resourceId,
                 activityId,
             });
