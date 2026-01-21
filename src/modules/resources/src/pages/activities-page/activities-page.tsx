@@ -16,6 +16,8 @@ import {
 } from "@/modules/resources/src/hooks";
 import resources from "./activities-page.resources.json";
 import styles from "./activities-page.module.css";
+import { $app } from "@/infra/service";
+import { userRepository } from "@/modules/resources/src/data";
 
 export function ActivitiesPage() {
     const navigate = useNavigate();
@@ -26,6 +28,7 @@ export function ActivitiesPage() {
     const [selectedActivity, setSelectedActivity] = useState<ActivityData | null>(null);
     const [createModalOpened, setCreateModalOpened] = useState(false);
     const [editModalOpened, setEditModalOpened] = useState(false);
+    const [userNames, setUserNames] = useState<Map<string, string>>(new Map());
     
     const { activities, fetchActivities, setCurrentDepartment, isLoading } = useActivities();
     const { createActivity, isLoading: isCreating } = useCreateActivity();
@@ -39,6 +42,40 @@ export function ActivitiesPage() {
         handleConfirm,
         isLoading: isConfirming,
     } = useConfirmation();
+
+    // Fetch user names for activities
+    useEffect(() => {
+        const loadUserNames = async () => {
+            const uniqueUserIds = new Set(
+                activities
+                    .map((a) => a.assignedUserId)
+                    .filter((id) => id !== "00000000-0000-0000-0000-000000000000")
+            );
+
+            $app.logger.info("[ActivitiesPage] Unique user IDs to fetch:", Array.from(uniqueUserIds));
+
+            const namesMap = new Map<string, string>();
+            
+            for (const userId of uniqueUserIds) {
+                try {
+                    const user = await userRepository.getById(userId);
+                    const fullName = `${user.firstName} ${user.lastName}`;
+                    namesMap.set(userId, fullName);
+                    $app.logger.info("[ActivitiesPage] Fetched user:", { userId, fullName });
+                } catch (error) {
+                    $app.logger.error("[ActivitiesPage] Error fetching user:", { userId, error });
+                    namesMap.set(userId, "Unknown User");
+                }
+            }
+            
+            setUserNames(namesMap);
+            $app.logger.info("[ActivitiesPage] All user names loaded:", Array.from(namesMap.entries()));
+        };
+
+        if (activities.length > 0) {
+            loadUserNames();
+        }
+    }, [activities]);
 
     // Load activities when page loads
     useEffect(() => {
@@ -188,12 +225,20 @@ export function ActivitiesPage() {
     // Filter activities for the current subject
     const subjectActivities: ActivityData[] = activities
         .filter((activity) => activity.subjectId === subjectId)
-        .map((activity) => ({
-            id: activity.id,
-            activityType: activity.activityType,
-            assignedUserId: activity.assignedUserId,
-            expectedStudents: activity.expectedStudents || 0,
-        }));
+        .map((activity) => {
+            const isUnassigned = activity.assignedUserId === "00000000-0000-0000-0000-000000000000";
+            const userName = isUnassigned 
+                ? "Unassigned" 
+                : userNames.get(activity.assignedUserId) || "Loading...";
+            
+            return {
+                id: activity.id,
+                activityType: activity.activityType,
+                assignedUserId: activity.assignedUserId,
+                assignedUserName: userName,
+                expectedStudents: activity.expectedStudents || 0,
+            };
+        });
 
     $app.logger.info("[ActivitiesPage] Filtered subject activities:", subjectActivities.length);
 

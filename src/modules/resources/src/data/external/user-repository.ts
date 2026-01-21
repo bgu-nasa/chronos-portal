@@ -36,7 +36,7 @@ export class UserRepository {
         $app.logger.info("[UserRepository] Fetching all users");
         try {
             const response = await $app.ajax.get<User[]>(
-                "/api/auth/user",
+                "/api/user",
                 { headers: this.getHeaders() }
             );
             $app.logger.info("[UserRepository] Fetched users", { count: response.length });
@@ -56,7 +56,7 @@ export class UserRepository {
         $app.logger.info("[UserRepository] Fetching user", { id });
         try {
             const response = await $app.ajax.get<User>(
-                `/api/auth/user/${id}`,
+                `/api/user/${id}`,
                 { headers: this.getHeaders() }
             );
             $app.logger.info("[UserRepository] Fetched user", { id });
