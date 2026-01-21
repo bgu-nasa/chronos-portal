@@ -82,7 +82,7 @@ function TimeSpinner({ label, totalMinutes, onChange, error }: TimeSpinnerProps)
                     −
                 </ActionIcon>
             </Stack>
-            {error && <Text size="xs" c="red" mt={4}>{error}</Text>}
+            {error && <Text size="xs" c="var(--mantine-color-error)" mt={4}>{error}</Text>}
         </Box>
     );
 }
@@ -293,7 +293,7 @@ export function SlotEditor({ schedulingPeriodId }: SlotEditorProps) {
                                         ))}
                                     </Group>
                                 </Chip.Group>
-                                {errors.days && <Text size="xs" c="red" mt="xs">{errors.days}</Text>}
+                                {errors.days && <Text size="xs" c="var(--mantine-color-error)" mt="xs">{errors.days}</Text>}
                             </div>
 
                             <Group grow align="flex-start">
@@ -359,7 +359,7 @@ export function SlotEditor({ schedulingPeriodId }: SlotEditorProps) {
                     )}
 
                     {apiError && (
-                        <Text c="red" size="sm">
+                        <Text c="var(--mantine-color-error)" size="sm">
                             {apiError}
                         </Text>
                     )}

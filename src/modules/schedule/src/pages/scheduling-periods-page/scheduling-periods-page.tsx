@@ -4,6 +4,7 @@ import { ConfirmationDialog, useConfirmation } from "@/common";
 import { SchedulingPeriodActions } from "@/modules/schedule/src/pages/scheduling-periods-page/components/scheduling-period-actions";
 import { SchedulingPeriodTable } from "@/modules/schedule/src/pages/scheduling-periods-page/components/scheduling-period-table";
 import { SchedulingPeriodEditor } from "@/modules/schedule/src/pages/scheduling-periods-page/components/scheduling-period-editor";
+import { AssignmentPanel } from "@/modules/schedule/src/pages/scheduling-periods-page/components/assignment-panel";
 import { SlotTable } from "@/modules/schedule/src/pages/slots-page/components/slot-table";
 import { SlotActions } from "@/modules/schedule/src/pages/slots-page/components/slot-actions";
 import { SlotEditor } from "@/modules/schedule/src/pages/slots-page/components/slot-editor";
@@ -27,6 +28,7 @@ export function SchedulingPeriodsPage() {
     const [selectedPeriod, setSelectedPeriod] = useState<SchedulingPeriodDataWithExpired | null>(null);
     const [showSlots, setShowSlots] = useState(false);
     const [selectedSlot, setSelectedSlot] = useState<SlotResponse | null>(null);
+    const [showAssignments, setShowAssignments] = useState(false);
 
     const { schedulingPeriods, fetchSchedulingPeriods } = useSchedulingPeriods();
     const { deleteSchedulingPeriod } = useDeleteSchedulingPeriod();
@@ -89,6 +91,34 @@ export function SchedulingPeriodsPage() {
         }
     }, [showSlots, selectedPeriod]);
 
+    // Sync selectedPeriod with updated processedPeriods list after edits
+    useEffect(() => {
+        if (selectedPeriod) {
+            const updatedPeriod = processedPeriods.find((p) => p.id === selectedPeriod.id);
+            if (updatedPeriod) {
+                // Update the selected period with fresh data
+                setSelectedPeriod(updatedPeriod);
+            } else {
+                // Period was deleted, clear selection
+                setSelectedPeriod(null);
+            }
+        }
+    }, [processedPeriods]);
+
+    // Sync selectedSlot with updated slots list after edits
+    useEffect(() => {
+        if (selectedSlot) {
+            const updatedSlot = slots.find((s) => s.id === selectedSlot.id);
+            if (updatedSlot) {
+                // Update the selected slot with fresh data
+                setSelectedSlot(updatedSlot);
+            } else {
+                // Slot was deleted, clear selection
+                setSelectedSlot(null);
+            }
+        }
+    }, [slots]);
+
     const handleCreateClick = () => openCreate();
 
     const handleEditClick = () => {
@@ -138,6 +168,13 @@ export function SchedulingPeriodsPage() {
                 if (success) setSelectedSlot(null);
             },
         });
+    };
+
+    // Assignment actions
+    const handleViewAssignmentsClick = () => {
+        if (selectedSlot) {
+            setShowAssignments(true);
+        }
     };
 
     return (
@@ -199,6 +236,7 @@ export function SchedulingPeriodsPage() {
                                         onCreateClick={handleCreateSlotClick}
                                         onEditClick={handleEditSlotClick}
                                         onDeleteClick={handleDeleteSlotClick}
+                                        onViewAssignmentsClick={handleViewAssignmentsClick}
                                     />
                                 )}
 
@@ -217,6 +255,12 @@ export function SchedulingPeriodsPage() {
                 </Grid>
 
                 <SchedulingPeriodEditor />
+
+                <AssignmentPanel
+                    isOpen={showAssignments}
+                    slot={selectedSlot}
+                    onClose={() => setShowAssignments(false)}
+                />
 
                 <ConfirmationDialog
                     opened={confirmationState.isOpen}
