@@ -38,7 +38,6 @@ export function ResourceActions({
                 onClick={onDeleteClick}
                 disabled={!selectedResource || !isResourceManager}
                 variant="outline"
-                color="red"
             >
                 {resources.deleteButton}
             </Button>
@@ -46,7 +45,6 @@ export function ResourceActions({
                 onClick={onAssignAttributesClick}
                 disabled={!selectedResource}
                 variant="outline"
-                color="blue"
             >
                 {resources.assignAttributesButton}
             </Button>

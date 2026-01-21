@@ -154,7 +154,6 @@ export function ResourceAttributeAssignmentModal({
                                             </Badge>
                                             <Button
                                                 size="xs"
-                                                color="red"
                                                 variant="subtle"
                                                 onClick={() => handleDelete(assignment.resourceAttributeId)}
                                             >
