@@ -1,6 +1,6 @@
 import { Button, Group } from "@mantine/core";
-import type { SlotResponse } from "@/modules/schedule/src/data/slot.types";
-import resources from "@/modules/schedule/src/pages/slots-page/slots-page.resources.json";
+import type { SlotResponse } from "@/modules/schedule/src/data";
+import resources from "@/modules/schedule/src/pages/scheduling-periods-page/slot.resources.json";
 
 interface SlotActionsProps {
     selectedSlot: SlotResponse | null;

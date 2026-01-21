@@ -1,9 +1,9 @@
 import { useEffect, useState } from "react";
 import { Modal, Select, Button, Stack, Text, Group, Chip, Box, ActionIcon } from "@mantine/core";
-import { useSlotEditorStore } from "@/modules/schedule/src/stores/slot-editor.store";
-import { useCreateSlot, useUpdateSlot } from "@/modules/schedule/src/hooks/use-slots";
-import { Weekday, WeekdayOrder } from "@/modules/schedule/src/data/slot.types";
-import resources from "@/modules/schedule/src/pages/slots-page/slots-page.resources.json";
+import { useSlotEditorStore } from "@/modules/schedule/src/stores";
+import { useCreateSlot, useUpdateSlot } from "@/modules/schedule/src/hooks";
+import { Weekday, WeekdayOrder } from "@/modules/schedule/src/data";
+import resources from "@/modules/schedule/src/pages/scheduling-periods-page/slot.resources.json";
 
 interface SlotEditorProps {
     schedulingPeriodId: string;
