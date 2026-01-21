@@ -5,8 +5,8 @@ import { WeekView } from "@/common/components/calendar";
 import { useUsers } from "@/modules/auth/src/hooks";
 import { useUserConstraints, useSchedulingPeriods } from "@/modules/schedule/src/hooks";
 import { serializeForbiddenTimeRange, parseForbiddenTimeRange, type ForbiddenTimeRangeEntry } from "@/modules/schedule/src/pages/constraints-page/utils";
-
-import { SchedulingPeriodSelect, TimeRangeSelectionModal, UserSelect } from "./components";
+import { assignmentDataRepository, activityDataRepository, slotDataRepository, type AssignmentResponse, type ActivityResponse, type SubjectResponse, type SlotResponse } from "@/modules/schedule/src/data";
+import { SchedulingPeriodSelect, TimeRangeSelectionModal, UserSelect, EventDetailsModal } from "./components";
 import styles from "./calendar-page.module.css";
 
 interface TimeRangeSelection {
@@ -22,6 +22,24 @@ export function CalendarPage() {
   const [modalOpened, setModalOpened] = useState(false);
   const [currentUserId, setCurrentUserId] = useState<string>("");
   const [isAdmin, setIsAdmin] = useState(false);
+  const [assignments, setAssignments] = useState<AssignmentResponse[]>([]);
+  const [activities, setActivities] = useState<ActivityResponse[]>([]);
+  const [slots, setSlots] = useState<SlotResponse[]>([]);
+  const [subjects, setSubjects] = useState<SubjectResponse[]>([]);
+
+  interface EventBlock {
+    weekday: string;
+    startTime: string;
+    endTime: string;
+    activityId?: string;
+    activityType?: string;
+    subjectName?: string;
+    assignmentId?: string;
+    slotId?: string;
+    resourceId?: string;
+  }
+  const [selectedEvent, setSelectedEvent] = useState<EventBlock | null>(null);
+  const [eventModalOpened, setEventModalOpened] = useState(false);
 
   const { createUserConstraint, fetchUserConstraintsByUser, userConstraints, isLoading } = useUserConstraints();
   const { schedulingPeriods, fetchSchedulingPeriods } = useSchedulingPeriods();
@@ -88,6 +106,41 @@ export function CalendarPage() {
     }
   }, [isAdmin, selectedUserId, currentUserId, fetchUserConstraintsByUser]);
 
+  // Fetch assignments, activities, and slots for events
+  useEffect(() => {
+    const fetchEvents = async () => {
+      if (!selectedPeriodId) {
+        setAssignments([]);
+        setActivities([]);
+        setSlots([]);
+        return;
+      }
+
+      try {
+        // Fetch all data in parallel
+        const [assignmentsData, activitiesData, slotsData, subjectsData] = await Promise.all([
+          assignmentDataRepository.getAllAssignments(),
+          activityDataRepository.getAllActivities(),
+          slotDataRepository.getSlots(selectedPeriodId),
+          activityDataRepository.getAllSubjects(),
+        ]);
+
+        setAssignments(assignmentsData);
+        setActivities(activitiesData);
+        setSlots(slotsData);
+        setSubjects(subjectsData);
+      } catch (error) {
+        $app.logger.error("[CalendarPage] Error fetching events:", error);
+        setAssignments([]);
+        setActivities([]);
+        setSlots([]);
+        setSubjects([]);
+      }
+    };
+
+    fetchEvents();
+  }, [selectedPeriodId]);
+
   // Convert constraints to visualizations
   const constraintVisualizations = useMemo(() => {
     if (isAdmin && !selectedUserId) {
@@ -116,6 +169,58 @@ export function CalendarPage() {
 
     return visualizations;
   }, [userConstraints, isAdmin, selectedUserId, currentUserId, selectedPeriodId]);
+
+  // Convert user events to visualizations
+  const eventBlockVisualizations = useMemo(() => {
+    if (isAdmin && !selectedUserId) {
+      return [];
+    }
+
+    const userIdToShow = isAdmin ? selectedUserId : currentUserId;
+    if (!userIdToShow || !selectedPeriodId || assignments.length === 0 || activities.length === 0 || slots.length === 0 || subjects.length === 0) {
+      return [];
+    }
+
+    // Create maps for quick lookup
+    const slotMap = new Map(slots.map(s => [s.id, s]));
+    const activityMap = new Map(activities.map(a => [a.id, a]));
+    const subjectMap = new Map(subjects.map(s => [s.id, s]));
+
+    // Filter assignments for the selected user's activities
+    const userActivityIds = new Set(
+      activities
+        .filter(a => a.assignedUserId === userIdToShow)
+        .map(a => a.id)
+    );
+
+    // Get slots for user's assignments with activity and subject info
+    const userEventBlocks = assignments
+      .filter(a => userActivityIds.has(a.activityId))
+      .map(a => {
+        const slot = slotMap.get(a.slotId);
+        const activity = activityMap.get(a.activityId);
+        const subject = activity ? subjectMap.get(activity.subjectId) : undefined;
+
+        if (!slot || slot?.schedulingPeriodId !== selectedPeriodId) {
+          return null;
+        }
+
+        return {
+          weekday: slot.weekday,
+          startTime: slot.fromTime,
+          endTime: slot.toTime,
+          activityId: a.activityId,
+          activityType: activity?.activityType,
+          subjectName: subject?.name,
+          assignmentId: a.id,
+          slotId: slot.id,
+          resourceId: a.resourceId,
+        };
+      })
+      .filter((block): block is NonNullable<typeof block> => block !== null);
+
+    return userEventBlocks;
+  }, [assignments, activities, slots, subjects, isAdmin, selectedUserId, currentUserId, selectedPeriodId]);
 
   const handleTimeRangeSelect = (selection: { date: Date; startTime: string; endTime: string }) => {
     // Only allow selection if a scheduling period is selected
@@ -205,7 +310,12 @@ export function CalendarPage() {
         <WeekView
           events={[]}
           constraints={constraintVisualizations}
+          eventBlocks={eventBlockVisualizations}
           onTimeRangeSelect={handleTimeRangeSelect}
+          onEventBlockClick={(eventBlock) => {
+            setSelectedEvent(eventBlock);
+            setEventModalOpened(true);
+          }}
         />
       </Box>
 
@@ -223,6 +333,15 @@ export function CalendarPage() {
           loading={isLoading}
         />
       )}
+
+      <EventDetailsModal
+        opened={eventModalOpened}
+        onClose={() => {
+          setEventModalOpened(false);
+          setSelectedEvent(null);
+        }}
+        eventBlock={selectedEvent}
+      />
     </Flex>
   );
 }
