@@ -16,6 +16,7 @@ import {
 } from "@/modules/resources/src/hooks";
 import resources from "./activities-page.resources.json";
 import styles from "./activities-page.module.css";
+import { userRepository } from "@/modules/resources/src/data";
 
 export function ActivitiesPage() {
     const navigate = useNavigate();
@@ -26,6 +27,7 @@ export function ActivitiesPage() {
     const [selectedActivity, setSelectedActivity] = useState<ActivityData | null>(null);
     const [createModalOpened, setCreateModalOpened] = useState(false);
     const [editModalOpened, setEditModalOpened] = useState(false);
+    const [userNames, setUserNames] = useState<Map<string, string>>(new Map());
     
     const { activities, fetchActivities, setCurrentDepartment, isLoading } = useActivities();
     const { createActivity, isLoading: isCreating } = useCreateActivity();
@@ -39,6 +41,40 @@ export function ActivitiesPage() {
         handleConfirm,
         isLoading: isConfirming,
     } = useConfirmation();
+
+    // Fetch user names for activities
+    useEffect(() => {
+        const loadUserNames = async () => {
+            const uniqueUserIds = new Set(
+                activities
+                    .map((a) => a.assignedUserId)
+                    .filter((id) => id && id.trim().length > 0)
+            );
+
+            $app.logger.info("[ActivitiesPage] Unique user IDs to fetch:", Array.from(uniqueUserIds));
+
+            const namesMap = new Map<string, string>();
+            
+            for (const userId of uniqueUserIds) {
+                try {
+                    const user = await userRepository.getById(userId);
+                    const fullName = `${user.firstName} ${user.lastName}`;
+                    namesMap.set(userId, fullName);
+                    $app.logger.info("[ActivitiesPage] Fetched user:", { userId, fullName });
+                } catch (error) {
+                    $app.logger.error("[ActivitiesPage] Error fetching user:", { userId, error });
+                    namesMap.set(userId, "Unknown User");
+                }
+            }
+            
+            setUserNames(namesMap);
+            $app.logger.info("[ActivitiesPage] All user names loaded:", Array.from(namesMap.entries()));
+        };
+
+        if (activities.length > 0) {
+            loadUserNames();
+        }
+    }, [activities]);
 
     // Load activities when page loads
     useEffect(() => {
@@ -80,11 +116,17 @@ export function ActivitiesPage() {
         const org = $app.organization.getOrganization();
         $app.logger.info("[ActivitiesPage] Organization from context:", org);
 
+        if (!org?.id) {
+            $app.logger.error("[ActivitiesPage] No organization context available");
+            $app.notifications.showError("Error", "Organization context missing. Please refresh and try again.");
+            return;
+        }
+
         const request: CreateActivityRequest = {
             id: crypto.randomUUID(),
-            organizationId: org?.id || "00000000-0000-0000-0000-000000000000",
+            organizationId: org.id,
             subjectId: subjectId,
-            assignedUserId: data.assignedUserId || "00000000-0000-0000-0000-000000000000",
+            assignedUserId: data.assignedUserId || "",
             activityType: data.activityType,
             expectedStudents: data.expectedStudents,
         };
@@ -97,8 +139,8 @@ export function ActivitiesPage() {
             
             if (result) {
                 setCreateModalOpened(false);
-                fetchActivities();
                 $app.notifications.showSuccess("Success", "Activity created successfully");
+                fetchActivities();
             } else {
                 $app.logger.error("[ActivitiesPage] Create activity returned null");
                 setCreateModalOpened(false);
@@ -135,10 +177,16 @@ export function ActivitiesPage() {
         const org = $app.organization.getOrganization();
         $app.logger.info("[ActivitiesPage] Organization from context:", org);
 
+        if (!org?.id) {
+            $app.logger.error("[ActivitiesPage] No organization context available");
+            $app.notifications.showError("Error", "Organization context missing. Please refresh and try again.");
+            return;
+        }
+
         const request: UpdateActivityRequest = {
-            organizationId: org?.id || "00000000-0000-0000-0000-000000000000",
+            organizationId: org.id,
             subjectId: subjectId,
-            assignedUserId: data.assignedUserId || "00000000-0000-0000-0000-000000000000",
+            assignedUserId: data.assignedUserId || "",
             activityType: data.activityType,
             expectedStudents: data.expectedStudents,
         };
@@ -152,8 +200,8 @@ export function ActivitiesPage() {
             if (success) {
                 setEditModalOpened(false);
                 setSelectedActivity(null);
-                fetchActivities();
                 $app.notifications.showSuccess("Success", "Activity updated successfully");
+                fetchActivities();
             } else {
                 $app.logger.error("[ActivitiesPage] Update activity returned false");
                 setEditModalOpened(false);
@@ -188,12 +236,20 @@ export function ActivitiesPage() {
     // Filter activities for the current subject
     const subjectActivities: ActivityData[] = activities
         .filter((activity) => activity.subjectId === subjectId)
-        .map((activity) => ({
-            id: activity.id,
-            activityType: activity.activityType,
-            assignedUserId: activity.assignedUserId,
-            expectedStudents: activity.expectedStudents || 0,
-        }));
+        .map((activity) => {
+            const isUnassigned = !activity.assignedUserId || activity.assignedUserId.trim().length === 0;
+            const userName = isUnassigned 
+                ? "Unassigned" 
+                : userNames.get(activity.assignedUserId) || "Loading...";
+            
+            return {
+                id: activity.id,
+                activityType: activity.activityType,
+                assignedUserId: activity.assignedUserId,
+                assignedUserName: userName,
+                expectedStudents: activity.expectedStudents || 0,
+            };
+        });
 
     $app.logger.info("[ActivitiesPage] Filtered subject activities:", subjectActivities.length);
 
@@ -223,14 +279,7 @@ export function ActivitiesPage() {
     return (
         <Container size="xl" py="xl">
             <div className={styles.container}>
-                <div className={styles.header}>
-                    <div>
-                        <Title order={1}>{resources.title}</Title>
-                    </div>
-                    <Button variant="outline" onClick={handleBackClick}>
-                        {resources.backToSubjects}
-                    </Button>
-                </div>
+                <Title order={1}>{resources.title}</Title>
                 <Divider className={styles.divider} />
 
                 <Group justify="space-between" mb="md">
@@ -240,8 +289,8 @@ export function ActivitiesPage() {
                         onEditClick={handleEditClick}
                         onDeleteClick={handleDeleteClick}
                     />
-                    <Button variant="default" onClick={handleBackClick}>
-                        Back to Subjects
+                    <Button variant="outline" onClick={handleBackClick}>
+                        {resources.backToSubjects}
                     </Button>
                 </Group>
 

@@ -31,6 +31,7 @@ export function RegisterPage() {
     const [confirmPassword, setConfirmPassword] = useState("");
 
     // Organization info
+    const [inviteCode, setInviteCode] = useState("");
     const [organizationName, setOrganizationName] = useState("");
     const [plan, setPlan] = useState<PlanType | null>(null);
 
@@ -41,6 +42,7 @@ export function RegisterPage() {
         lastName: false,
         password: false,
         confirmPassword: false,
+        inviteCode: false,
         organizationName: false,
     });
 
@@ -91,6 +93,7 @@ export function RegisterPage() {
             lastName: true,
             password: true,
             confirmPassword: true,
+            inviteCode: true,
             organizationName: true,
         });
 
@@ -101,7 +104,7 @@ export function RegisterPage() {
         const passwordValidation = validatePassword(password);
         const passwordMatchValidation = validatePasswordMatch(
             password,
-            confirmPassword
+            confirmPassword,
         );
         const organizationNameValidation =
             validateOrganizationName(organizationName);
@@ -133,6 +136,7 @@ export function RegisterPage() {
                 },
                 OrganizationName: organizationName,
                 Plan: plan,
+                InviteCode: inviteCode,
             };
 
             await register(registerRequest);
@@ -272,6 +276,23 @@ export function RegisterPage() {
                             <Title order={4} className={styles.sectionTitle}>
                                 {resources.orgInfoTitle}
                             </Title>
+
+                            <TextInput
+                                label="Invite Code"
+                                placeholder="Enter your invite code"
+                                value={inviteCode}
+                                onChange={(e) =>
+                                    setInviteCode(e.currentTarget.value)
+                                }
+                                onBlur={() =>
+                                    setTouched((prev) => ({
+                                        ...prev,
+                                        inviteCode: true,
+                                    }))
+                                }
+                                required
+                                size="md"
+                            />
 
                             <TextInput
                                 label={resources.orgNameLabel}

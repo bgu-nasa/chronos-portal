@@ -4,7 +4,6 @@
  */
 
 import { create } from "zustand";
-import { $app } from "@/infra/service";
 import { resourceTypeDataRepository } from "@/modules/resources/src/data";
 import type {
     ResourceTypeResponse,

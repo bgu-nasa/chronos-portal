@@ -10,7 +10,6 @@ import type {
     CreateActivityRequest,
     UpdateActivityRequest,
 } from "@/modules/resources/src/data";
-import { $app } from "@/infra/service";
 
 interface ActivityStore {
     // State
