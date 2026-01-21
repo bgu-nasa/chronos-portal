@@ -33,9 +33,13 @@ function renderNavigationItems(
     navigate: (path: string) => void,
     currentPath: string,
     collapsed: boolean,
+    openItems: Record<string, boolean>,
+    toggleItem: (itemKey: string) => void,
 ) {
     return items.map((item) => {
         const hasChildren = item.children && item.children.length > 0;
+        const itemKey = item.href || item.label;
+        const isOpen = openItems[itemKey] ?? false;
 
         // For collapsed state with children, show popover on hover
         if (collapsed && hasChildren) {
@@ -116,6 +120,8 @@ function renderNavigationItems(
                 leftSection={item.icon}
                 active={currentPath === item.href}
                 href={item.href}
+                opened={isOpen}
+                onChange={() => toggleItem(itemKey)}
             >
                 {hasChildren &&
                     item.children &&
@@ -124,6 +130,8 @@ function renderNavigationItems(
                         navigate,
                         currentPath,
                         collapsed,
+                        openItems,
+                        toggleItem,
                     )}
             </NavLink>
         );
@@ -136,7 +144,8 @@ export default function DashboardLayout() {
     const location = useLocation();
     const { fetchOrganization, organization, isLoading, error } =
         useOrganization();
-    const { collapsed, toggleCollapsed } = useNavbarStore();
+    const { collapsed, toggleCollapsed, openItems, toggleItem } =
+        useNavbarStore();
 
     // Fetch organization information when the dashboard layout mounts
     useEffect(() => {
@@ -208,6 +217,8 @@ export default function DashboardLayout() {
                                 navigate,
                                 location.pathname,
                                 collapsed,
+                                openItems,
+                                toggleItem,
                             )}
                         </Stack>
                     </div>
