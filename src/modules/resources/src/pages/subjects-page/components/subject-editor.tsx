@@ -1,6 +1,5 @@
 import { Modal, TextInput, Button, Stack, Select } from "@mantine/core";
 import { useState, useEffect } from "react";
-import { $app } from "@/infra/service";
 import { schedulingPeriodRepository } from "@/modules/resources/src/data";
 
 interface SubjectEditorProps {

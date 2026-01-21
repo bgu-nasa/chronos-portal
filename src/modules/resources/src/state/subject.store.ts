@@ -10,7 +10,6 @@ import type {
     CreateSubjectRequest,
     UpdateSubjectRequest,
 } from "@/modules/resources/src/data";
-import { $app } from "@/infra/service";
 
 interface SubjectStore {
     // State

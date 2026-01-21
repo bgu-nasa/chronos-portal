@@ -1,6 +1,5 @@
 import { Modal, TextInput, Button, Stack, NumberInput, Select } from "@mantine/core";
 import { useState, useEffect } from "react";
-import { $app } from "@/infra/service";
 import { userRepository } from "@/modules/resources/src/data";
 
 interface ActivityCreatorProps {

@@ -4,7 +4,6 @@
  * Used for dropdowns and display purposes in the resources module
  */
 
-import { $app } from "@/infra/service";
 import type { SchedulingPeriod } from "./scheduling-period.types";
 
 export class SchedulingPeriodRepository {

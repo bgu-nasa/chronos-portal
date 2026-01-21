@@ -4,7 +4,6 @@
  * Used for dropdowns and display purposes in the resources module
  */
 
-import { $app } from "@/infra/service";
 import type { User } from "./user.types";
 
 export class UserRepository {

@@ -17,7 +17,6 @@ import { ResourceTypeActions, ResourceTypeTable, ResourceTypeCreator, ResourceTy
 import resourcesJson from "./resources-page.resources.json";
 import resourceTypesJson from "../resource-types-page/resource-types-page.resources.json";
 import styles from "./resources-page.module.css";
-import { $app } from "@/infra/service";
 
 export function ResourcesPage() {
     const [activeTab, setActiveTab] = useState<string | null>("resources");
