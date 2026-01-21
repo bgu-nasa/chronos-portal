@@ -1,6 +1,6 @@
-import { Modal, TextInput, Button, Stack, NumberInput } from "@mantine/core";
-import { useState } from "react";
-import { $app } from "@/infra/service";
+import { Modal, TextInput, Button, Stack, NumberInput, Select } from "@mantine/core";
+import { useState, useEffect } from "react";
+import { userRepository } from "@/modules/resources/src/data";
 
 interface ActivityCreatorProps {
     opened: boolean;
@@ -20,8 +20,35 @@ export function ActivityCreator({
     loading = false,
 }: ActivityCreatorProps) {
     const [activityType, setActivityType] = useState("");
-    const [assignedUserId, setAssignedUserId] = useState("");
+    const [assignedUserId, setAssignedUserId] = useState<string | null>(null);
     const [expectedStudents, setExpectedStudents] = useState<number | null>(null);
+    const [users, setUsers] = useState<{ value: string; label: string }[]>([]);
+    const [isLoadingUsers, setIsLoadingUsers] = useState(false);
+
+    // Fetch users when modal opens
+    useEffect(() => {
+        if (opened) {
+            fetchUsers();
+        }
+    }, [opened]);
+
+    const fetchUsers = async () => {
+        setIsLoadingUsers(true);
+        try {
+            const userList = await userRepository.getAll();
+            const options = userList.map((user) => ({
+                value: user.id,
+                label: `${user.firstName} ${user.lastName} (${user.email})`,
+            }));
+            setUsers(options);
+            $app.logger.info("[ActivityCreator] Fetched users", { count: userList.length });
+        } catch (error) {
+            $app.logger.error("[ActivityCreator] Error fetching users:", error);
+            $app.notifications.showError("Error", "Failed to load users");
+        } finally {
+            setIsLoadingUsers(false);
+        }
+    };
 
     const handleSubmit = async () => {
         $app.logger.info("[ActivityCreator] handleSubmit called", {
@@ -38,19 +65,19 @@ export function ActivityCreator({
         $app.logger.info("[ActivityCreator] Calling onSubmit...");
         await onSubmit({
             activityType,
-            assignedUserId: assignedUserId.trim() || "00000000-0000-0000-0000-000000000000",
+            assignedUserId: assignedUserId || "",
             expectedStudents,
         });
 
         $app.logger.info("[ActivityCreator] onSubmit completed, resetting form");
         setActivityType("");
-        setAssignedUserId("");
+        setAssignedUserId(null);
         setExpectedStudents(null);
     };
 
     const handleClose = () => {
         setActivityType("");
-        setAssignedUserId("");
+        setAssignedUserId(null);
         setExpectedStudents(null);
         onClose();
     };
@@ -65,11 +92,15 @@ export function ActivityCreator({
                     onChange={(e) => setActivityType(e.currentTarget.value)}
                     required
                 />
-                <TextInput
-                    label="Assigned User ID"
-                    placeholder="User GUID (optional)"
+                <Select
+                    label="Assigned User (Optional)"
+                    placeholder="Select user or leave unassigned"
+                    data={users}
                     value={assignedUserId}
-                    onChange={(e) => setAssignedUserId(e.currentTarget.value)}
+                    onChange={setAssignedUserId}
+                    disabled={isLoadingUsers}
+                    searchable
+                    clearable
                 />
                 <NumberInput
                     label="Expected Students"
@@ -81,7 +112,7 @@ export function ActivityCreator({
                 <Button
                     onClick={handleSubmit}
                     loading={loading}
-                    disabled={!activityType.trim()}
+                    disabled={!activityType.trim() || isLoadingUsers}
                     fullWidth
                 >
                     Create Group

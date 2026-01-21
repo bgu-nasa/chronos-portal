@@ -7,6 +7,7 @@ interface SubjectActionsProps {
     onEditClick: () => void;
     onDeleteClick: () => void;
     onViewActivitiesClick: () => void;
+    hasDepartmentContext: boolean;
 }
 
 export function SubjectActions({
@@ -15,29 +16,30 @@ export function SubjectActions({
     onEditClick,
     onDeleteClick,
     onViewActivitiesClick,
+    hasDepartmentContext,
 }: SubjectActionsProps) {
     return (
         <Group mb="md">
-            <Button onClick={onCreateClick}>
+            <Button onClick={onCreateClick} disabled={!hasDepartmentContext}>
                 {resources.createButton}
             </Button>
             <Button 
                 onClick={onEditClick} 
-                disabled={!selectedSubject}
+                disabled={!selectedSubject || !hasDepartmentContext}
                 variant="outline"
             >
                 {resources.editButton}
             </Button>
             <Button 
                 onClick={onDeleteClick} 
-                disabled={!selectedSubject}
+                disabled={!selectedSubject || !hasDepartmentContext}
                 variant="outline"
             >
                 {resources.deleteButton}
             </Button>
             <Button 
                 onClick={onViewActivitiesClick} 
-                disabled={!selectedSubject}
+                disabled={!selectedSubject || !hasDepartmentContext}
                 variant="light"
             >
                 {resources.viewActivitiesButton}

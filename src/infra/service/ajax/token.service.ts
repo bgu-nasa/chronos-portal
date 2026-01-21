@@ -31,7 +31,7 @@ class TokenService {
                 this.token = JSON.parse(stored);
             }
         } catch (error) {
-            console.warn("Failed to load token from storage:", error);
+            $app.logger.warn("Failed to load token from storage:", error);
             this.clearToken();
         }
     }
@@ -43,7 +43,7 @@ class TokenService {
         try {
             localStorage.setItem(TOKEN_STORAGE_KEY, JSON.stringify(token));
         } catch (error) {
-            console.warn("Failed to save token to storage:", error);
+            $app.logger.warn("Failed to save token to storage:", error);
         }
     }
 
@@ -74,7 +74,7 @@ class TokenService {
         try {
             localStorage.removeItem(TOKEN_STORAGE_KEY);
         } catch (error) {
-            console.warn("Failed to clear token from storage:", error);
+            $app.logger.warn("Failed to clear token from storage:", error);
         }
     }
 

@@ -41,8 +41,14 @@ export function ResourceTypesPage() {
         const org = $app.organization.getOrganization();
         $app.logger.info("[ResourceTypesPage] Organization from context:", org);
 
+        if (!org?.id) {
+            $app.logger.error("[ResourceTypesPage] No organization context available");
+            $app.notifications.showError("Error", "Organization context missing. Please refresh and try again.");
+            return;
+        }
+
         const request = {
-            organizationId: org?.id || "00000000-0000-0000-0000-000000000000",
+            organizationId: org.id,
             type: data.type,
         };
 

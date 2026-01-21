@@ -1,11 +1,12 @@
-import { Modal, TextInput, Button, Stack } from "@mantine/core";
-import { useState } from "react";
-import { $app } from "@/infra/service";
+import { Modal, TextInput, Button, Stack, Select } from "@mantine/core";
+import { useState, useEffect } from "react";
+import { schedulingPeriodRepository } from "@/modules/resources/src/data";
+import resources from "./subject-creator.resources.json";
 
 interface SubjectCreatorProps {
     opened: boolean;
     onClose: () => void;
-    onSubmit: (data: { code: string; name: string }) => Promise<void>;
+    onSubmit: (data: { code: string; name: string; schedulingPeriodId: string }) => Promise<void>;
     loading?: boolean;
 }
 
@@ -17,26 +18,59 @@ export function SubjectCreator({
 }: SubjectCreatorProps) {
     const [code, setCode] = useState("");
     const [name, setName] = useState("");
+    const [schedulingPeriodId, setSchedulingPeriodId] = useState<string | null>(null);
+    const [schedulingPeriods, setSchedulingPeriods] = useState<{ value: string; label: string }[]>([]);
+    const [isLoadingPeriods, setIsLoadingPeriods] = useState(false);
+
+    // Fetch scheduling periods when modal opens
+    useEffect(() => {
+        if (opened) {
+            fetchSchedulingPeriods();
+        }
+    }, [opened]);
+
+    const fetchSchedulingPeriods = async () => {
+        setIsLoadingPeriods(true);
+        try {
+            const periods = await schedulingPeriodRepository.getAll();
+            const options = periods.map((period) => ({
+                value: period.id,
+                label: period.name,
+            }));
+            setSchedulingPeriods(options);
+            $app.logger.info(resources.logger.fetchedSchedulingPeriods, { count: options.length });
+        } catch (error) {
+            $app.logger.error(resources.logger.errorFetchingSchedulingPeriods, error);
+            $app.notifications.showError(
+                resources.notifications.loadSchedulingPeriodsError.title,
+                resources.notifications.loadSchedulingPeriodsError.message
+            );
+        } finally {
+            setIsLoadingPeriods(false);
+        }
+    };
 
     const handleSubmit = async () => {
-        $app.logger.info("[SubjectCreator] handleSubmit called", { code, name });
+        $app.logger.info(resources.logger.handleSubmitCalled, { code, name, schedulingPeriodId });
         
-        if (!code.trim() || !name.trim()) {
-            $app.logger.warn("[SubjectCreator] Validation failed - empty fields");
+        if (!code.trim() || !name.trim() || !schedulingPeriodId) {
+            $app.logger.warn(resources.logger.validationFailed);
             return;
         }
         
-        $app.logger.info("[SubjectCreator] Calling onSubmit...");
-        await onSubmit({ code, name });
+        $app.logger.info(resources.logger.callingOnSubmit);
+        await onSubmit({ code, name, schedulingPeriodId });
         
-        $app.logger.info("[SubjectCreator] onSubmit completed, resetting form");
+        $app.logger.info(resources.logger.onSubmitCompleted);
         setCode("");
         setName("");
+        setSchedulingPeriodId(null);
     };
 
     const handleClose = () => {
         setCode("");
         setName("");
+        setSchedulingPeriodId(null);
         onClose();
     };
 
@@ -44,31 +78,41 @@ export function SubjectCreator({
         <Modal
             opened={opened}
             onClose={handleClose}
-            title="Create Course"
+            title={resources.modalTitle}
             centered
         >
             <Stack>
                 <TextInput
-                    label="Course Code"
-                    placeholder="e.g. CS101"
+                    label={resources.codeLabel}
+                    placeholder={resources.codePlaceholder}
                     value={code}
                     onChange={(e) => setCode(e.currentTarget.value)}
                     required
                 />
                 <TextInput
-                    label="Course Name"
-                    placeholder="e.g. Operating Systems"
+                    label={resources.nameLabel}
+                    placeholder={resources.namePlaceholder}
                     value={name}
                     onChange={(e) => setName(e.currentTarget.value)}
+                    required
+                />
+                <Select
+                    label={resources.schedulingPeriodLabel}
+                    placeholder={resources.schedulingPeriodPlaceholder}
+                    data={schedulingPeriods}
+                    value={schedulingPeriodId}
+                    onChange={setSchedulingPeriodId}
+                    disabled={isLoadingPeriods}
+                    searchable
                     required
                 />
                 <Button
                     onClick={handleSubmit}
                     loading={loading}
-                    disabled={!code.trim() || !name.trim()}
+                    disabled={!code.trim() || !name.trim() || !schedulingPeriodId || isLoadingPeriods}
                     fullWidth
                 >
-                    Create Course
+                    {resources.submitButton}
                 </Button>
             </Stack>
         </Modal>

@@ -26,3 +26,6 @@ export * from "./resource-attribute-data-repository";
 // Resource Attribute Assignment types and repository
 export * from "./resource-attribute-assignment.types";
 export * from "./resource-attribute-assignment-data-repository";
+
+// External data (lightweight cross-module data access)
+export * from "./external";

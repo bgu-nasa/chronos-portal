@@ -60,7 +60,7 @@ export function useConfirmation(): UseConfirmationReturn {
                 onConfirm: params.onConfirm,
             });
         },
-        []
+        [],
     );
 
     const closeConfirmation = useCallback(() => {
@@ -81,7 +81,7 @@ export function useConfirmation(): UseConfirmationReturn {
                 await confirmationState.onConfirm();
                 closeConfirmation();
             } catch (error) {
-                console.error("Error during confirmation action:", error);
+                $app.logger.error("Error during confirmation action:", error);
             } finally {
                 setIsLoading(false);
             }

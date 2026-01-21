@@ -1,13 +1,13 @@
-import { Modal, TextInput, Button, Stack } from "@mantine/core";
+import { Modal, TextInput, Button, Stack, Select } from "@mantine/core";
 import { useState, useEffect } from "react";
-import { $app } from "@/infra/service";
+import { schedulingPeriodRepository } from "@/modules/resources/src/data";
 
 interface SubjectEditorProps {
     opened: boolean;
     onClose: () => void;
-    onSubmit: (data: { code: string; name: string }) => Promise<void>;
+    onSubmit: (data: { code: string; name: string; schedulingPeriodId: string }) => Promise<void>;
     loading?: boolean;
-    initialData?: { code: string; name: string };
+    initialData?: { code: string; name: string; schedulingPeriodId: string };
 }
 
 export function SubjectEditor({
@@ -19,33 +19,64 @@ export function SubjectEditor({
 }: SubjectEditorProps) {
     const [code, setCode] = useState("");
     const [name, setName] = useState("");
+    const [schedulingPeriodId, setSchedulingPeriodId] = useState<string | null>(null);
+    const [schedulingPeriods, setSchedulingPeriods] = useState<{ value: string; label: string }[]>([]);
+    const [isLoadingPeriods, setIsLoadingPeriods] = useState(false);
+
+    // Fetch scheduling periods when modal opens
+    useEffect(() => {
+        if (opened) {
+            fetchSchedulingPeriods();
+        }
+    }, [opened]);
 
     useEffect(() => {
         if (initialData) {
             setCode(initialData.code);
             setName(initialData.name);
+            setSchedulingPeriodId(initialData.schedulingPeriodId);
         }
     }, [initialData]);
 
+    const fetchSchedulingPeriods = async () => {
+        setIsLoadingPeriods(true);
+        try {
+            const periods = await schedulingPeriodRepository.getAll();
+            const options = periods.map((period) => ({
+                value: period.id,
+                label: period.name,
+            }));
+            setSchedulingPeriods(options);
+            $app.logger.info("[SubjectEditor] Fetched scheduling periods", { count: options.length });
+        } catch (error) {
+            $app.logger.error("[SubjectEditor] Error fetching scheduling periods:", error);
+            $app.notifications.showError("Error", "Failed to load scheduling periods");
+        } finally {
+            setIsLoadingPeriods(false);
+        }
+    };
+
     const handleSubmit = async () => {
-        $app.logger.info("[SubjectEditor] handleSubmit called", { code, name });
+        $app.logger.info("[SubjectEditor] handleSubmit called", { code, name, schedulingPeriodId });
         
-        if (!code.trim() || !name.trim()) {
+        if (!code.trim() || !name.trim() || !schedulingPeriodId) {
             $app.logger.warn("[SubjectEditor] Validation failed - empty fields");
             return;
         }
         
         $app.logger.info("[SubjectEditor] Calling onSubmit...");
-        await onSubmit({ code, name });
+        await onSubmit({ code, name, schedulingPeriodId });
         
         $app.logger.info("[SubjectEditor] onSubmit completed, resetting form");
         setCode("");
         setName("");
+        setSchedulingPeriodId(null);
     };
 
     const handleClose = () => {
         setCode("");
         setName("");
+        setSchedulingPeriodId(null);
         onClose();
     };
 
@@ -71,10 +102,20 @@ export function SubjectEditor({
                     onChange={(e) => setName(e.currentTarget.value)}
                     required
                 />
+                <Select
+                    label="Scheduling Period"
+                    placeholder="Select scheduling period"
+                    data={schedulingPeriods}
+                    value={schedulingPeriodId}
+                    onChange={setSchedulingPeriodId}
+                    disabled={isLoadingPeriods}
+                    searchable
+                    required
+                />
                 <Button
                     onClick={handleSubmit}
                     loading={loading}
-                    disabled={!code.trim() || !name.trim()}
+                    disabled={!code.trim() || !name.trim() || !schedulingPeriodId || isLoadingPeriods}
                     fullWidth
                 >
                     Save Changes

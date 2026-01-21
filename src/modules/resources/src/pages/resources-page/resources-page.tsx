@@ -23,7 +23,6 @@ import resourcesJson from "./resources-page.resources.json";
 import resourceTypesJson from "../resource-types-page/resource-types-page.resources.json";
 import resourceAttributesJson from "../resource-attributes-page/resource-attributes-page.resources.json";
 import styles from "./resources-page.module.css";
-import { $app } from "@/infra/service";
 
 export function ResourcesPage() {
     const [activeTab, setActiveTab] = useState<string | null>("resources");
@@ -94,9 +93,15 @@ export function ResourcesPage() {
         const org = $app.organization.getOrganization();
         $app.logger.info("[ResourcesPage] Organization from context:", org);
 
+        if (!org?.id) {
+            $app.logger.error("[ResourcesPage] No organization context available");
+            $app.notifications.showError("Error", "Organization context missing. Please refresh and try again.");
+            return;
+        }
+
         const request = {
             id: crypto.randomUUID(),
-            organizationId: org?.id || "00000000-0000-0000-0000-000000000000",
+            organizationId: org.id,
             resourceTypeId: data.resourceTypeId,
             location: data.location,
             identifier: data.identifier,
@@ -208,8 +213,14 @@ export function ResourcesPage() {
         const org = $app.organization.getOrganization();
         $app.logger.info("[ResourcesPage] Organization from context:", org);
 
+        if (!org?.id) {
+            $app.logger.error("[ResourcesPage] No organization context available");
+            $app.notifications.showError("Error", "Organization context missing. Please refresh and try again.");
+            return;
+        }
+
         const request = {
-            organizationId: org?.id || "00000000-0000-0000-0000-000000000000",
+            organizationId: org.id,
             type: data.type,
         };
 

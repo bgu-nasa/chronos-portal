@@ -1,6 +1,11 @@
 import type { ModuleConfig } from "@/infra";
 import React from "react";
-import { LoginPage, RegisterPage, UsersPage } from "./src/pages";
+import {
+    LoginPage,
+    RegisterPage,
+    UsersPage,
+    ProfileSettingsPage,
+} from "./src/pages";
 import { UsersIcon } from "@/common/icons";
 
 export const moduleConfig: ModuleConfig = {
@@ -23,6 +28,12 @@ export const moduleConfig: ModuleConfig = {
             name: "users",
             path: "/users",
             element: React.createElement(UsersPage),
+        },
+        {
+            authorize: true,
+            name: "profile-settings",
+            path: "/profile-settings",
+            element: React.createElement(ProfileSettingsPage),
         },
     ],
     navigationItems: [

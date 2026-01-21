@@ -1,12 +1,5 @@
 import { useState, useEffect } from "react";
-import {
-    Container,
-    Divider,
-    Title,
-    Loader,
-    Center,
-    Alert,
-} from "@mantine/core";
+import { Container, Divider, Title, Loader, Center } from "@mantine/core";
 import { UserActions } from "@/modules/auth/src/pages/users/components/user-actions";
 import { UserTable } from "@/modules/auth/src/pages/users/components/user-table/user-table";
 import { UserEditor } from "@/modules/auth/src/pages/users/components/user-editor";
@@ -17,7 +10,7 @@ import styles from "./users-page.module.css";
 
 export function UsersPage() {
     const [selectedUser, setSelectedUser] = useState<UserData | null>(null);
-    const { users, isLoading, error, fetchUsers } = useUsers();
+    const { users, isLoading, fetchUsers } = useUsers();
 
     // Fetch users on mount
     useEffect(() => {
@@ -46,12 +39,6 @@ export function UsersPage() {
             <div className={styles.container}>
                 <Title order={1}>{resources.title}</Title>
                 <Divider className={styles.divider} />
-
-                {error && (
-                    <Alert title="Error" color="red" mb="md">
-                        {error}
-                    </Alert>
-                )}
 
                 <UserActions selectedUser={selectedUser} />
 

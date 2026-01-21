@@ -1,9 +1,9 @@
 import { useEffect, useState } from "react";
 import { Modal, Select, Button, Stack, Text, Group, Chip, Box, ActionIcon } from "@mantine/core";
-import { useSlotEditorStore } from "@/modules/schedule/src/stores/slot-editor.store";
-import { useCreateSlot, useUpdateSlot } from "@/modules/schedule/src/hooks/use-slots";
-import { Weekday, WeekdayOrder } from "@/modules/schedule/src/data/slot.types";
-import resources from "@/modules/schedule/src/pages/slots-page/slots-page.resources.json";
+import { useSlotEditorStore } from "@/modules/schedule/src/stores";
+import { useCreateSlot, useUpdateSlot } from "@/modules/schedule/src/hooks";
+import { Weekday, WeekdayOrder } from "@/modules/schedule/src/data";
+import resources from "@/modules/schedule/src/pages/scheduling-periods-page/slot.resources.json";
 
 interface SlotEditorProps {
     schedulingPeriodId: string;
@@ -82,7 +82,7 @@ function TimeSpinner({ label, totalMinutes, onChange, error }: TimeSpinnerProps)
                     −
                 </ActionIcon>
             </Stack>
-            {error && <Text size="xs" c="red" mt={4}>{error}</Text>}
+            {error && <Text size="xs" c="var(--mantine-color-error)" mt={4}>{error}</Text>}
         </Box>
     );
 }
@@ -293,7 +293,7 @@ export function SlotEditor({ schedulingPeriodId }: SlotEditorProps) {
                                         ))}
                                     </Group>
                                 </Chip.Group>
-                                {errors.days && <Text size="xs" c="red" mt="xs">{errors.days}</Text>}
+                                {errors.days && <Text size="xs" c="var(--mantine-color-error)" mt="xs">{errors.days}</Text>}
                             </div>
 
                             <Group grow align="flex-start">
@@ -359,7 +359,7 @@ export function SlotEditor({ schedulingPeriodId }: SlotEditorProps) {
                     )}
 
                     {apiError && (
-                        <Text c="red" size="sm">
+                        <Text c="var(--mantine-color-error)" size="sm">
                             {apiError}
                         </Text>
                     )}

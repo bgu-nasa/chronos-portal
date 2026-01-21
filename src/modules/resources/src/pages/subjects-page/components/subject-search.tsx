@@ -1,6 +1,6 @@
 import { Button, TextInput, Group, Paper } from "@mantine/core";
 import { DepartmentSelect } from "@/common/components/department-select";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 export interface SubjectSearchFilters {
     departmentId: string;
@@ -18,9 +18,13 @@ export function SubjectSearch({ onSearch, onClear }: SubjectSearchProps) {
     const [code, setCode] = useState("");
     const [name, setName] = useState("");
 
-    const handleSearch = () => {
-        onSearch({ departmentId, code, name });
-    };
+    // Automatically trigger search when any filter changes
+    useEffect(() => {
+        if (departmentId) {
+            onSearch({ departmentId, code, name });
+        }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [departmentId, code, name]);
 
     const handleClear = () => {
         setDepartmentId("");
@@ -32,13 +36,14 @@ export function SubjectSearch({ onSearch, onClear }: SubjectSearchProps) {
     return (
         <Paper shadow="xs" p="md" mb="md">
             <Group align="flex-end">
-                <DepartmentSelect
-                    value={departmentId}
-                    onChange={(value) => setDepartmentId(value || "")}
-                    label="Department"
-                    placeholder="Select department"
-                    style={{ flex: 1 }}
-                />
+                <div style={{ flex: 1 }}>
+                    <DepartmentSelect
+                        value={departmentId}
+                        onChange={(value) => setDepartmentId(value || "")}
+                        label="Department"
+                        placeholder="Select department"
+                    />
+                </div>
                 <TextInput
                     label="Course Code"
                     placeholder="e.g. CS101"
@@ -53,7 +58,6 @@ export function SubjectSearch({ onSearch, onClear }: SubjectSearchProps) {
                     onChange={(e) => setName(e.currentTarget.value)}
                     style={{ flex: 1 }}
                 />
-                <Button onClick={handleSearch}>Search</Button>
                 <Button variant="outline" onClick={handleClear}>
                     Clear Filters
                 </Button>

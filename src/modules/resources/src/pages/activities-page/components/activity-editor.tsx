@@ -1,20 +1,20 @@
-import { Modal, TextInput, Button, Stack, NumberInput } from "@mantine/core";
+import { Modal, TextInput, Button, Stack, NumberInput, Select } from "@mantine/core";
 import { useState, useEffect } from "react";
-import { $app } from "@/infra/service";
+import { userRepository } from "@/modules/resources/src/data";
 
 interface ActivityEditorProps {
-    opened: boolean;
-    onClose: () => void;
-    onSubmit: (data: {
+    readonly opened: boolean;
+    readonly onClose: () => void;
+    readonly onSubmit: (data: {
         activityType: string;
         assignedUserId: string;
         expectedStudents: number | null;
     }) => Promise<void>;
-    loading?: boolean;
-    initialData?: {
-        activityType: string;
-        assignedUserId: string;
-        expectedStudents: number;
+    readonly loading?: boolean;
+    readonly initialData?: {
+        readonly activityType: string;
+        readonly assignedUserId: string;
+        readonly expectedStudents: number | null;
     };
 }
 
@@ -26,16 +26,46 @@ export function ActivityEditor({
     initialData,
 }: ActivityEditorProps) {
     const [activityType, setActivityType] = useState("");
-    const [assignedUserId, setAssignedUserId] = useState("");
+    const [assignedUserId, setAssignedUserId] = useState<string | null>(null);
     const [expectedStudents, setExpectedStudents] = useState<number | null>(null);
+    const [users, setUsers] = useState<{ value: string; label: string }[]>([]);
+    const [isLoadingUsers, setIsLoadingUsers] = useState(false);
+
+    // Fetch users when modal opens
+    useEffect(() => {
+        if (opened) {
+            fetchUsers();
+        }
+    }, [opened]);
 
     useEffect(() => {
         if (initialData) {
             setActivityType(initialData.activityType);
-            setAssignedUserId(initialData.assignedUserId);
+            // Check if assigned user is empty or unassigned, if so set to null
+            const isUnassigned = !initialData.assignedUserId || 
+                initialData.assignedUserId.trim().length === 0;
+            setAssignedUserId(isUnassigned ? null : initialData.assignedUserId);
             setExpectedStudents(initialData.expectedStudents);
         }
     }, [initialData]);
+
+    const fetchUsers = async () => {
+        setIsLoadingUsers(true);
+        try {
+            const userList = await userRepository.getAll();
+            const options = userList.map((user) => ({
+                value: user.id,
+                label: `${user.firstName} ${user.lastName} (${user.email})`,
+            }));
+            setUsers(options);
+            $app.logger.info("[ActivityEditor] Fetched users", { count: userList.length });
+        } catch (error) {
+            $app.logger.error("[ActivityEditor] Error fetching users:", error);
+            $app.notifications.showError("Error", "Failed to load users");
+        } finally {
+            setIsLoadingUsers(false);
+        }
+    };
 
     const handleSubmit = async () => {
         $app.logger.info("[ActivityEditor] handleSubmit called", {
@@ -52,19 +82,19 @@ export function ActivityEditor({
         $app.logger.info("[ActivityEditor] Calling onSubmit...");
         await onSubmit({
             activityType,
-            assignedUserId: assignedUserId.trim() || "00000000-0000-0000-0000-000000000000",
+            assignedUserId: assignedUserId || "",
             expectedStudents,
         });
 
         $app.logger.info("[ActivityEditor] onSubmit completed, resetting form");
         setActivityType("");
-        setAssignedUserId("");
+        setAssignedUserId(null);
         setExpectedStudents(null);
     };
 
     const handleClose = () => {
         setActivityType("");
-        setAssignedUserId("");
+        setAssignedUserId(null);
         setExpectedStudents(null);
         onClose();
     };
@@ -79,11 +109,15 @@ export function ActivityEditor({
                     onChange={(e) => setActivityType(e.currentTarget.value)}
                     required
                 />
-                <TextInput
-                    label="Assigned User ID"
-                    placeholder="User GUID (optional)"
+                <Select
+                    label="Assigned User (Optional)"
+                    placeholder="Select user or leave unassigned"
+                    data={users}
                     value={assignedUserId}
-                    onChange={(e) => setAssignedUserId(e.currentTarget.value)}
+                    onChange={setAssignedUserId}
+                    disabled={isLoadingUsers}
+                    searchable
+                    clearable
                 />
                 <NumberInput
                     label="Expected Students"
@@ -95,7 +129,7 @@ export function ActivityEditor({
                 <Button
                     onClick={handleSubmit}
                     loading={loading}
-                    disabled={!activityType.trim()}
+                    disabled={!activityType.trim() || isLoadingUsers}
                     fullWidth
                 >
                     Save Changes

@@ -1,15 +1,15 @@
 {
-    "title": "Scheduling Periods",
+    "title": "Semesters",
     "nameColumn": "Name",
     "fromDateColumn": "From Date",
     "toDateColumn": "To Date",
     "createButton": "Create",
     "editButton": "Edit",
     "deleteButton": "Delete",
-    "editorCreateTitle": "Create Scheduling Period",
-    "editorEditTitle": "Edit Scheduling Period",
+    "editorCreateTitle": "Create Semester",
+    "editorEditTitle": "Edit Semester",
     "editorNameLabel": "Name",
-    "editorNamePlaceholder": "Enter scheduling period name",
+    "editorNamePlaceholder": "Enter semester name",
     "editorFromDateLabel": "From Date",
     "editorFromDatePlaceholder": "Select start date",
     "editorToDateLabel": "To Date",
@@ -20,9 +20,9 @@
     "editorCreateButton": "Create",
     "editorSaveButton": "Save",
     "editorCancelButton": "Cancel",
-    "deleteConfirmTitle": "Delete Scheduling Period",
-    "deleteConfirmMessage": "Are you sure you want to delete the scheduling period \"{name}\"? This action cannot be undone.",
+    "deleteConfirmTitle": "Delete Semester",
+    "deleteConfirmMessage": "Are you sure you want to delete the semester \"{name}\"? This action cannot be undone.",
     "deleteConfirmButton": "Delete",
     "deleteCancelButton": "Cancel",
-    "emptyStateMessage": "No scheduling periods found. Click \"Create\" to add one."
+    "emptyStateMessage": "No semesters found. Click \"Create\" to add one."
 }
