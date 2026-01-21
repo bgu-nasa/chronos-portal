@@ -27,10 +27,6 @@ export function SubjectSearch({ onSearch, onClear }: SubjectSearchProps) {
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [departmentId]);
 
-    const handleSearch = () => {
-        onSearch({ departmentId, code, name });
-    };
-
     const handleClear = () => {
         setDepartmentId("");
         setCode("");
@@ -62,7 +58,6 @@ export function SubjectSearch({ onSearch, onClear }: SubjectSearchProps) {
                     onChange={(e) => setName(e.currentTarget.value)}
                     style={{ flex: 1 }}
                 />
-                <Button onClick={handleSearch}>Search</Button>
                 <Button variant="outline" onClick={handleClear}>
                     Clear Filters
                 </Button>

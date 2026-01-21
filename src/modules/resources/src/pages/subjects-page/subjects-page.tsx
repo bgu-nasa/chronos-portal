@@ -28,7 +28,7 @@ export function SubjectsPage() {
     const [currentDepartmentName, setCurrentDepartmentName] = useState<string | null>(null);
     const [schedulingPeriods, setSchedulingPeriods] = useState<Map<string, string>>(new Map());
     
-    const { subjects, fetchSubjects, setCurrentDepartment, clearState } = useSubjects();
+    const { subjects, fetchSubjects, setCurrentDepartment } = useSubjects();
     const { createSubject, isLoading: isCreating } = useCreateSubject();
     const { updateSubject, isLoading: isEditing } = useUpdateSubject();
     const { deleteSubject } = useDeleteSubject();
@@ -87,7 +87,6 @@ export function SubjectsPage() {
         setCurrentDepartmentId(null);
         setCurrentDepartmentName(null);
         setSelectedSubject(null);
-        clearState();
     };
 
     const handleCreateClick = () => {
@@ -100,22 +99,15 @@ export function SubjectsPage() {
         
         if (!currentDepartmentId) {
             $app.logger.error("[SubjectsPage] No department ID set");
-            $app.notifications.showError("Error", "Department context missing for creating a course.");
             return;
         }
 
         const org = $app.organization.getOrganization();
         $app.logger.info("[SubjectsPage] Organization from context:", org);
 
-        if (!org?.id) {
-            $app.logger.error("[SubjectsPage] No organization context available");
-            $app.notifications.showError("Error", "Organization context missing. Please refresh and try again.");
-            return;
-        }
-
         const request = {
             id: crypto.randomUUID(),
-            organizationId: org.id,
+            organizationId: org?.id || "00000000-0000-0000-0000-000000000000",
             departmentId: currentDepartmentId,
             schedulingPeriodId: data.schedulingPeriodId,
             code: data.code,
@@ -130,15 +122,12 @@ export function SubjectsPage() {
             
             if (result) {
                 setCreateModalOpened(false);
-                $app.notifications.showSuccess("Success", "Course created successfully");
                 fetchSubjects();
             } else {
                 $app.logger.error("[SubjectsPage] Create subject returned null");
-                $app.notifications.showError("Error", "Failed to create course. Check console for details.");
             }
         } catch (error) {
             $app.logger.error("[SubjectsPage] Error creating subject:", error);
-            $app.notifications.showError("Error", `Error creating course: ${error instanceof Error ? error.message : "Unknown error"}`);
         }
     };
 
@@ -155,21 +144,14 @@ export function SubjectsPage() {
         
         if (!selectedSubject || !currentDepartmentId) {
             $app.logger.error("[SubjectsPage] Missing selectedSubject or currentDepartmentId");
-            $app.notifications.showWarning("Warning", "Missing course or department context for edit.");
             return;
         }
 
         const org = $app.organization.getOrganization();
         $app.logger.info("[SubjectsPage] Organization from context:", org);
 
-        if (!org?.id) {
-            $app.logger.error("[SubjectsPage] No organization context available");
-            $app.notifications.showError("Error", "Organization context missing. Please refresh and try again.");
-            return;
-        }
-
         const request: UpdateSubjectRequest = {
-            organizationId: org.id,
+            organizationId: org?.id || "00000000-0000-0000-0000-000000000000",
             departmentId: currentDepartmentId,
             schedulingPeriodId: data.schedulingPeriodId,
             code: data.code,
@@ -185,15 +167,12 @@ export function SubjectsPage() {
             if (success) {
                 setEditModalOpened(false);
                 setSelectedSubject(null);
-                $app.notifications.showSuccess("Success", "Course updated successfully");
                 fetchSubjects();
             } else {
                 $app.logger.error("[SubjectsPage] Update subject returned false");
-                $app.notifications.showError("Error", "Failed to update course. Check console for details.");
             }
         } catch (error) {
             $app.logger.error("[SubjectsPage] Error updating subject:", error);
-            $app.notifications.showError("Error", `Error updating course: ${error instanceof Error ? error.message : "Unknown error"}`);
         }
     };
 
@@ -210,10 +189,7 @@ export function SubjectsPage() {
                 const success = await deleteSubject(selectedSubject.id);
                 if (success) {
                     setSelectedSubject(null);
-                    $app.notifications.showSuccess("Success", "Course deleted successfully");
-                    fetchSubjects();
-                } else {
-                    $app.notifications.showError("Error", "Failed to delete course. Check console for details.");
+                    fetchSubjects(); // Refresh the list
                 }
             },
         });
@@ -229,7 +205,7 @@ export function SubjectsPage() {
 
     // Convert SubjectResponse to SubjectData with display names
     // Only show subjects if department context is set
-    // Filter subjects by the selected department
+    // Filter subjects by the selected department ID
     const subjectData: SubjectData[] = currentDepartmentId
         ? subjects
             .filter((subject) => subject.departmentId === currentDepartmentId)
