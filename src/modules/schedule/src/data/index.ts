@@ -8,3 +8,5 @@ export * from "./resource.types";
 export * from "./resource-data-repository";
 export * from "./activity.types";
 export * from "./activity-data-repository";
+export * from "./constraints.types";
+export * from "./constraint-data-repository";

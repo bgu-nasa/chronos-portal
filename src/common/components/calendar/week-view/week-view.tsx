@@ -2,25 +2,35 @@
 import React, { useState, useMemo } from 'react';
 import { Box, Button, Group, Text, Paper } from '@mantine/core';
 import { useHotkeys } from '@mantine/hooks';
-import { WeekHeader } from './week-header';
-import { TimeGrid } from './time-grid';
+
 import type { CalendarEvent } from "@/common/types";
 
+import { WeekHeader, TimeGrid } from './';
 import styles from './week-view.module.css';
 import resources from './week-view.resources.json';
+
+interface ConstraintVisualization {
+  weekday: string;
+  startTime: string;
+  endTime: string;
+}
 
 interface WeekViewProps {
   initialDate?: Date;
   events: CalendarEvent[];
+  constraints?: ConstraintVisualization[];
   dayStartHour?: number;
   dayEndHour?: number;
+  onTimeRangeSelect?: (selection: { date: Date; startTime: string; endTime: string }) => void;
 }
 
 export const WeekView: React.FC<WeekViewProps> = ({
   initialDate = new Date(),
   events,
+  constraints = [],
   dayStartHour = resources.config.defaultStartHour,
-  dayEndHour = resources.config.defaultEndHour
+  dayEndHour = resources.config.defaultEndHour,
+  onTimeRangeSelect
 }) => {
   const [currentDate, setCurrentDate] = useState(initialDate);
 
@@ -83,9 +93,11 @@ export const WeekView: React.FC<WeekViewProps> = ({
         <TimeGrid
           weekDates={weekDates}
           events={events}
+          constraints={constraints}
           dayStartHour={dayStartHour}
           hoursPerDay={hoursPerDay}
           hourHeight={resources.config.hourHeight || 60}
+          onTimeRangeSelect={onTimeRangeSelect}
         />
       </Box>
     </Paper>

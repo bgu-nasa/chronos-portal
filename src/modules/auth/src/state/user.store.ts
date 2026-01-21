@@ -22,7 +22,7 @@ interface UserStore {
     createUser: (request: CreateUserRequest) => Promise<UserResponse | null>;
     updateUser: (
         userId: string,
-        request: UserUpdateRequest
+        request: UserUpdateRequest,
     ) => Promise<boolean>;
     updateMyProfile: (request: UserUpdateRequest) => Promise<boolean>;
     deleteUser: (userId: string) => Promise<boolean>;
@@ -48,7 +48,7 @@ export const useUserStore = create<UserStore>((set, get) => ({
             const errorMessage =
                 err instanceof Error ? err.message : "Failed to fetch users";
             set({ error: errorMessage, isLoading: false });
-            console.error("Error fetching users:", err);
+            $app.logger.error("Error fetching users:", err);
         }
     },
 
@@ -67,7 +67,7 @@ export const useUserStore = create<UserStore>((set, get) => ({
             const errorMessage =
                 err instanceof Error ? err.message : "Failed to create user";
             set({ error: errorMessage, isLoading: false });
-            console.error("Error creating user:", err);
+            $app.logger.error("Error creating user:", err);
             return null;
         }
     },
@@ -87,7 +87,7 @@ export const useUserStore = create<UserStore>((set, get) => ({
             const errorMessage =
                 err instanceof Error ? err.message : "Failed to update user";
             set({ error: errorMessage, isLoading: false });
-            console.error("Error updating user:", err);
+            $app.logger.error("Error updating user:", err);
             return false;
         }
     },
@@ -107,7 +107,7 @@ export const useUserStore = create<UserStore>((set, get) => ({
             const errorMessage =
                 err instanceof Error ? err.message : "Failed to update profile";
             set({ error: errorMessage, isLoading: false });
-            console.error("Error updating profile:", err);
+            $app.logger.error("Error updating profile:", err);
             return false;
         }
     },
@@ -127,7 +127,7 @@ export const useUserStore = create<UserStore>((set, get) => ({
             const errorMessage =
                 err instanceof Error ? err.message : "Failed to delete user";
             set({ error: errorMessage, isLoading: false });
-            console.error("Error deleting user:", err);
+            $app.logger.error("Error deleting user:", err);
             return false;
         }
     },

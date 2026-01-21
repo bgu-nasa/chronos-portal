@@ -3,18 +3,18 @@ import { useState, useEffect } from "react";
 import { $app } from "@/infra/service";
 
 interface ActivityEditorProps {
-    opened: boolean;
-    onClose: () => void;
-    onSubmit: (data: {
+    readonly opened: boolean;
+    readonly onClose: () => void;
+    readonly onSubmit: (data: {
         activityType: string;
         assignedUserId: string;
         expectedStudents: number | null;
     }) => Promise<void>;
-    loading?: boolean;
-    initialData?: {
-        activityType: string;
-        assignedUserId: string;
-        expectedStudents: number;
+    readonly loading?: boolean;
+    readonly initialData?: {
+        readonly activityType: string;
+        readonly assignedUserId: string;
+        readonly expectedStudents: number | null;
     };
 }
 

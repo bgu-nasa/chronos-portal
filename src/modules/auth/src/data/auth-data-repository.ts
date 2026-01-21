@@ -8,6 +8,7 @@ import type {
     LoginResponse,
     RegisterRequest,
     RegisterResponse,
+    PasswordUpdateRequest,
 } from "./auth.types";
 
 /**
@@ -33,7 +34,7 @@ export class AuthDataRepository {
         const response = await $app.ajax.post<LoginResponse>(
             "/api/auth/login",
             request,
-            { auth: false }
+            { auth: false },
         );
 
         // Save token to storage
@@ -57,7 +58,7 @@ export class AuthDataRepository {
         const response = await $app.ajax.post<RegisterResponse>(
             "/api/auth/register",
             request,
-            { auth: false }
+            { auth: false },
         );
 
         // Save token to storage
@@ -82,6 +83,18 @@ export class AuthDataRepository {
      */
     isAuthenticated(): boolean {
         return $app.token.hasToken();
+    }
+
+    /**
+     * Update the authenticated user's password
+     * @param request - Password update request with old and new passwords
+     * @returns void (HTTP 204 No Content)
+     */
+    async updatePassword(request: PasswordUpdateRequest): Promise<void> {
+        await $app.ajax.put<void>("/api/auth/password", {
+            OldPassword: request.oldPassword,
+            NewPassword: request.newPassword,
+        });
     }
 }
 

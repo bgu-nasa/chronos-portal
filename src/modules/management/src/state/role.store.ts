@@ -21,7 +21,7 @@ interface RoleStore {
     // Actions
     fetchRoleAssignments: () => Promise<void>;
     createRoleAssignment: (
-        request: RoleAssignmentRequest
+        request: RoleAssignmentRequest,
     ) => Promise<RoleAssignmentResponse | null>;
     removeRoleAssignment: (roleAssignmentId: string) => Promise<boolean>;
 
@@ -48,7 +48,7 @@ export const useRoleStore = create<RoleStore>((set, get) => ({
                     ? err.message
                     : "Failed to fetch role assignments";
             set({ error: errorMessage, isLoading: false });
-            console.error("Error fetching role assignments:", err);
+            $app.logger.error("Error fetching role assignments:", err);
         }
     },
 
@@ -56,9 +56,8 @@ export const useRoleStore = create<RoleStore>((set, get) => ({
     createRoleAssignment: async (request: RoleAssignmentRequest) => {
         set({ isLoading: true, error: null });
         try {
-            const newAssignment = await roleDataRepository.createRoleAssignment(
-                request
-            );
+            const newAssignment =
+                await roleDataRepository.createRoleAssignment(request);
             set({ isLoading: false });
 
             // Refetch to update the list
@@ -71,7 +70,7 @@ export const useRoleStore = create<RoleStore>((set, get) => ({
                     ? err.message
                     : "Failed to create role assignment";
             set({ error: errorMessage, isLoading: false });
-            console.error("Error creating role assignment:", err);
+            $app.logger.error("Error creating role assignment:", err);
             return null;
         }
     },
@@ -93,7 +92,7 @@ export const useRoleStore = create<RoleStore>((set, get) => ({
                     ? err.message
                     : "Failed to remove role assignment";
             set({ error: errorMessage, isLoading: false });
-            console.error("Error removing role assignment:", err);
+            $app.logger.error("Error removing role assignment:", err);
             return false;
         }
     },

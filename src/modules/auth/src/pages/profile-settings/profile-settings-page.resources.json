@@ -1,0 +1,13 @@
+{
+    "title": "Profile Settings",
+    "description": "Manage your profile information and account settings",
+    "sections": {
+        "profileInfo": "Profile Information",
+        "dangerZone": "Danger Zone"
+    },
+    "dangerZone": {
+        "passwordTitle": "Update Password",
+        "passwordDescription": "Change your account password. Make sure it's strong and unique.",
+        "passwordButton": "Update Password"
+    }
+}

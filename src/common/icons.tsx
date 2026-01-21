@@ -13,6 +13,7 @@ import {
     HiOutlineCalendar,
     HiOutlineCog,
     HiOutlineLogout,
+    HiOutlineAdjustments,
     HiOutlineCollection,
     HiOutlineBookOpen,
     HiOutlineOfficeBuilding,
@@ -37,6 +38,7 @@ export const AccessControlIcon = HiOutlineLockOpen;
 export const ScheduleIcon = HiOutlineCalendar;
 export const SchedulingPeriodsIcon = HiOutlineCalendar;
 export const CalendarIcon = HiOutlineCalendar;
+export const ConstraintsIcon = HiOutlineAdjustments;
 export const ResourcesIcon = HiOutlineCollection;
 export const CoursesIcon = HiOutlineBookOpen;
 export const ResourceManagementIcon = HiOutlineOfficeBuilding;
