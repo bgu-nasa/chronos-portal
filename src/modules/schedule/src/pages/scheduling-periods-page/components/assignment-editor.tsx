@@ -5,13 +5,13 @@
 
 import { useEffect, useState, useMemo } from "react";
 import { Modal, Select, Button, Group, Text, Stack } from "@mantine/core";
-import { useAssignmentEditorStore } from "@/modules/schedule/src/stores/assignment-editor.store";
+import { useAssignmentEditorStore } from "@/modules/schedule/src/stores";
 import {
     useCreateAssignment,
     useUpdateAssignment,
-} from "@/modules/schedule/src/hooks/use-assignments";
-import { useResources } from "@/modules/schedule/src/hooks/use-resources";
-import { useActivities } from "@/modules/schedule/src/hooks/use-activities";
+    useResources,
+    useActivities,
+} from "@/modules/schedule/src/hooks";
 
 export function AssignmentEditor() {
     const { isOpen, mode, assignment, slotId, close } = useAssignmentEditorStore();
